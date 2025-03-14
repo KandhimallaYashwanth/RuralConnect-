@@ -24,6 +24,7 @@ langButtons.forEach(button => {
     
     // Here you would normally handle language change logic
     console.log('Language changed to:', button.textContent.trim());
+    notify(`Language changed to: ${button.textContent.trim()}`, 'success');
   });
 });
 
@@ -66,9 +67,59 @@ document.addEventListener('DOMContentLoaded', () => {
           thumbnail.appendChild(removeBtn);
           filePreview.appendChild(thumbnail);
         });
+        
+        notify('Files uploaded successfully', 'success');
       }
     });
   }
+  
+  // Handle form submission for report issue
+  const reportForm = document.getElementById('report-issue-form');
+  if (reportForm) {
+    reportForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleReportIssueSubmit();
+    });
+  }
+  
+  // Add click handlers to buttons in HTML version
+  const resourceButtons = document.querySelectorAll('.download-btn');
+  resourceButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
+      notify(`Downloading resource: ${resourceTitle}`, 'info');
+    });
+  });
+  
+  const eventDetailButtons = document.querySelectorAll('.event-card .btn-outline-accent');
+  eventDetailButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const eventTitle = this.closest('.event-card').querySelector('h3').textContent;
+      notify(`Viewing details for event: ${eventTitle}`, 'info');
+    });
+  });
+  
+  const issueActionButtons = document.querySelectorAll('.issue-actions .btn');
+  issueActionButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const text = this.textContent.trim();
+      notify(`${text} for issue #RCI-2023-06-15`, 'info');
+    });
+  });
+  
+  // Add smooth scrolling to all internal links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
 });
 
 // Animations on scroll
@@ -94,6 +145,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Create a basic popup notification system
 const notify = (message, type = 'info') => {
+  // Remove any notifications with the same message to prevent duplicates
+  const existingNotifications = document.querySelectorAll('.notification');
+  existingNotifications.forEach(notification => {
+    if (notification.textContent.includes(message)) {
+      notification.remove();
+    }
+  });
+  
   const notification = document.createElement('div');
   notification.className = `notification ${type}`;
   notification.textContent = message;
@@ -102,78 +161,118 @@ const notify = (message, type = 'info') => {
   closeBtn.className = 'notification-close';
   closeBtn.innerHTML = '&times;';
   closeBtn.addEventListener('click', () => {
-    notification.remove();
+    notification.classList.add('fadeOut');
+    setTimeout(() => notification.remove(), 500);
   });
   
   notification.appendChild(closeBtn);
   document.body.appendChild(notification);
   
+  // Apply CSS if it's not already in the page
+  if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+      .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: var(--border-radius, 0.5rem);
+        background-color: var(--white, white);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        min-width: 250px;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out forwards;
+      }
+      .notification.info { border-left: 4px solid var(--sky, #7EC8E3); }
+      .notification.success { border-left: 4px solid var(--leaf, #4D724D); }
+      .notification.warning { border-left: 4px solid var(--mustard, #F0C05A); }
+      .notification.error { border-left: 4px solid var(--terracotta, #CD5D45); }
+      .notification-close {
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 20px;
+      }
+      .notification.fadeOut {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
   // Auto remove after 5 seconds
   setTimeout(() => {
-    notification.classList.add('fadeOut');
-    setTimeout(() => notification.remove(), 500);
+    if (document.body.contains(notification)) {
+      notification.classList.add('fadeOut');
+      setTimeout(() => notification.remove(), 500);
+    }
   }, 5000);
   
   return notification;
 };
-
-// Add this CSS for notifications to styles.css
-// .notification {
-//   position: fixed;
-//   bottom: 20px;
-//   right: 20px;
-//   padding: 15px 20px;
-//   border-radius: var(--border-radius);
-//   background-color: var(--white);
-//   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-//   display: flex;
-//   align-items: center;
-//   justify-content: space-between;
-//   z-index: 1000;
-//   min-width: 250px;
-//   max-width: 400px;
-//   animation: slideIn 0.3s ease-out forwards;
-// }
-// .notification.info { border-left: 4px solid var(--sky); }
-// .notification.success { border-left: 4px solid var(--leaf); }
-// .notification.warning { border-left: 4px solid var(--mustard); }
-// .notification.error { border-left: 4px solid var(--terracotta); }
-// .notification-close {
-//   cursor: pointer;
-//   margin-left: 10px;
-//   font-size: 20px;
-// }
-// .notification.fadeOut {
-//   animation: fadeOut 0.5s ease-out forwards;
-// }
-// @keyframes slideIn {
-//   from { transform: translateX(100%); opacity: 0; }
-//   to { transform: translateX(0); opacity: 1; }
-// }
-// @keyframes fadeOut {
-//   from { opacity: 1; }
-//   to { opacity: 0; }
-// }
-
-// Example usage:
-// notify('Your issue has been reported successfully!', 'success');
-// notify('Please fill all required fields.', 'warning');
-// notify('Error saving your data. Please try again.', 'error');
-// notify('Loading your profile...', 'info');
 
 // Placeholder for the report issue form submission
 const handleReportIssueSubmit = (event) => {
   if (event) event.preventDefault();
   
   // Get form data, validate, etc.
-  // This would be replaced with actual form handling logic
+  const form = document.getElementById('report-issue-form');
+  let isValid = true;
   
-  notify('Your issue has been reported successfully!', 'success');
+  // Basic validation
+  if (form) {
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('error');
+        notify(`Please fill in the ${field.name || 'required'} field`, 'warning');
+      } else {
+        field.classList.remove('error');
+      }
+    });
+  }
   
-  // In a real application, you'd submit to a server, etc.
-  console.log('Issue reported');
+  if (isValid) {
+    notify('Your issue has been reported successfully!', 'success');
+    
+    // Reset form after successful submission
+    if (form) form.reset();
+    
+    // Clear file previews
+    const filePreview = document.querySelector('.file-preview');
+    if (filePreview) filePreview.innerHTML = '';
+  }
 };
+
+// Make the notification system available globally
+window.notify = notify;
 
 // Optional: Add basic offline support notification
 window.addEventListener('online', () => notify('You are back online!', 'success'));
 window.addEventListener('offline', () => notify('You are offline. Some features may be unavailable.', 'warning'));
+
+// Add event listeners to all buttons with class btn-primary or btn-accent
+document.addEventListener('DOMContentLoaded', () => {
+  const actionButtons = document.querySelectorAll('.btn-primary:not([data-has-handler]), .btn-accent:not([data-has-handler])');
+  actionButtons.forEach(button => {
+    button.setAttribute('data-has-handler', 'true');
+    button.addEventListener('click', function() {
+      const buttonText = this.textContent.trim();
+      notify(`Action: ${buttonText}`, 'info');
+    });
+  });
+});

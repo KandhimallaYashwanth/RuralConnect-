@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X, Home, FileText, Calendar, DollarSign, BookOpen, FolderOpen, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { notify } from "@/lib/notification";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +17,10 @@ const NavBar = () => {
     { name: "Resources", icon: FolderOpen, href: "/resources" },
     { name: "Announcements", icon: FileText, href: "/announcements" },
   ];
+
+  const handleLogin = () => {
+    notify("Login functionality coming soon!", "info");
+  };
 
   return (
     <nav className="bg-white shadow-md">
@@ -42,7 +47,12 @@ const NavBar = () => {
                 <span>{item.name}</span>
               </Link>
             ))}
-            <Button className="bg-rural-terracotta hover:bg-rural-terracotta/90">Login</Button>
+            <Button 
+              className="bg-rural-terracotta hover:bg-rural-terracotta/90"
+              onClick={handleLogin}
+            >
+              Login
+            </Button>
           </div>
 
           {/* Mobile menu button */}
@@ -75,7 +85,12 @@ const NavBar = () => {
                   <span>{item.name}</span>
                 </Link>
               ))}
-              <Button className="bg-rural-terracotta hover:bg-rural-terracotta/90 mt-4">Login</Button>
+              <Button 
+                className="bg-rural-terracotta hover:bg-rural-terracotta/90 mt-4"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageSquare, Calendar, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
@@ -18,11 +18,14 @@ const HeroSection = () => {
               empowering villages with digital tools for better governance and communication.
             </p>
             <div className="flex flex-wrap gap-4 pt-4">
-              <Button className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white font-medium px-6 py-3 rounded-md flex items-center gap-2">
+              <Button className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white font-medium px-6 py-3 rounded-md flex items-center gap-2" onClick={() => window.location.href = '/report-issue.html'}>
                 Report an Issue
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" className="border-rural-leaf text-rural-leaf hover:bg-rural-leaf/10 font-medium px-6 py-3 rounded-md">
+              <Button variant="outline" className="border-rural-leaf text-rural-leaf hover:bg-rural-leaf/10 font-medium px-6 py-3 rounded-md" onClick={() => {
+                const resourcesSection = document.querySelector('.resources-preview');
+                if (resourcesSection) resourcesSection.scrollIntoView({ behavior: 'smooth' });
+              }}>
                 Explore Resources
               </Button>
             </div>

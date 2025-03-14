@@ -1,6 +1,7 @@
 
 import { Calendar, Users, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { notify } from "@/lib/notification";
 
 const EventsPreview = () => {
   const events = [
@@ -30,6 +31,16 @@ const EventsPreview = () => {
     }
   ];
 
+  const handleViewAllEvents = () => {
+    // In a real app, this would navigate to the events page
+    notify("Navigating to events page", "info");
+  };
+
+  const handleEventDetails = (eventId: number, eventTitle: string) => {
+    // In a real app, this would open event details
+    notify(`Viewing details for event: ${eventTitle}`, "info");
+  };
+
   return (
     <div className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -40,7 +51,10 @@ const EventsPreview = () => {
               Stay informed about important community gatherings, government programs, and local festivals.
             </p>
           </div>
-          <Button className="mt-4 lg:mt-0 bg-rural-leaf hover:bg-rural-leaf/90">
+          <Button 
+            className="mt-4 lg:mt-0 bg-rural-leaf hover:bg-rural-leaf/90"
+            onClick={handleViewAllEvents}
+          >
             View All Events
           </Button>
         </div>
@@ -72,7 +86,10 @@ const EventsPreview = () => {
                 </div>
               </div>
               
-              <button className="w-full py-2 border border-rural-terracotta text-rural-terracotta rounded-md hover:bg-rural-terracotta/10 transition-colors">
+              <button 
+                className="w-full py-2 border border-rural-terracotta text-rural-terracotta rounded-md hover:bg-rural-terracotta/10 transition-colors"
+                onClick={() => handleEventDetails(event.id, event.title)}
+              >
                 Event Details
               </button>
             </div>
