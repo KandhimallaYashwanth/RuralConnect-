@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Report Issue - RuralConnect</title>
+    <meta name="description" content="Report local issues in your area to bring them to the attention of the authorities." />
+    <meta name="author" content="RuralConnect" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      /* Additional styles for the report issue page */
+      .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: var(--border-radius);
+        background-color: var(--white);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        min-width: 250px;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out forwards;
+      }
+      .notification.info { border-left: 4px solid var(--sky); }
+      .notification.success { border-left: 4px solid var(--leaf); }
+      .notification.warning { border-left: 4px solid var(--mustard); }
+      .notification.error { border-left: 4px solid var(--terracotta); }
+      .notification-close {
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 20px;
+      }
+      .notification.fadeOut {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-logo">
+          <a href="index.html">
+            <div class="logo-circle">RC</div>
+            <span>RuralConnect</span>
+          </a>
+        </div>
+        <div class="nav-menu" id="navMenu">
+          <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+          <a href="report-issue.html" class="nav-link active"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
+          <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+          <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
+          <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
+          <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
+          <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
+          <button class="btn btn-primary login-btn">Login</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="py-12 bg-gray-100">
+        <div class="container">
+          <div class="text-center mb-8">
+            <h1>Report an Issue</h1>
+            <p>Report local issues in your area to bring them to the attention of the authorities. Track the status of your reported issues in real-time.</p>
+          </div>
+          
+          <div class="report-form">
+            <form id="issueForm" onsubmit="handleReportIssueSubmit(event)">
+              <div class="form-row">
+                <label class="form-label" for="issueType">Issue Type</label>
+                <select id="issueType" class="form-select" required>
+                  <option value="">Select Issue Type</option>
+                  <option value="Road Condition">Road Condition</option>
+                  <option value="Water Supply">Water Supply</option>
+                  <option value="Electricity">Electricity</option>
+                  <option value="Sanitation">Sanitation</option>
+                  <option value="Public Property Damage">Public Property Damage</option>
+                  <option value="Agriculture Related">Agriculture Related</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Education">Education</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              
+              <div class="form-row">
+                <label class="form-label" for="description">Description</label>
+                <div class="flex items-start gap-2">
+                  <textarea id="description" class="form-textarea" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="grid-2">
+                  <div>
+                    <label class="form-label" for="ward">Ward Number</label>
+                    <input type="text" id="ward" class="form-input" placeholder="Enter your ward number" required>
+                  </div>
+                  
+                  <div>
+                    <label class="form-label" for="location">Location</label>
+                    <div class="input-icon">
+                      <input type="text" id="location" class="form-input" placeholder="Enter location or use current location" required>
+                      <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <label class="form-label">Upload Images/Videos</label>
+                <div class="file-upload">
+                  <div class="file-upload-icon">
+                    <i class="fas fa-camera"></i>
+                  </div>
+                  <p class="file-upload-text">Drag & drop files here or click to browse</p>
+                  <input type="file" id="file-input" multiple accept="image/*,video/*" style="display: none;">
+                  <button type="button" class="btn btn-primary">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Files</span>
+                  </button>
+                  <div class="file-preview"></div>
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <span>Submit Issue</span>
+                  <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <h3>RuralConnect</h3>
+            <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          
+          <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="report-issue.html">Report Issue</a></li>
+              <li><a href="events.html">Events</a></li>
+              <li><a href="budget.html">Budget</a></li>
+              <li><a href="history.html">History</a></li>
+              <li><a href="resources.html">Resources</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-contact">
+            <h3>Contact</h3>
+            <ul>
+              <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+              <li><i class="fas fa-phone"></i> +91 9876543210</li>
+              <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+            </ul>
+          </div>
+          
+          <div class="footer-language">
+            <h3>Language</h3>
+            <div class="language-buttons">
+              <button class="lang-btn active">English</button>
+              <button class="lang-btn">हिंदी</button>
+              <button class="lang-btn">தமிழ்</button>
+              <button class="lang-btn">తెలుగు</button>
+            </div>
+            
+            <h3>Download App</h3>
+            <div class="app-buttons">
+              <button class="app-btn">
+                <i class="fab fa-google-play"></i>
+                <span>Play Store</span>
+              </button>
+              <button class="app-btn">
+                <i class="fab fa-apple"></i>
+                <span>App Store</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+          <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Add GPT Engineer script -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script src="/js/main.js"></script>
+    <script>
+      // Specific JavaScript for the report issue page
+      const handleReportIssueSubmit = (event) => {
+        event.preventDefault();
+        
+        // Get form values
+        const issueType = document.getElementById('issueType').value;
+        const description = document.getElementById('description').value;
+        const ward = document.getElementById('ward').value;
+        const location = document.getElementById('location').value;
+        const fileInput = document.getElementById('file-input');
+        const files = fileInput ? fileInput.files : [];
+        
+        // Validate form (basic validation)
+        if (!issueType || !description || !ward || !location) {
+          notify('Please fill all required fields.', 'warning');
+          return;
+        }
+        
+        // In a real application, you would send this data to a server
+        console.log({
+          issueType,
+          description,
+          ward,
+          location,
+          filesCount: files.length
+        });
+        
+        // Show success message
+        notify('Your issue has been reported successfully! You can track its status in the dashboard.', 'success');
+        
+        // Reset form
+        document.getElementById('issueForm').reset();
+        const filePreview = document.querySelector('.file-preview');
+        if (filePreview) filePreview.innerHTML = '';
+      };
+      
+      // Function to show notifications
+      const notify = (message, type = 'info') => {
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        const closeBtn = document.createElement('span');
+        closeBtn.className = 'notification-close';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', () => {
+          notification.remove();
+        });
+        
+        notification.appendChild(closeBtn);
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+          notification.classList.add('fadeOut');
+          setTimeout(() => notification.remove(), 500);
+        }, 5000);
+        
+        return notification;
+      };
+      
+      // Handle file upload interface
+      document.addEventListener('DOMContentLoaded', () => {
+        const fileUpload = document.querySelector('.file-upload');
+        const fileInput = document.getElementById('file-input');
+        const filePreview = document.querySelector('.file-preview');
+        const uploadButton = document.querySelector('.file-upload .btn');
+        
+        if (fileUpload && fileInput && uploadButton) {
+          uploadButton.addEventListener('click', () => {
+            fileInput.click();
+          });
+          
+          fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0 && filePreview) {
+              filePreview.innerHTML = ''; // Clear previous previews
+              
+              Array.from(fileInput.files).forEach(file => {
+                const thumbnail = document.createElement('div');
+                thumbnail.className = 'file-thumbnail';
+                
+                if (file.type.startsWith('image/')) {
+                  const img = document.createElement('img');
+                  img.src = URL.createObjectURL(file);
+                  thumbnail.appendChild(img);
+                } else {
+                  thumbnail.textContent = file.name.substring(0, 10) + '...';
+                }
+                
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'file-remove';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  thumbnail.remove();
+                  // Note: We can't actually remove items from a FileList, this is just for UI
+                });
+                
+                thumbnail.appendChild(removeBtn);
+                filePreview.appendChild(thumbnail);
+              });
+            }
+          });
+        }
+      });
+    </script>
+    <style>
+      /* Responsive grid for the form */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      @media (min-width: 768px) {
+        .grid-2 {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      
+      .input-icon {
+        position: relative;
+      }
+      
+      .input-icon i {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        color: var(--terracotta);
+      }
+      
+      /* File upload styles */
+      .file-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
+      
+      .file-thumbnail {
+        width: 4rem;
+        height: 4rem;
+        background-color: var(--gray-200);
+        border-radius: 0.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        overflow: hidden;
+        position: relative;
+      }
+      
+      .file-thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      .file-remove {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 1.25rem;
+        height: 1.25rem;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: var(--white);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        cursor: pointer;
+      }
+    </style>
+  </body>
+</html>
