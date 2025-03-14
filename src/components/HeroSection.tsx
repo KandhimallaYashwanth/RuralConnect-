@@ -3,11 +3,24 @@ import { ArrowRight, MessageSquare, Calendar, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { notify } from "@/lib/notification";
+import { useAuth } from "@/contexts/AuthContext";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const { isLoggedIn, login } = useAuth();
 
   const handleReportIssue = () => {
+    if (!isLoggedIn) {
+      notify("Please login to report an issue", "warning");
+      
+      // Save the intended destination
+      localStorage.setItem("redirectAfterLogin", "/report-issue");
+      
+      // Prompt for login
+      login();
+      return;
+    }
+    
     notify("Navigating to Report Issue page", "info");
     navigate("/report-issue");
   };

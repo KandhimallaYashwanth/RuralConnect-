@@ -1,15 +1,18 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Home, FileText, Calendar, DollarSign, BookOpen, FolderOpen, MessageSquare } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Menu, X, Home, FileText, Calendar, DollarSign, BookOpen, FolderOpen, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { notify } from "@/lib/notification";
 import { Toggle } from "@/components/ui/toggle";
+import { notify } from "@/lib/notification";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeItem, setActiveItem] = useState("Home");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { isLoggedIn, login, logout, currentUser } = useAuth();
 
   const navItems = [
     { name: "Home", icon: Home, href: "/" },
@@ -21,15 +24,32 @@ const NavBar = () => {
     { name: "Announcements", icon: FileText, href: "/announcements" },
   ];
 
+  useEffect(() => {
+    // Set active item based on current path
+    const path = location.pathname;
+    const currentItem = navItems.find(item => item.href === path);
+    if (currentItem) {
+      setActiveItem(currentItem.name);
+    }
+  }, [location.pathname]);
+
   const handleLogin = () => {
-    notify("Login functionality initiated!", "info");
-    // Simulating login modal or redirect
-    setTimeout(() => {
-      notify("Login successful! Welcome back.", "success");
-    }, 2000);
+    if (isLoggedIn) {
+      logout();
+    } else {
+      login();
+    }
   };
 
   const handleNavItemClick = (item) => {
+    if (item.name === "Report Issue" && !isLoggedIn) {
+      notify("Please login to report an issue", "warning");
+      
+      // Save the intended destination
+      localStorage.setItem("redirectAfterLogin", item.href);
+      return;
+    }
+    
     setActiveItem(item.name);
     navigate(item.href);
     setIsOpen(false);
@@ -64,10 +84,11 @@ const NavBar = () => {
               </Toggle>
             ))}
             <Button 
-              className="bg-rural-terracotta hover:bg-rural-terracotta/90 transition-all duration-300 transform hover:scale-105"
+              className="bg-rural-terracotta hover:bg-rural-terracotta/90 transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
               onClick={handleLogin}
             >
-              Login
+              <User className="h-4 w-4" />
+              {isLoggedIn ? "Logout" : "Login"} 
             </Button>
           </div>
 
@@ -104,10 +125,11 @@ const NavBar = () => {
                 </button>
               ))}
               <Button 
-                className="bg-rural-terracotta hover:bg-rural-terracotta/90 mt-4 w-full transition-all duration-300"
+                className="bg-rural-terracotta hover:bg-rural-terracotta/90 mt-4 w-full transition-all duration-300 flex items-center justify-center gap-2"
                 onClick={handleLogin}
               >
-                Login
+                <User className="h-4 w-4" />
+                {isLoggedIn ? "Logout" : "Login"}
               </Button>
             </div>
           </div>
