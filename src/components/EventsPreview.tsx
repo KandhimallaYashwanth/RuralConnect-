@@ -2,8 +2,11 @@
 import { Calendar, Users, MapPin, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { notify } from "@/lib/notification";
+import { useNavigate } from "react-router-dom";
 
 const EventsPreview = () => {
+  const navigate = useNavigate();
+  
   const events = [
     {
       id: 1,
@@ -32,13 +35,13 @@ const EventsPreview = () => {
   ];
 
   const handleViewAllEvents = () => {
-    // In a real app, this would navigate to the events page
-    notify("Navigating to events page", "info");
+    notify("Navigating to all events", "info");
+    navigate("/events");
   };
 
-  const handleEventDetails = (eventId: number, eventTitle: string) => {
-    // In a real app, this would open event details
+  const handleEventDetails = (eventId, eventTitle) => {
     notify(`Viewing details for event: ${eventTitle}`, "info");
+    navigate(`/events/${eventId}`);
   };
 
   return (
@@ -52,7 +55,7 @@ const EventsPreview = () => {
             </p>
           </div>
           <Button 
-            className="mt-4 lg:mt-0 bg-rural-leaf hover:bg-rural-leaf/90"
+            className="mt-4 lg:mt-0 bg-rural-leaf hover:bg-rural-leaf/90 transition-all duration-300 transform hover:scale-105"
             onClick={handleViewAllEvents}
           >
             View All Events
@@ -61,7 +64,7 @@ const EventsPreview = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => (
-            <div key={event.id} className="rural-card hover:translate-y-[-5px] transition-all duration-300">
+            <div key={event.id} className="rural-card hover:translate-y-[-5px] transition-all duration-300 hover:shadow-md">
               <div className="mb-4 pb-4 border-b border-gray-100">
                 <span className="text-sm font-medium text-rural-terracotta">Upcoming Event</span>
                 <h3 className="text-xl font-semibold mt-1">{event.title}</h3>

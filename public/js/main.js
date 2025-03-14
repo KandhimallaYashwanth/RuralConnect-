@@ -13,6 +13,29 @@ if (hamburger && navMenu) {
   });
 }
 
+// Add ripple effect to buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const buttons = document.querySelectorAll('.btn, button:not([disabled])');
+  
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      const x = e.clientX - e.target.getBoundingClientRect().left;
+      const y = e.clientY - e.target.getBoundingClientRect().top;
+      
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple-effect');
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+});
+
 // Language switcher
 const langButtons = document.querySelectorAll('.lang-btn');
 langButtons.forEach(button => {
@@ -28,8 +51,57 @@ langButtons.forEach(button => {
   });
 });
 
-// Report issue form (for when you create the report-issue.html page)
+// Handle form submission for report issue
 document.addEventListener('DOMContentLoaded', () => {
+  const reportForm = document.getElementById('report-issue-form');
+  if (reportForm) {
+    reportForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleReportIssueSubmit(e);
+    });
+  }
+  
+  // Add hover effects to cards
+  const cards = document.querySelectorAll('.rural-card, .feature-card, .event-card, .resource-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.classList.add('card-hover');
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.classList.remove('card-hover');
+    });
+  });
+  
+  // Enhanced button interactivity
+  const actionButtons = document.querySelectorAll('.btn-primary, .btn-accent, .btn-secondary, .btn-outline-accent, .btn-outline');
+  actionButtons.forEach(button => {
+    if (!button.hasAttribute('data-has-handler')) {
+      button.setAttribute('data-has-handler', 'true');
+      
+      button.addEventListener('click', function() {
+        const buttonText = this.textContent.trim();
+        notify(`Action: ${buttonText}`, 'info');
+        
+        // Add temporary active state visual feedback
+        this.classList.add('btn-active');
+        setTimeout(() => {
+          this.classList.remove('btn-active');
+        }, 300);
+      });
+      
+      // Add hover animation
+      button.addEventListener('mouseenter', function() {
+        this.classList.add('btn-hover');
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        this.classList.remove('btn-hover');
+      });
+    }
+  });
+  
+  // File upload handling
   const fileUpload = document.querySelector('.file-upload');
   const fileInput = document.getElementById('file-input');
   const filePreview = document.querySelector('.file-preview');
@@ -73,40 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Handle form submission for report issue
-  const reportForm = document.getElementById('report-issue-form');
-  if (reportForm) {
-    reportForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      handleReportIssueSubmit();
-    });
-  }
-  
-  // Add click handlers to buttons in HTML version
-  const resourceButtons = document.querySelectorAll('.download-btn');
-  resourceButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
-      notify(`Downloading resource: ${resourceTitle}`, 'info');
-    });
-  });
-  
-  const eventDetailButtons = document.querySelectorAll('.event-card .btn-outline-accent');
-  eventDetailButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const eventTitle = this.closest('.event-card').querySelector('h3').textContent;
-      notify(`Viewing details for event: ${eventTitle}`, 'info');
-    });
-  });
-  
-  const issueActionButtons = document.querySelectorAll('.issue-actions .btn');
-  issueActionButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const text = this.textContent.trim();
-      notify(`${text} for issue #RCI-2023-06-15`, 'info');
-    });
-  });
-  
   // Add smooth scrolling to all internal links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
@@ -120,26 +158,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-});
 
-// Animations on scroll
-document.addEventListener('DOMContentLoaded', () => {
-  const animateElements = document.querySelectorAll('.feature-card, .event-card, .resource-card, .feature-box');
-  
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }
+  // Enhance resource download buttons
+  const resourceButtons = document.querySelectorAll('.download-btn');
+  resourceButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
+      notify(`Downloading resource: ${resourceTitle}`, 'info');
+      
+      // Add download animation
+      this.classList.add('downloading');
+      setTimeout(() => {
+        this.classList.remove('downloading');
+        notify(`${resourceTitle} downloaded successfully!`, 'success');
+      }, 1500);
     });
-  }, { threshold: 0.1 });
+  });
   
-  animateElements.forEach(element => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(20px)';
-    element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-    observer.observe(element);
+  // Enhance event detail buttons
+  const eventDetailButtons = document.querySelectorAll('.event-card .btn-outline-accent');
+  eventDetailButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const eventTitle = this.closest('.event-card').querySelector('h3').textContent;
+      notify(`Viewing details for event: ${eventTitle}`, 'info');
+      
+      // In a real app, this would navigate to the event details page
+      this.classList.add('loading');
+      setTimeout(() => {
+        this.classList.remove('loading');
+        // Simulating navigation delay
+        window.location.href = '#'; // Would go to event page in real app
+      }, 500);
+    });
   });
 });
 
@@ -209,6 +259,80 @@ const notify = (message, type = 'info') => {
         from { opacity: 1; }
         to { opacity: 0; }
       }
+      
+      /* Button effects */
+      .ripple-effect {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        pointer-events: none;
+        width: 100px;
+        height: 100px;
+        transform: translate(-50%, -50%) scale(0);
+        animation: ripple 0.6s linear;
+      }
+      
+      @keyframes ripple {
+        to {
+          transform: translate(-50%, -50%) scale(4);
+          opacity: 0;
+        }
+      }
+      
+      .btn-hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      
+      .btn-active {
+        transform: translateY(1px);
+      }
+      
+      .card-hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      
+      .downloading {
+        position: relative;
+        pointer-events: none;
+        color: transparent !important;
+      }
+      
+      .downloading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1.2em;
+        height: 1.2em;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-radius: 50%;
+        border-top-color: currentColor;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+      
+      .loading {
+        position: relative;
+        pointer-events: none;
+      }
+      
+      .loading::after {
+        content: '...';
+        display: inline-block;
+        animation: loading 1.5s infinite;
+      }
+      
+      @keyframes loading {
+        0% { content: '.'; }
+        33% { content: '..'; }
+        66% { content: '...'; }
+      }
     `;
     document.head.appendChild(style);
   }
@@ -224,12 +348,12 @@ const notify = (message, type = 'info') => {
   return notification;
 };
 
-// Placeholder for the report issue form submission
+// Function to handle report issue form submission
 const handleReportIssueSubmit = (event) => {
   if (event) event.preventDefault();
   
   // Get form data, validate, etc.
-  const form = document.getElementById('report-issue-form');
+  const form = document.getElementById('report-issue-form') || document.getElementById('issueForm');
   let isValid = true;
   
   // Basic validation
@@ -239,7 +363,14 @@ const handleReportIssueSubmit = (event) => {
       if (!field.value.trim()) {
         isValid = false;
         field.classList.add('error');
-        notify(`Please fill in the ${field.name || 'required'} field`, 'warning');
+        
+        // Add shake animation to invalid fields
+        field.classList.add('shake-error');
+        setTimeout(() => {
+          field.classList.remove('shake-error');
+        }, 500);
+        
+        notify(`Please fill in the ${field.name || field.id || 'required'} field`, 'warning');
       } else {
         field.classList.remove('error');
       }
@@ -247,14 +378,35 @@ const handleReportIssueSubmit = (event) => {
   }
   
   if (isValid) {
-    notify('Your issue has been reported successfully!', 'success');
-    
-    // Reset form after successful submission
-    if (form) form.reset();
-    
-    // Clear file previews
-    const filePreview = document.querySelector('.file-preview');
-    if (filePreview) filePreview.innerHTML = '';
+    // Add loading state to submit button
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      
+      // Simulate submission delay
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        notify('Your issue has been reported successfully!', 'success');
+        
+        // Reset form after successful submission
+        if (form) form.reset();
+        
+        // Clear file previews
+        const filePreview = document.querySelector('.file-preview');
+        if (filePreview) filePreview.innerHTML = '';
+      }, 1500);
+    } else {
+      notify('Your issue has been reported successfully!', 'success');
+      
+      // Reset form after successful submission
+      if (form) form.reset();
+      
+      // Clear file previews
+      const filePreview = document.querySelector('.file-preview');
+      if (filePreview) filePreview.innerHTML = '';
+    }
   }
 };
 
@@ -265,14 +417,23 @@ window.notify = notify;
 window.addEventListener('online', () => notify('You are back online!', 'success'));
 window.addEventListener('offline', () => notify('You are offline. Some features may be unavailable.', 'warning'));
 
-// Add event listeners to all buttons with class btn-primary or btn-accent
+// Add CSS for button animations and error states
 document.addEventListener('DOMContentLoaded', () => {
-  const actionButtons = document.querySelectorAll('.btn-primary:not([data-has-handler]), .btn-accent:not([data-has-handler])');
-  actionButtons.forEach(button => {
-    button.setAttribute('data-has-handler', 'true');
-    button.addEventListener('click', function() {
-      const buttonText = this.textContent.trim();
-      notify(`Action: ${buttonText}`, 'info');
-    });
-  });
+  if (!document.getElementById('animation-styles')) {
+    const style = document.createElement('style');
+    style.id = 'animation-styles';
+    style.textContent = `
+      .shake-error {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      }
+      
+      @keyframes shake {
+        10%, 90% { transform: translateX(-1px); }
+        20%, 80% { transform: translateX(2px); }
+        30%, 50%, 70% { transform: translateX(-4px); }
+        40%, 60% { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 });
