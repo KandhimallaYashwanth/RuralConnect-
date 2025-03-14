@@ -1,0 +1,39 @@
+
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="800" height="600" fill="#F9F5EB" />
+  
+  <!-- Sun -->
+  <circle cx="650" cy="150" r="60" fill="#F0C05A" />
+  <circle cx="650" cy="150" r="70" fill="#F0C05A" opacity="0.5" />
+  <circle cx="650" cy="150" r="80" fill="#F0C05A" opacity="0.3" />
+  
+  <!-- Fields -->
+  <rect x="0" y="300" width="800" height="300" fill="#4D724D" opacity="0.7" />
+  <path d="M0,300 Q400,250 800,300 L800,600 L0,600 Z" fill="#4D724D" />
+  
+  <!-- Farm plots -->
+  <rect x="50" y="350" width="100" height="100" fill="#7EC8E3" opacity="0.3" />
+  <rect x="200" y="380" width="150" height="120" fill="#F0C05A" opacity="0.4" />
+  <rect x="400" y="350" width="120" height="90" fill="#CD5D45" opacity="0.3" />
+  <rect x="570" y="370" width="180" height="130" fill="#8B4513" opacity="0.2" />
+  
+  <!-- Hut -->
+  <path d="M200,280 L250,230 L300,280 Z" fill="#8B4513" />
+  <rect x="210" y="280" width="80" height="70" fill="#D2691E" />
+  <rect x="235" y="310" width="30" height="40" fill="#4D4D4D" />
+  
+  <!-- Trees -->
+  <circle cx="150" cy="290" r="30" fill="#4D724D" />
+  <rect x="145" y="290" width="10" height="40" fill="#8B4513" />
+  
+  <circle cx="350" cy="270" r="25" fill="#4D724D" />
+  <rect x="345" y="270" width="10" height="35" fill="#8B4513" />
+  
+  <circle cx="450" cy="290" r="35" fill="#4D724D" />
+  <rect x="445" y="290" width="10" height="45" fill="#8B4513" />
+  
+  <!-- Birds -->
+  <path d="M680,200 Q690,190 700,200 Q710,190 720,200" stroke="#333" fill="none" stroke-width="2" />
+  <path d="M620,220 Q630,210 640,220 Q650,210 660,220" stroke="#333" fill="none" stroke-width="2" />
+</svg>
