@@ -1,4 +1,3 @@
-
 // Global state
 const appState = {
   isLoggedIn: false,
@@ -46,6 +45,9 @@ function init() {
   } else if (currentPage === '' || currentPage === 'index.html') {
     initHomePage();
   }
+  
+  // Add authorities link to navigation menu (if not already present)
+  addAuthoritiesLink();
 }
 
 // Initialize report issue page
@@ -674,6 +676,28 @@ function showNotification(message, type = 'info') {
   }, 5000);
 }
 
+// Add authorities link to navigation menu
+function addAuthoritiesLink() {
+  const navMenu = document.getElementById('navMenu');
+  
+  // Check if authorities link already exists
+  if (navMenu && !document.querySelector('a[href="authorities-login.html"]')) {
+    // Create new link for authorities
+    const authoritiesLink = document.createElement('a');
+    authoritiesLink.href = 'authorities-login.html';
+    authoritiesLink.className = 'nav-link';
+    authoritiesLink.innerHTML = '<i class="fas fa-user-shield"></i> Authorities';
+    
+    // Insert before the login button
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+      navMenu.insertBefore(authoritiesLink, loginBtn);
+    } else {
+      navMenu.appendChild(authoritiesLink);
+    }
+  }
+}
+
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
   init();
@@ -748,3 +772,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Make showNotification function available globally
+window.showNotification = showNotification;
