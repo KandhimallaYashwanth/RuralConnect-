@@ -1,4 +1,3 @@
-
 // Authorities Module
 const authoritiesModule = (function() {
   // State Management
@@ -75,9 +74,8 @@ const authoritiesModule = (function() {
       const email = document.getElementById('authorityEmail').value;
       const password = document.getElementById('authorityPassword').value;
       
-      // Simulate authentication (in real app, this would validate with backend)
-      // For demo, accept any email ending with .gov.in
-      if (email && email.endsWith('.gov.in') && password) {
+      // Simplified authentication without email validation
+      if (email && password) {
         // Create authority object
         const authority = {
           id: generateId(),
@@ -98,7 +96,7 @@ const authoritiesModule = (function() {
           window.location.href = 'authorities-dashboard.html';
         }, 1500);
       } else {
-        showNotification('Invalid login credentials. Authority email must end with .gov.in', 'error');
+        showNotification('Please enter both email and password', 'error');
       }
     });
   }
@@ -865,7 +863,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to show notifications (if not already defined in main.js)
 function showNotification(message, type = 'info') {
-  // Check if the function is already defined in main.js
+  // Check if the function is already defined in global scope
   if (typeof window.showNotification === 'function') {
     window.showNotification(message, type);
     return;
