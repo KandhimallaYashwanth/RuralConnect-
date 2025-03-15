@@ -1,1044 +1,1288 @@
 
-// Authorities Module
-const authoritiesModule = (function() {
-  // State Management
-  const state = {
-    currentAuthority: null,
-    issues: [],
-    menuSection: 'pending-issues',
-    contentItems: {
-      budget: [],
-      history: [],
-      resources: [],
-      announcements: []
-    }
-  };
+// Authority credentials and roles
+const AUTHORITY_CREDENTIALS = {
+  sarpanch: {
+    password: "sarpanch",
+    level: 3,
+    permissions: ["review", "update", "resolve", "post-content", "manage-content"]
+  },
+  uppasarpanch: {
+    password: "uppasarpanch",
+    level: 2,
+    permissions: ["review", "update", "resolve", "post-content", "manage-content"]
+  },
+  wardmember: {
+    password: "wardmember",
+    level: 1,
+    permissions: ["review", "update", "escalate", "post-content"]
+  }
+};
 
-  // Authority role credentials
-  const authorityCredentials = {
-    sarpanch: { password: "sarpanch", level: 3 },
-    uppasarpanch: { password: "uppasarpanch", level: 2 },
-    wardmember: { password: "wardmember", level: 1 }
-  };
+// Global state for authorities
+const authorityState = {
+  isLoggedIn: false,
+  currentAuthority: null,
+  redirectAfterLogin: null
+};
 
-  // DOM Elements
-  const DOM = {
-    // Login form
-    authoritiesLoginForm: document.getElementById('authoritiesLoginForm'),
+// Check if authority is logged in from localStorage
+function initAuthority() {
+  const savedLogin = localStorage.getItem('authority_isLoggedIn');
+  const savedAuthority = localStorage.getItem('authority_currentUser');
+  
+  if (savedLogin === 'true' && savedAuthority) {
+    authorityState.isLoggedIn = true;
+    authorityState.currentAuthority = JSON.parse(savedAuthority);
+    updateUIForAuthorityLogin();
     
-    // Dashboard elements
-    authorityName: document.getElementById('authorityName'),
-    authorityLogoutBtn: document.getElementById('authorityLogoutBtn'),
-    menuItems: document.querySelectorAll('.menu-item'),
-    dashboardSections: document.querySelectorAll('.dashboard-section'),
-    
-    // Issue counters
-    pendingCount: document.getElementById('pendingCount'),
-    inProgressCount: document.getElementById('inProgressCount'),
-    resolvedCount: document.getElementById('resolvedCount'),
-    
-    // Issue lists
-    pendingIssuesList: document.getElementById('pendingIssuesList'),
-    inProgressIssuesList: document.getElementById('inProgressIssuesList'),
-    resolvedIssuesList: document.getElementById('resolvedIssuesList'),
-    
-    // Issue details modal
-    issueDetailsModal: document.getElementById('issueDetailsModal'),
-    closeIssueModal: document.getElementById('closeIssueModal'),
-    issueDetailsContent: document.getElementById('issueDetailsContent'),
-    
-    // Content management buttons
-    saveBudgetBtn: document.getElementById('saveBudgetBtn'),
-    saveHistoryBtn: document.getElementById('saveHistoryBtn'),
-    saveResourceBtn: document.getElementById('saveResourceBtn'),
-    saveAnnouncementBtn: document.getElementById('saveAnnouncementBtn'),
-    saveProfileBtn: document.getElementById('saveProfileBtn')
-  };
-
-  // Initialize the module
-  function init() {
-    // Check if we're on the login page or dashboard
-    if (DOM.authoritiesLoginForm) {
-      initLoginPage();
-    } else if (DOM.authorityLogoutBtn) {
-      initDashboard();
+    // If on the authorities-login page but already logged in, redirect to dashboard
+    if (window.location.pathname.includes('authorities-login.html')) {
+      window.location.href = 'authorities-dashboard.html';
     }
   }
-
-  // Initialize login page functionality
-  function initLoginPage() {
-    // Check if already logged in as authority
-    const savedAuthority = localStorage.getItem('currentAuthority');
-    if (savedAuthority) {
-      // Redirect to dashboard
-      window.location.href = 'authorities-dashboard.html';
+  
+  // Initialize authority-specific page functionality
+  const currentPage = window.location.pathname.split('/').pop();
+  
+  if (currentPage === 'authorities-dashboard.html') {
+    // If not logged in but trying to access dashboard, redirect to login
+    if (!authorityState.isLoggedIn) {
+      window.location.href = 'authorities-login.html';
       return;
     }
+    initAuthoritiesDashboard();
+  } else if (currentPage === 'authorities-login.html') {
+    initAuthoritiesLogin();
+  }
+}
 
-    // Handle login form submission
-    DOM.authoritiesLoginForm.addEventListener('submit', function(e) {
+// Initialize authorities login page
+function initAuthoritiesLogin() {
+  const authoritiesLoginForm = document.getElementById('authoritiesLoginForm');
+  
+  if (authoritiesLoginForm) {
+    authoritiesLoginForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
       const role = document.getElementById('authorityRole').value;
       const email = document.getElementById('authorityEmail').value;
       const password = document.getElementById('authorityPassword').value;
       
-      // Validate against predefined credentials
+      // Validate credentials
       if (!role || !email || !password) {
-        displayNotification('Please fill in all fields', 'warning');
+        showNotification('Please fill in all fields', 'error');
         return;
       }
       
-      // Check if role exists and password matches
-      if (authorityCredentials[role] && authorityCredentials[role].password === password) {
-        // Create authority object
-        const authority = {
-          id: generateId(),
-          name: email.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          email: email,
-          role: role,
-          level: authorityCredentials[role].level,
-          position: roleToPosition(role),
-          dateJoined: new Date().toISOString()
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('currentAuthority', JSON.stringify(authority));
-        
-        // Show success message
-        displayNotification('Login successful. Redirecting to dashboard...', 'success');
-        
-        // Redirect to dashboard
-        setTimeout(() => {
-          window.location.href = 'authorities-dashboard.html';
-        }, 1500);
-      } else {
-        displayNotification('Invalid credentials. Please try again.', 'error');
-      }
-    });
-  }
-
-  // Convert role to position title
-  function roleToPosition(role) {
-    switch(role) {
-      case 'sarpanch': return 'Sarpanch';
-      case 'uppasarpanch': return 'Uppasarpanch';
-      case 'wardmember': return 'Ward Member';
-      default: return 'Village Authority';
-    }
-  }
-
-  // Initialize dashboard functionality
-  function initDashboard() {
-    // Load authority data
-    const savedAuthority = localStorage.getItem('currentAuthority');
-    if (!savedAuthority) {
-      // Not logged in, redirect to login page
-      window.location.href = 'authorities-login.html';
-      return;
-    }
-    
-    state.currentAuthority = JSON.parse(savedAuthority);
-    
-    if (DOM.authorityName) {
-      DOM.authorityName.textContent = state.currentAuthority.name;
-    }
-    
-    // Load issues from localStorage
-    loadIssues();
-    
-    // Load content items
-    loadContentItems();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Initialize the dashboard UI
-    updateIssueCounters();
-    populateIssueLists();
-    
-    // Adjust UI based on authority level
-    adjustUIForAuthorityLevel();
-  }
-
-  // Adjust UI elements based on authority level
-  function adjustUIForAuthorityLevel() {
-    const level = state.currentAuthority.level;
-    
-    // Handle issue assignment based on authority level
-    if (level < 3) { // Not Sarpanch
-      const resolveButtons = document.querySelectorAll('.resolve-issue-btn');
-      resolveButtons.forEach(btn => {
-        btn.disabled = true;
-        btn.title = "Only Sarpanch can resolve issues";
-      });
-    }
-    
-    if (level < 2) { // Ward Member
-      const escalateToSarpanchButtons = document.querySelectorAll('.escalate-sarpanch-btn');
-      escalateToSarpanchButtons.forEach(btn => {
-        btn.disabled = true;
-        btn.title = "Only Uppasarpanch can escalate to Sarpanch";
-      });
-    }
-  }
-
-  // Set up dashboard event listeners
-  function setupEventListeners() {
-    // Logout button
-    if (DOM.authorityLogoutBtn) {
-      DOM.authorityLogoutBtn.addEventListener('click', function() {
-        localStorage.removeItem('currentAuthority');
-        displayNotification('Logged out successfully', 'info');
-        window.location.href = 'authorities-login.html';
-      });
-    }
-    
-    // Menu item clicks
-    if (DOM.menuItems) {
-      DOM.menuItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-          e.preventDefault();
-          
-          const section = this.getAttribute('data-section');
-          changeActiveSection(section);
-        });
-      });
-    }
-    
-    // Close issue details modal
-    if (DOM.closeIssueModal) {
-      DOM.closeIssueModal.addEventListener('click', function() {
-        DOM.issueDetailsModal.classList.remove('active');
-      });
-    }
-    
-    // Content form submissions
-    if (DOM.saveBudgetBtn) {
-      DOM.saveBudgetBtn.addEventListener('click', saveBudgetItem);
-    }
-    
-    if (DOM.saveHistoryBtn) {
-      DOM.saveHistoryBtn.addEventListener('click', saveHistoryItem);
-    }
-    
-    if (DOM.saveResourceBtn) {
-      DOM.saveResourceBtn.addEventListener('click', saveResourceItem);
-    }
-    
-    if (DOM.saveAnnouncementBtn) {
-      DOM.saveAnnouncementBtn.addEventListener('click', saveAnnouncementItem);
-    }
-    
-    if (DOM.saveProfileBtn) {
-      DOM.saveProfileBtn.addEventListener('click', saveProfileSettings);
-    }
-    
-    // Content type change
-    const resourceType = document.getElementById('resourceType');
-    if (resourceType) {
-      resourceType.addEventListener('change', function() {
-        const linkRow = document.getElementById('resourceLinkRow');
-        if (this.value === 'link') {
-          linkRow.style.display = 'block';
-        } else {
-          linkRow.style.display = 'none';
-        }
-      });
-    }
-    
-    // File uploads
-    setupFileUploads();
-  }
-
-  // Load issues from localStorage
-  function loadIssues() {
-    const savedIssues = localStorage.getItem('issues');
-    state.issues = savedIssues ? JSON.parse(savedIssues) : [];
-  }
-
-  // Load content items
-  function loadContentItems() {
-    // Load from localStorage
-    ['budget', 'history', 'resources', 'announcements'].forEach(type => {
-      const saved = localStorage.getItem(`content_${type}`);
-      state.contentItems[type] = saved ? JSON.parse(saved) : [];
-    });
-  }
-
-  // Change active section
-  function changeActiveSection(sectionId) {
-    // Update menu items
-    if (DOM.menuItems) {
-      DOM.menuItems.forEach(item => {
-        if (item.getAttribute('data-section') === sectionId) {
-          item.classList.add('active');
-        } else {
-          item.classList.remove('active');
-        }
-      });
-    }
-    
-    // Update visible section
-    if (DOM.dashboardSections) {
-      DOM.dashboardSections.forEach(section => {
-        if (section.id === sectionId) {
-          section.classList.add('active');
-        } else {
-          section.classList.remove('active');
-        }
-      });
-    }
-    
-    state.menuSection = sectionId;
-  }
-
-  // Update issue counters
-  function updateIssueCounters() {
-    // Count issues by status
-    let pendingCount = 0;
-    let inProgressCount = 0;
-    let resolvedCount = 0;
-    
-    state.issues.forEach(issue => {
-      const status = issue.status.toLowerCase();
-      if (status === 'submitted') {
-        pendingCount++;
-      } else if (status === 'in-progress' || status === 'in-review') {
-        inProgressCount++;
-      } else if (status === 'resolved' || status === 'closed') {
-        resolvedCount++;
-      }
-    });
-    
-    // Update DOM
-    if (DOM.pendingCount) DOM.pendingCount.textContent = pendingCount;
-    if (DOM.inProgressCount) DOM.inProgressCount.textContent = inProgressCount;
-    if (DOM.resolvedCount) DOM.resolvedCount.textContent = resolvedCount;
-  }
-
-  // Filter issues based on authority level
-  function getIssuesForCurrentAuthority() {
-    const level = state.currentAuthority.level;
-    
-    return state.issues.filter(issue => {
-      // Ward Members can only see newly submitted issues
-      if (level === 1) {
-        return issue.status.toLowerCase() === 'submitted' || 
-               issue.assignedTo === state.currentAuthority.role;
+      // Check if role exists
+      if (!AUTHORITY_CREDENTIALS[role]) {
+        showNotification('Invalid role selected', 'error');
+        return;
       }
       
-      // Uppasarpanch can see issues escalated to them or higher
-      if (level === 2) {
-        return issue.status.toLowerCase() === 'submitted' || 
-               issue.status.toLowerCase() === 'in-review' ||
-               issue.escalationLevel >= 2 ||
-               issue.assignedTo === state.currentAuthority.role;
+      // Check password
+      if (password !== AUTHORITY_CREDENTIALS[role].password) {
+        showNotification('Invalid credentials', 'error');
+        return;
       }
       
-      // Sarpanch can see all issues
-      return true;
+      // Login successful
+      const authority = {
+        id: `auth_${Date.now()}`,
+        role: role,
+        email: email,
+        name: roleToDisplayName(role),
+        permissions: AUTHORITY_CREDENTIALS[role].permissions,
+        level: AUTHORITY_CREDENTIALS[role].level
+      };
+      
+      authorityState.isLoggedIn = true;
+      authorityState.currentAuthority = authority;
+      
+      // Save to localStorage
+      localStorage.setItem('authority_isLoggedIn', 'true');
+      localStorage.setItem('authority_currentUser', JSON.stringify(authority));
+      
+      showNotification(`Welcome ${roleToDisplayName(role)}! You have been logged in successfully.`, 'success');
+      
+      // Redirect to dashboard
+      window.location.href = 'authorities-dashboard.html';
     });
   }
+}
 
-  // Populate issue lists
-  function populateIssueLists() {
-    // Clear existing lists
-    if (DOM.pendingIssuesList) DOM.pendingIssuesList.innerHTML = '';
-    if (DOM.inProgressIssuesList) DOM.inProgressIssuesList.innerHTML = '';
-    if (DOM.resolvedIssuesList) DOM.resolvedIssuesList.innerHTML = '';
-    
-    // Get filtered issues for current authority
-    const filteredIssues = getIssuesForCurrentAuthority();
-    
-    // Group issues by status
-    const pending = [];
-    const inProgress = [];
-    const resolved = [];
-    
-    filteredIssues.forEach(issue => {
-      const status = issue.status.toLowerCase();
-      if (status === 'submitted') {
-        pending.push(issue);
-      } else if (status === 'in-progress' || status === 'in-review') {
-        inProgress.push(issue);
-      } else if (status === 'resolved' || status === 'closed') {
-        resolved.push(issue);
-      }
+// Initialize authorities dashboard
+function initAuthoritiesDashboard() {
+  if (!authorityState.isLoggedIn) {
+    window.location.href = 'authorities-login.html';
+    return;
+  }
+  
+  // Load UI elements based on authority role
+  loadAuthorityDashboard();
+  
+  // Set up event listeners for dashboard actions
+  setupDashboardEvents();
+}
+
+// Load authority dashboard with appropriate content
+function loadAuthorityDashboard() {
+  const authName = document.getElementById('authorityName');
+  const authRole = document.getElementById('authorityRole');
+  const pendingIssuesCount = document.getElementById('pendingIssuesCount');
+  const issuesList = document.getElementById('issuesList');
+  const contentTabButtons = document.querySelectorAll('.content-tab-btn');
+  const contentTabContents = document.querySelectorAll('.content-tab-content');
+  
+  if (authName) authName.textContent = authorityState.currentAuthority.name;
+  if (authRole) authRole.textContent = roleToDisplayName(authorityState.currentAuthority.role);
+  
+  // Load issues relevant to this authority
+  loadAuthorityIssues(issuesList, pendingIssuesCount);
+  
+  // Set up content tabs
+  if (contentTabButtons.length > 0) {
+    contentTabButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        contentTabButtons.forEach(btn => btn.classList.remove('active'));
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Hide all content tabs
+        contentTabContents.forEach(content => content.classList.add('hidden'));
+        
+        // Show the selected content tab
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(`${tabId}Content`).classList.remove('hidden');
+        
+        // Load content for the selected tab
+        loadContentForTab(tabId);
+      });
     });
     
-    // Populate lists
-    if (DOM.pendingIssuesList) {
-      if (pending.length === 0) {
-        DOM.pendingIssuesList.innerHTML = '<div class="empty-message">No pending issues at this time.</div>';
-      } else {
-        pending.forEach(issue => {
-          DOM.pendingIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
-    }
-    
-    if (DOM.inProgressIssuesList) {
-      if (inProgress.length === 0) {
-        DOM.inProgressIssuesList.innerHTML = '<div class="empty-message">No issues in progress at this time.</div>';
-      } else {
-        inProgress.forEach(issue => {
-          DOM.inProgressIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
-    }
-    
-    if (DOM.resolvedIssuesList) {
-      if (resolved.length === 0) {
-        DOM.resolvedIssuesList.innerHTML = '<div class="empty-message">No resolved issues to show.</div>';
-      } else {
-        resolved.forEach(issue => {
-          DOM.resolvedIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
+    // Trigger click on first tab to load by default
+    if (contentTabButtons[0]) {
+      contentTabButtons[0].click();
     }
   }
+}
 
-  // Create issue card element
-  function createIssueCard(issue) {
-    const card = document.createElement('div');
-    card.className = 'issue-card';
-    card.setAttribute('data-issue-id', issue.id);
+// Load issues that are relevant to the current authority
+function loadAuthorityIssues(issuesList, pendingIssuesCount) {
+  if (!issuesList) return;
+  
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const role = authorityState.currentAuthority.role;
+  const level = authorityState.currentAuthority.level;
+  
+  // Filter issues based on authority role
+  let relevantIssues = [];
+  
+  if (role === 'wardmember') {
+    // Ward members see all new issues and those assigned to them
+    relevantIssues = allIssues.filter(issue => 
+      issue.status === 'submitted' || 
+      issue.assignedTo === 'wardmember'
+    );
+  } else if (role === 'uppasarpanch') {
+    // Uppasarpanch sees issues escalated to them or higher
+    relevantIssues = allIssues.filter(issue => 
+      issue.escalationLevel >= 2 ||
+      issue.assignedTo === 'uppasarpanch'
+    );
+  } else if (role === 'sarpanch') {
+    // Sarpanch sees all issues
+    relevantIssues = allIssues;
+  }
+  
+  // Update pending issues count
+  const pendingCount = relevantIssues.filter(issue => 
+    issue.status.toLowerCase() !== 'resolved' && 
+    issue.status.toLowerCase() !== 'closed'
+  ).length;
+  
+  if (pendingIssuesCount) pendingIssuesCount.textContent = pendingCount;
+  
+  // Clear previous issues
+  issuesList.innerHTML = '';
+  
+  // No issues case
+  if (relevantIssues.length === 0) {
+    issuesList.innerHTML = `
+      <div class="no-issues-message">
+        <i class="fas fa-check-circle"></i>
+        <p>No issues to display.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Sort issues: pending first, then by date (newest first)
+  relevantIssues.sort((a, b) => {
+    // Sort by status (pending first)
+    const statusA = a.status.toLowerCase();
+    const statusB = b.status.toLowerCase();
+    
+    const isResolvedA = statusA === 'resolved' || statusA === 'closed';
+    const isResolvedB = statusB === 'resolved' || statusB === 'closed';
+    
+    if (isResolvedA && !isResolvedB) return 1;
+    if (!isResolvedA && isResolvedB) return -1;
+    
+    // Sort by date (newest first)
+    return new Date(b.dateSubmitted) - new Date(a.dateSubmitted);
+  });
+  
+  // Display issues
+  relevantIssues.forEach(issue => {
+    const issueCard = document.createElement('div');
+    issueCard.className = 'issue-card';
     
     const statusClass = getStatusClass(issue.status);
     
-    card.innerHTML = `
+    // Create action buttons based on authority role and issue status
+    let actionButtons = '';
+    
+    // Determine available actions based on role and current status
+    if (role === 'wardmember' && issue.status === 'submitted') {
+      actionButtons = `
+        <button class="btn btn-sm btn-primary review-issue-btn" data-issue-id="${issue.id}">
+          <i class="fas fa-check"></i> Review
+        </button>
+        <button class="btn btn-sm btn-danger reject-issue-btn" data-issue-id="${issue.id}">
+          <i class="fas fa-times"></i> Reject
+        </button>
+      `;
+    } else if ((role === 'uppasarpanch' || role === 'sarpanch') && 
+               (issue.status !== 'resolved' && issue.status !== 'closed')) {
+      actionButtons = `
+        <button class="btn btn-sm btn-primary update-issue-btn" data-issue-id="${issue.id}">
+          <i class="fas fa-comment"></i> Respond
+        </button>
+        <button class="btn btn-sm btn-success resolve-issue-btn" data-issue-id="${issue.id}">
+          <i class="fas fa-check-circle"></i> Resolve
+        </button>
+      `;
+    } else if (issue.status !== 'closed') {
+      // For all other cases, just allow updates
+      actionButtons = `
+        <button class="btn btn-sm btn-primary update-issue-btn" data-issue-id="${issue.id}">
+          <i class="fas fa-comment"></i> Update
+        </button>
+      `;
+    }
+    
+    issueCard.innerHTML = `
       <div class="issue-card-header">
         <div>
           <h3>${issue.type}</h3>
-          <p>Reference ID: #${issue.id}</p>
+          <p class="issue-id">ID: #${issue.id}</p>
         </div>
         <div class="issue-status ${statusClass}">${issue.status}</div>
       </div>
-      <p class="issue-description">${issue.description}</p>
-      <div class="issue-meta">
-        <div>
-          <i class="fas fa-map-marker-alt"></i>
-          <span>${issue.location}, Ward ${issue.ward}</span>
+      <div class="issue-details">
+        <p>${issue.description}</p>
+        <div class="issue-meta">
+          <div>
+            <i class="fas fa-map-marker-alt"></i>
+            <span>${issue.location}, Ward ${issue.ward}</span>
+          </div>
+          <div>
+            <i class="fas fa-clock"></i>
+            <span>${new Date(issue.dateSubmitted).toLocaleString()}</span>
+          </div>
         </div>
-        <div>
-          <i class="fas fa-clock"></i>
-          <span>${new Date(issue.dateSubmitted).toLocaleString()}</span>
-        </div>
+        ${issue.images && issue.images.length > 0 ? `
+          <div class="issue-images">
+            ${issue.images.map((img, i) => `
+              <div class="issue-image">
+                <img src="${img}" alt="Issue image ${i+1}">
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
       </div>
       <div class="issue-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-eye"></i> View Details
+        ${actionButtons}
+        <button class="btn btn-sm btn-text view-details-btn" data-issue-id="${issue.id}">
+          View History <i class="fas fa-chevron-right"></i>
         </button>
       </div>
     `;
     
-    // Add click event
-    card.addEventListener('click', function() {
-      showIssueDetails(issue.id);
+    issuesList.appendChild(issueCard);
+  });
+  
+  // Add event listeners for action buttons
+  issuesList.querySelectorAll('.review-issue-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const issueId = this.getAttribute('data-issue-id');
+      reviewIssue(issueId);
+    });
+  });
+  
+  issuesList.querySelectorAll('.reject-issue-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const issueId = this.getAttribute('data-issue-id');
+      rejectIssue(issueId);
+    });
+  });
+  
+  issuesList.querySelectorAll('.update-issue-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const issueId = this.getAttribute('data-issue-id');
+      updateIssue(issueId);
+    });
+  });
+  
+  issuesList.querySelectorAll('.resolve-issue-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const issueId = this.getAttribute('data-issue-id');
+      resolveIssue(issueId);
+    });
+  });
+  
+  issuesList.querySelectorAll('.view-details-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const issueId = this.getAttribute('data-issue-id');
+      viewIssueDetails(issueId);
+    });
+  });
+}
+
+// Review and forward an issue to Uppasarpanch and Sarpanch
+function reviewIssue(issueId) {
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  
+  if (issueIndex === -1) {
+    showNotification('Issue not found', 'error');
+    return;
+  }
+  
+  const issue = allIssues[issueIndex];
+  
+  // Show review dialog
+  const reviewDialog = document.createElement('div');
+  reviewDialog.className = 'modal active';
+  reviewDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Review Issue #${issue.id}</h2>
+      <p class="mb-4">After reviewing this issue, it will be forwarded to both the Uppasarpanch and Sarpanch.</p>
+      
+      <form id="reviewIssueForm">
+        <div class="form-row">
+          <label for="reviewComment">Add a comment</label>
+          <textarea id="reviewComment" placeholder="Add your review comments..." rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-accent" id="cancelReview">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Forward to Authorities
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(reviewDialog);
+  
+  // Handle close button
+  const closeBtn = reviewDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(reviewDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = reviewDialog.querySelector('#cancelReview');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(reviewDialog);
+  });
+  
+  // Handle form submission
+  const reviewForm = reviewDialog.querySelector('#reviewIssueForm');
+  reviewForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const comment = document.getElementById('reviewComment').value;
+    
+    // Update issue status
+    issue.status = 'in-review';
+    issue.escalationLevel = 2; // Escalate to level 2 (Uppasarpanch)
+    issue.updates.push({
+      id: `UPDATE-${Date.now().toString(36)}`,
+      date: new Date().toISOString(),
+      status: 'Forwarded to Authorities',
+      comment: comment,
+      by: roleToDisplayName(authorityState.currentAuthority.role)
     });
     
-    return card;
-  }
+    // Save updated issues
+    allIssues[issueIndex] = issue;
+    localStorage.setItem('issues', JSON.stringify(allIssues));
+    
+    // Close dialog
+    document.body.removeChild(reviewDialog);
+    
+    // Show notification
+    showNotification('Issue has been reviewed and forwarded to authorities', 'success');
+    
+    // Reload issues list
+    const issuesList = document.getElementById('issuesList');
+    const pendingIssuesCount = document.getElementById('pendingIssuesCount');
+    loadAuthorityIssues(issuesList, pendingIssuesCount);
+  });
+}
 
-  // Show issue details in modal
-  function showIssueDetails(issueId) {
-    // Find the issue
-    const issue = state.issues.find(issue => issue.id === issueId);
-    if (!issue) return;
+// Reject an issue
+function rejectIssue(issueId) {
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  
+  if (issueIndex === -1) {
+    showNotification('Issue not found', 'error');
+    return;
+  }
+  
+  const issue = allIssues[issueIndex];
+  
+  // Show reject dialog
+  const rejectDialog = document.createElement('div');
+  rejectDialog.className = 'modal active';
+  rejectDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Reject Issue #${issue.id}</h2>
+      <p class="mb-4">Please provide a reason for rejecting this issue. This information will be shown to the user.</p>
+      
+      <form id="rejectIssueForm">
+        <div class="form-row">
+          <label for="rejectReason">Reason for rejection</label>
+          <textarea id="rejectReason" placeholder="Explain why this issue is being rejected..." rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-accent" id="cancelReject">Cancel</button>
+          <button type="submit" class="btn btn-danger">
+            <i class="fas fa-times"></i> Reject Issue
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(rejectDialog);
+  
+  // Handle close button
+  const closeBtn = rejectDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(rejectDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = rejectDialog.querySelector('#cancelReject');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(rejectDialog);
+  });
+  
+  // Handle form submission
+  const rejectForm = rejectDialog.querySelector('#rejectIssueForm');
+  rejectForm.addEventListener('submit', (e) => {
+    e.preventDefault();
     
-    // Determine available actions based on authority level
-    const authorityLevel = state.currentAuthority.level;
-    const canResolve = authorityLevel === 3; // Only Sarpanch can resolve
-    const canEscalateToSarpanch = authorityLevel >= 2; // Uppasarpanch or Sarpanch
-    const canTakeAction = authorityLevel >= 1; // Any authority
+    const reason = document.getElementById('rejectReason').value;
     
-    // Populate modal content
-    if (DOM.issueDetailsContent) {
-      DOM.issueDetailsContent.innerHTML = `
+    // Update issue status
+    issue.status = 'closed';
+    issue.updates.push({
+      id: `UPDATE-${Date.now().toString(36)}`,
+      date: new Date().toISOString(),
+      status: 'Rejected',
+      comment: reason,
+      by: roleToDisplayName(authorityState.currentAuthority.role)
+    });
+    
+    // Save updated issues
+    allIssues[issueIndex] = issue;
+    localStorage.setItem('issues', JSON.stringify(allIssues));
+    
+    // Close dialog
+    document.body.removeChild(rejectDialog);
+    
+    // Show notification
+    showNotification('Issue has been rejected', 'success');
+    
+    // Reload issues list
+    const issuesList = document.getElementById('issuesList');
+    const pendingIssuesCount = document.getElementById('pendingIssuesCount');
+    loadAuthorityIssues(issuesList, pendingIssuesCount);
+  });
+}
+
+// Update an issue with a comment
+function updateIssue(issueId) {
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  
+  if (issueIndex === -1) {
+    showNotification('Issue not found', 'error');
+    return;
+  }
+  
+  const issue = allIssues[issueIndex];
+  
+  // Show update dialog
+  const updateDialog = document.createElement('div');
+  updateDialog.className = 'modal active';
+  updateDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Update Issue #${issue.id}</h2>
+      <p class="mb-4">Add a comment or update to this issue. This will be visible to the user who reported it.</p>
+      
+      <form id="updateIssueForm">
+        <div class="form-row">
+          <label for="updateStatus">Update Status</label>
+          <select id="updateStatus" required>
+            <option value="in-review">In Review</option>
+            <option value="in-progress">In Progress</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="updateComment">Comment</label>
+          <textarea id="updateComment" placeholder="Add your update or comment..." rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-accent" id="cancelUpdate">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Update
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(updateDialog);
+  
+  // Set default status to current status
+  const statusSelect = document.getElementById('updateStatus');
+  if (statusSelect) {
+    // Find the option that matches the current status
+    const options = statusSelect.options;
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].value === issue.status) {
+        statusSelect.selectedIndex = i;
+        break;
+      }
+    }
+  }
+  
+  // Handle close button
+  const closeBtn = updateDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(updateDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = updateDialog.querySelector('#cancelUpdate');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(updateDialog);
+  });
+  
+  // Handle form submission
+  const updateForm = updateDialog.querySelector('#updateIssueForm');
+  updateForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const status = document.getElementById('updateStatus').value;
+    const comment = document.getElementById('updateComment').value;
+    
+    // Update issue
+    issue.status = status;
+    issue.updates.push({
+      id: `UPDATE-${Date.now().toString(36)}`,
+      date: new Date().toISOString(),
+      status: status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' '),
+      comment: comment,
+      by: roleToDisplayName(authorityState.currentAuthority.role)
+    });
+    
+    // Save updated issues
+    allIssues[issueIndex] = issue;
+    localStorage.setItem('issues', JSON.stringify(allIssues));
+    
+    // Close dialog
+    document.body.removeChild(updateDialog);
+    
+    // Show notification
+    showNotification('Issue has been updated', 'success');
+    
+    // Reload issues list
+    const issuesList = document.getElementById('issuesList');
+    const pendingIssuesCount = document.getElementById('pendingIssuesCount');
+    loadAuthorityIssues(issuesList, pendingIssuesCount);
+  });
+}
+
+// Resolve an issue
+function resolveIssue(issueId) {
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  
+  if (issueIndex === -1) {
+    showNotification('Issue not found', 'error');
+    return;
+  }
+  
+  const issue = allIssues[issueIndex];
+  
+  // Show resolve dialog
+  const resolveDialog = document.createElement('div');
+  resolveDialog.className = 'modal active';
+  resolveDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Resolve Issue #${issue.id}</h2>
+      <p class="mb-4">Add a resolution comment. This will mark the issue as resolved.</p>
+      
+      <form id="resolveIssueForm">
+        <div class="form-row">
+          <label for="resolutionComment">Resolution Comment</label>
+          <textarea id="resolutionComment" placeholder="Explain how this issue was resolved..." rows="4" required></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-accent" id="cancelResolve">Cancel</button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check-circle"></i> Mark as Resolved
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(resolveDialog);
+  
+  // Handle close button
+  const closeBtn = resolveDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(resolveDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = resolveDialog.querySelector('#cancelResolve');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(resolveDialog);
+  });
+  
+  // Handle form submission
+  const resolveForm = resolveDialog.querySelector('#resolveIssueForm');
+  resolveForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const comment = document.getElementById('resolutionComment').value;
+    
+    // Update issue status
+    issue.status = 'resolved';
+    issue.updates.push({
+      id: `UPDATE-${Date.now().toString(36)}`,
+      date: new Date().toISOString(),
+      status: 'Resolved',
+      comment: comment,
+      by: roleToDisplayName(authorityState.currentAuthority.role)
+    });
+    
+    // Save updated issues
+    allIssues[issueIndex] = issue;
+    localStorage.setItem('issues', JSON.stringify(allIssues));
+    
+    // Close dialog
+    document.body.removeChild(resolveDialog);
+    
+    // Show notification
+    showNotification('Issue has been marked as resolved', 'success');
+    
+    // Reload issues list
+    const issuesList = document.getElementById('issuesList');
+    const pendingIssuesCount = document.getElementById('pendingIssuesCount');
+    loadAuthorityIssues(issuesList, pendingIssuesCount);
+  });
+}
+
+// View issue details with history
+function viewIssueDetails(issueId) {
+  const allIssues = JSON.parse(localStorage.getItem('issues')) || [];
+  const issue = allIssues.find(issue => issue.id === issueId);
+  
+  if (!issue) {
+    showNotification('Issue not found', 'error');
+    return;
+  }
+  
+  // Show issue details dialog
+  const detailsDialog = document.createElement('div');
+  detailsDialog.className = 'modal active';
+  
+  const statusClass = getStatusClass(issue.status);
+  
+  detailsDialog.innerHTML = `
+    <div class="modal-content modal-lg">
+      <span class="close-modal">&times;</span>
+      <h2>Issue #${issue.id} Details</h2>
+      
+      <div class="issue-details-card">
         <div class="issue-card-header">
           <div>
-            <h2>${issue.type}</h2>
-            <p>Reference ID: #${issue.id}</p>
+            <h3>${issue.type}</h3>
           </div>
-          <div class="issue-status ${getStatusClass(issue.status)}">${issue.status}</div>
+          <div class="issue-status ${statusClass}">${issue.status}</div>
         </div>
         
-        <div class="mt-6">
-          <h3>Description</h3>
+        <div class="issue-section">
+          <h4>Description</h4>
           <p>${issue.description}</p>
         </div>
         
-        <div class="grid-2 mt-6">
-          <div>
-            <h3>Location</h3>
-            <div class="flex items-center gap-2">
-              <i class="fas fa-map-marker-alt text-terracotta"></i>
-              <span>${issue.location}, Ward ${issue.ward}</span>
-            </div>
+        <div class="grid-2">
+          <div class="issue-section">
+            <h4>Location</h4>
+            <p><i class="fas fa-map-marker-alt"></i> ${issue.location}, Ward ${issue.ward}</p>
           </div>
-          <div>
-            <h3>Date Submitted</h3>
-            <div class="flex items-center gap-2">
-              <i class="fas fa-clock text-terracotta"></i>
-              <span>${new Date(issue.dateSubmitted).toLocaleString()}</span>
-            </div>
+          <div class="issue-section">
+            <h4>Reported On</h4>
+            <p><i class="fas fa-calendar-alt"></i> ${new Date(issue.dateSubmitted).toLocaleDateString()}</p>
           </div>
         </div>
         
         ${issue.images && issue.images.length > 0 ? `
-          <div class="mt-6">
-            <h3>Uploaded Images</h3>
+          <div class="issue-section">
+            <h4>Images</h4>
             <div class="issue-images">
-              ${issue.images.map((image, index) => `
+              ${issue.images.map((img, i) => `
                 <div class="issue-image">
-                  <img src="${image}" alt="Issue image ${index + 1}">
+                  <img src="${img}" alt="Issue image ${i+1}">
                 </div>
               `).join('')}
             </div>
           </div>
         ` : ''}
         
-        <div class="issue-timeline">
-          <h3>Issue Timeline</h3>
-          ${renderIssueTimeline(issue)}
-        </div>
-        
-        <div class="issue-response-form">
-          <h3>Respond to Issue</h3>
-          <div class="response-options">
-            ${canTakeAction ? `
-              <div class="response-option" data-status="in-review">
-                <i class="fas fa-search"></i>
-                <span>Mark as In Review</span>
+        <div class="issue-section">
+          <h4>Updates Timeline</h4>
+          <div class="issue-timeline">
+            ${issue.updates.map(update => `
+              <div class="timeline-item">
+                <div class="timeline-icon">
+                  <i class="fas ${getTimelineIcon(update.status)}"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <h5>${update.status}</h5>
+                    <small>${new Date(update.date).toLocaleString()}</small>
+                  </div>
+                  <p>${update.comment}</p>
+                  <div class="timeline-footer">
+                    <small>By ${update.by}</small>
+                  </div>
+                </div>
               </div>
-              <div class="response-option" data-status="in-progress">
-                <i class="fas fa-tools"></i>
-                <span>Mark as In Progress</span>
-              </div>
-            ` : ''}
-            
-            ${canEscalateToSarpanch ? `
-              <div class="response-option escalate-sarpanch-btn" data-status="escalated-sarpanch">
-                <i class="fas fa-level-up-alt"></i>
-                <span>Escalate to Sarpanch</span>
-              </div>
-            ` : ''}
-            
-            ${canResolve ? `
-              <div class="response-option resolve-issue-btn" data-status="resolved">
-                <i class="fas fa-check-circle"></i>
-                <span>Mark as Resolved</span>
-              </div>
-            ` : ''}
-          </div>
-          
-          <div class="form-row">
-            <label for="responseComment">Add a Comment</label>
-            <textarea id="responseComment" class="form-textarea" rows="4" placeholder="Add details about the action taken or status update"></textarea>
-          </div>
-          
-          <div class="form-actions">
-            <button id="submitResponseBtn" class="btn btn-primary">
-              <i class="fas fa-paper-plane"></i> Submit Response
-            </button>
+            `).join('')}
           </div>
         </div>
-      `;
-    
-      // Show the modal
-      if (DOM.issueDetailsModal) {
-        DOM.issueDetailsModal.classList.add('active');
-      }
-      
-      // Add event listeners for response options
-      const responseOptions = DOM.issueDetailsContent.querySelectorAll('.response-option');
-      responseOptions.forEach(option => {
-        option.addEventListener('click', function() {
-          // Remove selected class from all options
-          responseOptions.forEach(opt => opt.classList.remove('selected'));
-          // Add selected class to clicked option
-          this.classList.add('selected');
-        });
-      });
-      
-      // Add event listener for submit response button
-      const submitResponseBtn = document.getElementById('submitResponseBtn');
-      if (submitResponseBtn) {
-        submitResponseBtn.addEventListener('click', function() {
-          const selectedOption = DOM.issueDetailsContent.querySelector('.response-option.selected');
-          if (!selectedOption) {
-            displayNotification('Please select a status update option', 'warning');
-            return;
-          }
-          
-          const newStatus = selectedOption.getAttribute('data-status');
-          const comment = document.getElementById('responseComment').value;
-          
-          if (!comment.trim()) {
-            displayNotification('Please add a comment with details', 'warning');
-            return;
-          }
-          
-          // Update the issue with proper escalation tracking
-          updateIssueStatus(issue.id, newStatus, comment);
-          
-          // Close the modal
-          if (DOM.issueDetailsModal) {
-            DOM.issueDetailsModal.classList.remove('active');
-          }
-        });
-      }
-    }
-  }
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(detailsDialog);
+  
+  // Handle close button
+  const closeBtn = detailsDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(detailsDialog);
+  });
+}
 
-  // Render issue timeline
-  function renderIssueTimeline(issue) {
-    let timelineHTML = '<div class="timeline">';
-    
-    issue.updates.forEach(update => {
-      timelineHTML += `
-        <div class="timeline-item completed">
-          <div class="timeline-icon">
-            <i class="fas fa-${getStatusIcon(update.status)}"></i>
-          </div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <h4>${update.status}</h4>
-              <span>${new Date(update.date).toLocaleString()}</span>
-            </div>
-            <p>${update.comment}</p>
-            <div class="text-sm text-gray-500">by ${update.by}</div>
-          </div>
-        </div>
-      `;
-    });
-    
-    timelineHTML += '</div>';
-    return timelineHTML;
+// Get icon for timeline based on status
+function getTimelineIcon(status) {
+  status = status.toLowerCase();
+  
+  if (status.includes('submit') || status.includes('reported')) {
+    return 'fa-file-alt';
+  } else if (status.includes('review') || status.includes('forward')) {
+    return 'fa-search';
+  } else if (status.includes('progress')) {
+    return 'fa-tools';
+  } else if (status.includes('resolved')) {
+    return 'fa-check-circle';
+  } else if (status.includes('reject') || status.includes('closed')) {
+    return 'fa-times-circle';
+  } else {
+    return 'fa-info-circle';
   }
+}
 
-  // Update issue status
-  function updateIssueStatus(issueId, newStatus, comment) {
-    // Find the issue
-    const issueIndex = state.issues.findIndex(issue => issue.id === issueId);
-    if (issueIndex === -1) return;
-    
-    // Create a copy of the issue
-    const updatedIssue = { ...state.issues[issueIndex] };
-    
-    // Set escalation level based on authority role
-    if (newStatus === 'escalated-sarpanch') {
-      updatedIssue.escalationLevel = 3;
-      updatedIssue.assignedTo = 'sarpanch';
-      newStatus = 'in-review'; // Change displayed status
-    } else if (newStatus === 'in-review' || newStatus === 'in-progress') {
-      updatedIssue.escalationLevel = state.currentAuthority.level;
-      updatedIssue.assignedTo = state.currentAuthority.role;
-    }
-    
-    // Update status
-    updatedIssue.status = newStatus;
-    
-    // Add update to timeline
-    updatedIssue.updates.push({
-      id: generateId(),
-      status: getDisplayStatus(newStatus, state.currentAuthority.role),
-      date: new Date().toISOString(),
-      comment: comment,
-      by: `${state.currentAuthority.position} (${state.currentAuthority.name})`
-    });
-    
-    // Update issue in state
-    state.issues[issueIndex] = updatedIssue;
-    
-    // Save to localStorage
-    localStorage.setItem('issues', JSON.stringify(state.issues));
-    
-    // Update UI
-    updateIssueCounters();
-    populateIssueLists();
-    
-    displayNotification(`Issue has been updated to "${getDisplayStatus(newStatus, state.currentAuthority.role)}" status`, 'success');
-  }
-
-  // Get user-friendly status display
-  function getDisplayStatus(status, role) {
-    if (status === 'escalated-sarpanch') return 'Escalated to Sarpanch';
-    if (status === 'in-review') return `In Review by ${roleToPosition(role)}`;
-    if (status === 'in-progress') return `In Progress by ${roleToPosition(role)}`;
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  }
-
-  // Save budget item
-  function saveBudgetItem() {
-    const title = document.getElementById('budgetTitle').value;
-    const description = document.getElementById('budgetDescription').value;
-    const details = document.getElementById('budgetDetails').value;
-    
-    if (!title || !description || !details) {
-      displayNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const budgetItem = {
-      id: generateId(),
-      title,
-      description,
-      details,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      authorityRole: state.currentAuthority.role,
-      images: getUploadedFileUrls('budgetFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.budget.push(budgetItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_budget', JSON.stringify(state.contentItems.budget));
-    
-    // Clear form
-    document.getElementById('budgetTitle').value = '';
-    document.getElementById('budgetDescription').value = '';
-    document.getElementById('budgetDetails').value = '';
-    document.getElementById('budgetFilePreview').innerHTML = '';
-    
-    displayNotification('Budget information has been saved successfully', 'success');
-  }
-
-  // Save history item
-  function saveHistoryItem() {
-    const title = document.getElementById('historyTitle').value;
-    const content = document.getElementById('historyContent').value;
-    const year = document.getElementById('historyYear').value;
-    
-    if (!title || !content) {
-      displayNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const historyItem = {
-      id: generateId(),
-      title,
-      content,
-      year,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      authorityRole: state.currentAuthority.role,
-      images: getUploadedFileUrls('historyFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.history.push(historyItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_history', JSON.stringify(state.contentItems.history));
-    
-    // Clear form
-    document.getElementById('historyTitle').value = '';
-    document.getElementById('historyContent').value = '';
-    document.getElementById('historyYear').value = '';
-    document.getElementById('historyFilePreview').innerHTML = '';
-    
-    displayNotification('Historical information has been saved successfully', 'success');
-  }
-
-  // Save resource item
-  function saveResourceItem() {
-    const title = document.getElementById('resourceTitle').value;
-    const description = document.getElementById('resourceDescription').value;
-    const type = document.getElementById('resourceType').value;
-    const link = document.getElementById('resourceLink').value;
-    
-    if (!title || !description) {
-      displayNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    if (type === 'link' && !link) {
-      displayNotification('Please provide a link for the resource', 'warning');
-      return;
-    }
-    
-    const resourceItem = {
-      id: generateId(),
-      title,
-      description,
-      type,
-      link,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      authorityRole: state.currentAuthority.role,
-      files: getUploadedFileUrls('resourceFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.resources.push(resourceItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_resources', JSON.stringify(state.contentItems.resources));
-    
-    // Clear form
-    document.getElementById('resourceTitle').value = '';
-    document.getElementById('resourceDescription').value = '';
-    document.getElementById('resourceType').value = 'document';
-    document.getElementById('resourceLink').value = '';
-    document.getElementById('resourceFilePreview').innerHTML = '';
-    
-    displayNotification('Resource has been saved successfully', 'success');
-  }
-
-  // Save announcement item
-  function saveAnnouncementItem() {
-    const title = document.getElementById('announcementTitle').value;
-    const content = document.getElementById('announcementContent').value;
-    const date = document.getElementById('announcementDate').value;
-    const priority = document.getElementById('announcementPriority').value;
-    
-    if (!title || !content) {
-      displayNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const announcementItem = {
-      id: generateId(),
-      title,
-      content,
-      date,
-      priority,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      authorityRole: state.currentAuthority.role,
-      images: getUploadedFileUrls('announcementFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.announcements.push(announcementItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_announcements', JSON.stringify(state.contentItems.announcements));
-    
-    // Clear form
-    document.getElementById('announcementTitle').value = '';
-    document.getElementById('announcementContent').value = '';
-    document.getElementById('announcementDate').value = '';
-    document.getElementById('announcementPriority').value = 'normal';
-    document.getElementById('announcementFilePreview').innerHTML = '';
-    
-    displayNotification('Announcement has been published successfully', 'success');
-  }
-
-  // Save profile settings
-  function saveProfileSettings() {
-    const fullName = document.getElementById('authorityFullName').value;
-    const position = document.getElementById('authorityPosition').value;
-    const email = document.getElementById('authorityContactEmail').value;
-    const currentPassword = document.getElementById('authorityCurrentPassword').value;
-    const newPassword = document.getElementById('authorityNewPassword').value;
-    const confirmPassword = document.getElementById('authorityConfirmPassword').value;
-    
-    if (!fullName || !position || !email) {
-      displayNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    // In a real app, we would verify the current password here
-    
-    if (newPassword && newPassword !== confirmPassword) {
-      displayNotification('New passwords do not match', 'error');
-      return;
-    }
-    
-    // Update authority object
-    state.currentAuthority.name = fullName;
-    state.currentAuthority.position = position;
-    state.currentAuthority.email = email;
-    
-    // Save to localStorage
-    localStorage.setItem('currentAuthority', JSON.stringify(state.currentAuthority));
-    
-    // Update UI
-    if (DOM.authorityName) {
-      DOM.authorityName.textContent = fullName;
-    }
-    
-    // Clear password fields
-    document.getElementById('authorityCurrentPassword').value = '';
-    document.getElementById('authorityNewPassword').value = '';
-    document.getElementById('authorityConfirmPassword').value = '';
-    
-    displayNotification('Profile settings have been updated successfully', 'success');
-  }
-
-  // Set up file uploads
-  function setupFileUploads() {
-    const uploadElements = [
-      { uploadArea: 'budgetFileUpload', input: 'budget-file-input', preview: 'budgetFilePreview' },
-      { uploadArea: 'historyFileUpload', input: 'history-file-input', preview: 'historyFilePreview' },
-      { uploadArea: 'resourceFileUpload', input: 'resource-file-input', preview: 'resourceFilePreview' },
-      { uploadArea: 'announcementFileUpload', input: 'announcement-file-input', preview: 'announcementFilePreview' }
-    ];
-    
-    uploadElements.forEach(element => {
-      const uploadArea = document.getElementById(element.uploadArea);
-      const fileInput = document.getElementById(element.input);
-      const filePreview = document.getElementById(element.preview);
-      
-      if (uploadArea && fileInput && filePreview) {
-        // Click on upload area to trigger file input
-        uploadArea.addEventListener('click', function() {
-          fileInput.click();
-        });
-        
-        // Handle file selection
-        fileInput.addEventListener('change', function() {
-          if (fileInput.files.length > 0) {
-            filePreview.innerHTML = '';
-            
-            Array.from(fileInput.files).forEach(file => {
-              const thumbnail = document.createElement('div');
-              thumbnail.className = 'file-thumbnail';
-              
-              if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                thumbnail.appendChild(img);
-              } else {
-                thumbnail.textContent = file.name.substring(0, 10) + '...';
-              }
-              
-              const removeBtn = document.createElement('div');
-              removeBtn.className = 'file-remove';
-              removeBtn.innerHTML = '&times;';
-              removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                thumbnail.remove();
-                // Note: We can't actually remove items from a FileList
-              });
-              
-              thumbnail.appendChild(removeBtn);
-              filePreview.appendChild(thumbnail);
-            });
-          }
-        });
-        
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', function(e) {
-          e.preventDefault();
-          uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', function() {
-          uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', function(e) {
-          e.preventDefault();
-          uploadArea.classList.remove('dragover');
-          
-          if (e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            // Trigger change event
-            const event = new Event('change');
-            fileInput.dispatchEvent(event);
-          }
-        });
-      }
+// Setup dashboard events
+function setupDashboardEvents() {
+  const logoutBtn = document.getElementById('logoutBtn');
+  const contentForm = document.getElementById('contentForm');
+  
+  // Logout button
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function() {
+      authorityLogout();
     });
   }
-
-  // Get uploaded file URLs
-  function getUploadedFileUrls(previewId) {
-    const filePreview = document.getElementById(previewId);
-    const urls = [];
-    
-    if (filePreview) {
-      const thumbnails = filePreview.querySelectorAll('.file-thumbnail img');
-      thumbnails.forEach(thumbnail => {
-        urls.push(thumbnail.src);
-      });
-    }
-    
-    return urls;
+  
+  // Content form submission
+  if (contentForm) {
+    contentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const contentType = document.getElementById('contentType').value;
+      const contentTitle = document.getElementById('contentTitle').value;
+      const contentDescription = document.getElementById('contentDescription').value;
+      const contentPriority = document.getElementById('contentPriority')?.value || 'normal';
+      
+      // Process form based on content type
+      saveAuthorityContent(contentType, contentTitle, contentDescription, contentPriority);
+    });
   }
+}
 
-  // Utility functions
-  function generateId() {
-    return Math.random().toString(36).substring(2, 10);
-  }
-
-  function getStatusClass(status) {
-    status = status.toLowerCase();
-    if (status === 'submitted') return 'reported';
-    if (status === 'in-progress' || status === 'in-review') return 'in-progress';
-    return 'resolved';
-  }
-
-  function getStatusIcon(status) {
-    status = status.toLowerCase();
-    if (status === 'submitted') return 'file-alt';
-    if (status === 'in-review') return 'search';
-    if (status === 'in-progress') return 'tools';
-    if (status === 'resolved') return 'check-circle';
-    if (status === 'closed') return 'lock';
-    if (status.includes('escalated')) return 'level-up-alt';
-    return 'info-circle';
-  }
-
-  // Initialize when DOM is loaded
-  document.addEventListener('DOMContentLoaded', init);
-
-  // Return public API
-  return {
-    init
-  };
-})();
-
-// Initialize the authorities module when the document is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  authoritiesModule.init();
-});
-
-// Fixed notification function to avoid recursive calls - renamed to displayNotification
-function displayNotification(message, type = 'info') {
-  // Check if the function is already defined in global scope
-  if (typeof window.showNotification === 'function') {
-    window.showNotification(message, type);
+// Load content for a specific tab
+function loadContentForTab(tabId) {
+  const contentList = document.getElementById(`${tabId}List`);
+  if (!contentList) return;
+  
+  const contentItems = JSON.parse(localStorage.getItem(`content_${tabId}`)) || [];
+  
+  // Clear previous content
+  contentList.innerHTML = '';
+  
+  // No content case
+  if (contentItems.length === 0) {
+    contentList.innerHTML = `
+      <div class="no-content-message">
+        <i class="fas fa-info-circle"></i>
+        <p>No ${tabId} content has been added yet.</p>
+      </div>
+    `;
     return;
   }
   
-  const notificationEl = document.getElementById('notification');
-  if (!notificationEl) return;
+  // Display content items
+  contentItems.forEach(item => {
+    const contentCard = document.createElement('div');
+    contentCard.className = 'content-card';
+    
+    // Build card based on content type
+    let cardContent = '';
+    
+    if (tabId === 'budget') {
+      cardContent = `
+        <h3>${item.title}</h3>
+        <p>${item.description}</p>
+        <div class="content-details">${item.details || ''}</div>
+      `;
+    } else if (tabId === 'history') {
+      cardContent = `
+        <h3>${item.title}</h3>
+        <div class="content-year">${item.year || 'N/A'}</div>
+        <div class="content-text">${item.description}</div>
+      `;
+    } else if (tabId === 'resources') {
+      cardContent = `
+        <h3>${item.title}</h3>
+        <p>${item.description}</p>
+        ${item.link ? `<a href="${item.link}" target="_blank" class="resource-link"><i class="fas fa-external-link-alt"></i> Access Resource</a>` : ''}
+      `;
+    } else if (tabId === 'announcements') {
+      const priorityClass = item.priority === 'high' ? 'priority-high' : (item.priority === 'medium' ? 'priority-medium' : 'priority-normal');
+      
+      cardContent = `
+        <h3>${item.title}</h3>
+        <div class="announcement-date"><i class="fas fa-calendar-day"></i> ${item.date || new Date(item.dateCreated).toLocaleDateString()}</div>
+        <div class="announcement-priority ${priorityClass}">
+          <i class="fas fa-exclamation-circle"></i> ${item.priority.charAt(0).toUpperCase() + item.priority.slice(1)} Priority
+        </div>
+        <div class="announcement-content">${item.description}</div>
+      `;
+    } else {
+      // Default content card
+      cardContent = `
+        <h3>${item.title}</h3>
+        <p>${item.description}</p>
+      `;
+    }
+    
+    // Add meta information and actions
+    contentCard.innerHTML = `
+      <div class="content-header">
+        ${cardContent}
+      </div>
+      <div class="content-meta">
+        <span>
+          <i class="fas fa-user-shield"></i> Posted by ${item.createdBy} (${roleToDisplayName(item.authorityRole)})
+        </span>
+        <span>
+          <i class="fas fa-calendar-alt"></i> ${new Date(item.dateCreated).toLocaleDateString()}
+        </span>
+      </div>
+      <div class="content-actions">
+        <button class="btn btn-sm btn-primary edit-content-btn" data-id="${item.id}" data-type="${tabId}">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-sm btn-danger delete-content-btn" data-id="${item.id}" data-type="${tabId}">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    `;
+    
+    contentList.appendChild(contentCard);
+  });
   
-  notificationEl.className = `notification ${type}`;
-  notificationEl.innerHTML = `
-    ${message}
-    <span class="notification-close">&times;</span>
-  `;
-  
-  notificationEl.classList.remove('hidden');
-  
-  // Add close event
-  const closeBtn = notificationEl.querySelector('.notification-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      notificationEl.classList.add('fadeOut');
-      setTimeout(() => {
-        notificationEl.classList.add('hidden');
-        notificationEl.classList.remove('fadeOut');
-      }, 300);
+  // Add event listeners for content actions
+  contentList.querySelectorAll('.edit-content-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const contentId = this.getAttribute('data-id');
+      const contentType = this.getAttribute('data-type');
+      editContent(contentId, contentType);
     });
+  });
+  
+  contentList.querySelectorAll('.delete-content-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const contentId = this.getAttribute('data-id');
+      const contentType = this.getAttribute('data-type');
+      deleteContent(contentId, contentType);
+    });
+  });
+}
+
+// Save content posted by authority
+function saveAuthorityContent(contentType, title, description, priority = 'normal') {
+  if (!contentType || !title || !description) {
+    showNotification('Please fill in all required fields', 'error');
+    return;
   }
   
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    if (!notificationEl.classList.contains('hidden')) {
-      notificationEl.classList.add('fadeOut');
-      setTimeout(() => {
-        notificationEl.classList.add('hidden');
-        notificationEl.classList.remove('fadeOut');
-      }, 300);
-    }
-  }, 5000);
+  // Get additional fields based on content type
+  let contentData = {
+    id: `content_${Date.now()}`,
+    title,
+    description,
+    dateCreated: new Date().toISOString(),
+    createdBy: authorityState.currentAuthority.name,
+    authorityRole: authorityState.currentAuthority.role
+  };
+  
+  // Add specific fields based on content type
+  if (contentType === 'budget') {
+    const budgetYear = document.getElementById('budgetYear')?.value;
+    const budgetAmount = document.getElementById('budgetAmount')?.value;
+    const budgetDetails = document.getElementById('budgetDetails')?.value;
+    
+    contentData = {
+      ...contentData,
+      year: budgetYear,
+      amount: budgetAmount,
+      details: budgetDetails
+    };
+  } else if (contentType === 'history') {
+    const historyYear = document.getElementById('historyYear')?.value;
+    
+    contentData = {
+      ...contentData,
+      year: historyYear
+    };
+  } else if (contentType === 'resources') {
+    const resourceLink = document.getElementById('resourceLink')?.value;
+    const resourceType = document.getElementById('resourceType')?.value;
+    
+    contentData = {
+      ...contentData,
+      link: resourceLink,
+      type: resourceType
+    };
+  } else if (contentType === 'announcements') {
+    contentData = {
+      ...contentData,
+      priority: priority,
+      date: new Date().toLocaleDateString()
+    };
+  }
+  
+  // Save to localStorage
+  const contentKey = `content_${contentType}`;
+  const existingContent = JSON.parse(localStorage.getItem(contentKey)) || [];
+  existingContent.push(contentData);
+  localStorage.setItem(contentKey, JSON.stringify(existingContent));
+  
+  // Show notification
+  showNotification(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} content has been saved successfully`, 'success');
+  
+  // Reset form
+  document.getElementById('contentForm').reset();
+  
+  // Reload content list
+  loadContentForTab(contentType);
 }
+
+// Edit existing content
+function editContent(contentId, contentType) {
+  const contentKey = `content_${contentType}`;
+  const contentItems = JSON.parse(localStorage.getItem(contentKey)) || [];
+  const contentItem = contentItems.find(item => item.id === contentId);
+  
+  if (!contentItem) {
+    showNotification('Content not found', 'error');
+    return;
+  }
+  
+  // Show edit dialog
+  const editDialog = document.createElement('div');
+  editDialog.className = 'modal active';
+  
+  // Create form fields based on content type
+  let additionalFields = '';
+  
+  if (contentType === 'budget') {
+    additionalFields = `
+      <div class="form-row">
+        <label for="editBudgetYear">Budget Year</label>
+        <input type="text" id="editBudgetYear" value="${contentItem.year || ''}">
+      </div>
+      <div class="form-row">
+        <label for="editBudgetAmount">Budget Amount</label>
+        <input type="text" id="editBudgetAmount" value="${contentItem.amount || ''}">
+      </div>
+      <div class="form-row">
+        <label for="editBudgetDetails">Budget Details</label>
+        <textarea id="editBudgetDetails" rows="4">${contentItem.details || ''}</textarea>
+      </div>
+    `;
+  } else if (contentType === 'history') {
+    additionalFields = `
+      <div class="form-row">
+        <label for="editHistoryYear">Year</label>
+        <input type="text" id="editHistoryYear" value="${contentItem.year || ''}">
+      </div>
+    `;
+  } else if (contentType === 'resources') {
+    additionalFields = `
+      <div class="form-row">
+        <label for="editResourceLink">Resource Link</label>
+        <input type="url" id="editResourceLink" value="${contentItem.link || ''}">
+      </div>
+      <div class="form-row">
+        <label for="editResourceType">Resource Type</label>
+        <select id="editResourceType">
+          <option value="document" ${contentItem.type === 'document' ? 'selected' : ''}>Document</option>
+          <option value="video" ${contentItem.type === 'video' ? 'selected' : ''}>Video</option>
+          <option value="link" ${contentItem.type === 'link' ? 'selected' : ''}>Link</option>
+          <option value="other" ${contentItem.type === 'other' ? 'selected' : ''}>Other</option>
+        </select>
+      </div>
+    `;
+  } else if (contentType === 'announcements') {
+    additionalFields = `
+      <div class="form-row">
+        <label for="editAnnouncementPriority">Priority</label>
+        <select id="editAnnouncementPriority">
+          <option value="normal" ${contentItem.priority === 'normal' ? 'selected' : ''}>Normal</option>
+          <option value="medium" ${contentItem.priority === 'medium' ? 'selected' : ''}>Medium</option>
+          <option value="high" ${contentItem.priority === 'high' ? 'selected' : ''}>High</option>
+        </select>
+      </div>
+    `;
+  }
+  
+  editDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Edit ${contentType.charAt(0).toUpperCase() + contentType.slice(1)}</h2>
+      
+      <form id="editContentForm">
+        <div class="form-row">
+          <label for="editContentTitle">Title</label>
+          <input type="text" id="editContentTitle" value="${contentItem.title}" required>
+        </div>
+        <div class="form-row">
+          <label for="editContentDescription">Description</label>
+          <textarea id="editContentDescription" rows="4" required>${contentItem.description}</textarea>
+        </div>
+        
+        ${additionalFields}
+        
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline-accent" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+  
+  document.body.appendChild(editDialog);
+  
+  // Handle close button
+  const closeBtn = editDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(editDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = editDialog.querySelector('#cancelEdit');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(editDialog);
+  });
+  
+  // Handle form submission
+  const editForm = editDialog.querySelector('#editContentForm');
+  editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const title = document.getElementById('editContentTitle').value;
+    const description = document.getElementById('editContentDescription').value;
+    
+    // Update common fields
+    contentItem.title = title;
+    contentItem.description = description;
+    
+    // Update specific fields based on content type
+    if (contentType === 'budget') {
+      contentItem.year = document.getElementById('editBudgetYear').value;
+      contentItem.amount = document.getElementById('editBudgetAmount').value;
+      contentItem.details = document.getElementById('editBudgetDetails').value;
+    } else if (contentType === 'history') {
+      contentItem.year = document.getElementById('editHistoryYear').value;
+    } else if (contentType === 'resources') {
+      contentItem.link = document.getElementById('editResourceLink').value;
+      contentItem.type = document.getElementById('editResourceType').value;
+    } else if (contentType === 'announcements') {
+      contentItem.priority = document.getElementById('editAnnouncementPriority').value;
+    }
+    
+    // Save updated content
+    const contentIndex = contentItems.findIndex(item => item.id === contentId);
+    contentItems[contentIndex] = contentItem;
+    localStorage.setItem(contentKey, JSON.stringify(contentItems));
+    
+    // Close dialog
+    document.body.removeChild(editDialog);
+    
+    // Show notification
+    showNotification('Content has been updated successfully', 'success');
+    
+    // Reload content list
+    loadContentForTab(contentType);
+  });
+}
+
+// Delete content
+function deleteContent(contentId, contentType) {
+  const contentKey = `content_${contentType}`;
+  const contentItems = JSON.parse(localStorage.getItem(contentKey)) || [];
+  
+  // Show confirm dialog
+  const confirmDialog = document.createElement('div');
+  confirmDialog.className = 'modal active';
+  confirmDialog.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Delete ${contentType.charAt(0).toUpperCase() + contentType.slice(1)}</h2>
+      <p class="mb-4">Are you sure you want to delete this content? This action cannot be undone.</p>
+      
+      <div class="form-actions">
+        <button class="btn btn-outline-accent" id="cancelDelete">Cancel</button>
+        <button class="btn btn-danger" id="confirmDelete">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(confirmDialog);
+  
+  // Handle close button
+  const closeBtn = confirmDialog.querySelector('.close-modal');
+  closeBtn.addEventListener('click', () => {
+    document.body.removeChild(confirmDialog);
+  });
+  
+  // Handle cancel button
+  const cancelBtn = confirmDialog.querySelector('#cancelDelete');
+  cancelBtn.addEventListener('click', () => {
+    document.body.removeChild(confirmDialog);
+  });
+  
+  // Handle confirm button
+  const confirmBtn = confirmDialog.querySelector('#confirmDelete');
+  confirmBtn.addEventListener('click', () => {
+    // Filter out the deleted item
+    const updatedItems = contentItems.filter(item => item.id !== contentId);
+    localStorage.setItem(contentKey, JSON.stringify(updatedItems));
+    
+    // Close dialog
+    document.body.removeChild(confirmDialog);
+    
+    // Show notification
+    showNotification('Content has been deleted successfully', 'success');
+    
+    // Reload content list
+    loadContentForTab(contentType);
+  });
+}
+
+// Authority logout function
+function authorityLogout() {
+  authorityState.isLoggedIn = false;
+  authorityState.currentAuthority = null;
+  
+  // Clear localStorage
+  localStorage.removeItem('authority_isLoggedIn');
+  localStorage.removeItem('authority_currentUser');
+  
+  // Show notification
+  if (window.showNotification) {
+    window.showNotification('You have been logged out successfully', 'info');
+  }
+  
+  // Redirect to login page
+  window.location.href = 'authorities-login.html';
+}
+
+// Helper function to convert role to display name
+function roleToDisplayName(role) {
+  if (!role) return 'Authority';
+  
+  switch(role) {
+    case 'sarpanch': return 'Sarpanch';
+    case 'uppasarpanch': return 'Uppasarpanch';
+    case 'wardmember': return 'Ward Member';
+    default: return role.charAt(0).toUpperCase() + role.slice(1);
+  }
+}
+
+// Helper function to get status CSS class
+function getStatusClass(status) {
+  switch (status.toLowerCase()) {
+    case 'submitted':
+      return 'reported';
+    case 'in-review':
+      return 'in-review';
+    case 'in-progress':
+      return 'in-progress';
+    case 'resolved':
+      return 'resolved';
+    case 'rejected':
+    case 'closed':
+      return 'closed';
+    default:
+      return 'reported';
+  }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initAuthority);
