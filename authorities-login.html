@@ -50,6 +50,15 @@
             <div class="report-form">
               <form id="authoritiesLoginForm">
                 <div class="form-row">
+                  <label for="authorityRole" class="form-label">Select Your Role</label>
+                  <select id="authorityRole" class="form-select" required>
+                    <option value="">Select Role</option>
+                    <option value="sarpanch">Sarpanch</option>
+                    <option value="uppasarpanch">Uppasarpanch</option>
+                    <option value="wardmember">Ward Member</option>
+                  </select>
+                </div>
+                <div class="form-row">
                   <label for="authorityEmail" class="form-label">Email</label>
                   <input type="email" id="authorityEmail" class="form-input" required placeholder="Enter your official email">
                 </div>
