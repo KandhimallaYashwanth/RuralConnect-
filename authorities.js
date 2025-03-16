@@ -1,905 +1,955 @@
-// Authorities Module
-const authoritiesModule = (function() {
-  // State Management
-  const state = {
-    currentAuthority: null,
-    issues: [],
-    menuSection: 'pending-issues',
-    contentItems: {
-      budget: [],
-      history: [],
-      resources: [],
-      announcements: []
-    }
-  };
 
-  // DOM Elements
-  const DOM = {
-    // Login form
-    authoritiesLoginForm: document.getElementById('authoritiesLoginForm'),
-    
-    // Dashboard elements
-    authorityName: document.getElementById('authorityName'),
-    authorityLogoutBtn: document.getElementById('authorityLogoutBtn'),
-    menuItems: document.querySelectorAll('.menu-item'),
-    dashboardSections: document.querySelectorAll('.dashboard-section'),
-    
-    // Issue counters
-    pendingCount: document.getElementById('pendingCount'),
-    inProgressCount: document.getElementById('inProgressCount'),
-    resolvedCount: document.getElementById('resolvedCount'),
-    
-    // Issue lists
-    pendingIssuesList: document.getElementById('pendingIssuesList'),
-    inProgressIssuesList: document.getElementById('inProgressIssuesList'),
-    resolvedIssuesList: document.getElementById('resolvedIssuesList'),
-    
-    // Issue details modal
-    issueDetailsModal: document.getElementById('issueDetailsModal'),
-    closeIssueModal: document.getElementById('closeIssueModal'),
-    issueDetailsContent: document.getElementById('issueDetailsContent'),
-    
-    // Content management buttons
-    saveBudgetBtn: document.getElementById('saveBudgetBtn'),
-    saveHistoryBtn: document.getElementById('saveHistoryBtn'),
-    saveResourceBtn: document.getElementById('saveResourceBtn'),
-    saveAnnouncementBtn: document.getElementById('saveAnnouncementBtn'),
-    saveProfileBtn: document.getElementById('saveProfileBtn')
-  };
+// Authorities functionality
+let authorityState = {
+  isLoggedIn: false,
+  currentAuthority: null,
+  contentTypes: ['events', 'budget', 'history', 'resources', 'announcements']
+};
 
-  // Initialize the module
-  function init() {
-    // Check if we're on the login page or dashboard
-    if (DOM.authoritiesLoginForm) {
-      initLoginPage();
-    } else if (DOM.authorityLogoutBtn) {
-      initDashboard();
-    }
+// DOM elements
+const authoritiesLoginForm = document.getElementById('authoritiesLoginForm');
+const authorityDashboard = document.getElementById('authorityDashboard');
+const contentManagementSection = document.getElementById('contentManagementSection');
+const addContentForm = document.getElementById('addContentForm');
+const contentTypeSelect = document.getElementById('contentType');
+const contentFormFields = document.getElementById('contentFormFields');
+const contentList = document.getElementById('contentList');
+const saveContentBtn = document.getElementById('saveContentBtn');
+const logoutAuthorityBtn = document.getElementById('logoutAuthorityBtn');
+const issueManagementSection = document.getElementById('issueManagementSection');
+const issuesList = document.getElementById('issuesList');
+const issueDetailPanel = document.getElementById('issueDetailPanel');
+
+// Check if authority is logged in (from localStorage)
+function initAuthorities() {
+  const savedLogin = localStorage.getItem('authorityIsLoggedIn');
+  const savedAuthority = localStorage.getItem('currentAuthority');
+  
+  if (savedLogin === 'true' && savedAuthority) {
+    authorityState.isLoggedIn = true;
+    authorityState.currentAuthority = JSON.parse(savedAuthority);
+    updateUIForAuthorityLogin();
   }
+  
+  // Determine the current page
+  const currentPage = window.location.pathname.split('/').pop();
+  
+  if (currentPage === 'authorities-login.html') {
+    setupLoginPage();
+  } else if (currentPage === 'authorities-dashboard.html') {
+    setupDashboardPage();
+  }
+}
 
-  // Initialize login page functionality
-  function initLoginPage() {
-    // Check if already logged in as authority
-    const savedAuthority = localStorage.getItem('currentAuthority');
-    if (savedAuthority) {
-      // Redirect to dashboard
-      window.location.href = 'authorities-dashboard.html';
-      return;
-    }
-
-    // Handle login form submission
-    DOM.authoritiesLoginForm.addEventListener('submit', function(e) {
+// Setup login page
+function setupLoginPage() {
+  if (authoritiesLoginForm) {
+    authoritiesLoginForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
       const email = document.getElementById('authorityEmail').value;
       const password = document.getElementById('authorityPassword').value;
       
-      // Simplified authentication without email validation
+      // Simple validation - in a real app this would be authenticated against a server
       if (email && password) {
-        // Create authority object
-        const authority = {
-          id: generateId(),
-          name: email.split('@')[0].replace(/\./g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-          email: email,
-          position: 'Village Authority',
-          dateJoined: new Date().toISOString()
-        };
+        // Determine authority role based on email
+        let role = 'Ward Member'; // Default role
         
-        // Save to localStorage
-        localStorage.setItem('currentAuthority', JSON.stringify(authority));
-        
-        // Show success message
-        showNotification('Login successful. Redirecting to dashboard...', 'success');
-        
-        // Redirect to dashboard
-        setTimeout(() => {
-          window.location.href = 'authorities-dashboard.html';
-        }, 1500);
-      } else {
-        showNotification('Please enter both email and password', 'error');
-      }
-    });
-  }
-
-  // Initialize dashboard functionality
-  function initDashboard() {
-    // Load authority data
-    const savedAuthority = localStorage.getItem('currentAuthority');
-    if (!savedAuthority) {
-      // Not logged in, redirect to login page
-      window.location.href = 'authorities-login.html';
-      return;
-    }
-    
-    state.currentAuthority = JSON.parse(savedAuthority);
-    DOM.authorityName.textContent = state.currentAuthority.name;
-    
-    // Load issues from localStorage
-    loadIssues();
-    
-    // Load content items
-    loadContentItems();
-    
-    // Set up event listeners
-    setupEventListeners();
-    
-    // Initialize the dashboard UI
-    updateIssueCounters();
-    populateIssueLists();
-  }
-
-  // Set up dashboard event listeners
-  function setupEventListeners() {
-    // Logout button
-    DOM.authorityLogoutBtn.addEventListener('click', function() {
-      localStorage.removeItem('currentAuthority');
-      showNotification('Logged out successfully', 'info');
-      window.location.href = 'authorities-login.html';
-    });
-    
-    // Menu item clicks
-    DOM.menuItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const section = this.getAttribute('data-section');
-        changeActiveSection(section);
-      });
-    });
-    
-    // Close issue details modal
-    if (DOM.closeIssueModal) {
-      DOM.closeIssueModal.addEventListener('click', function() {
-        DOM.issueDetailsModal.classList.remove('active');
-      });
-    }
-    
-    // Content form submissions
-    if (DOM.saveBudgetBtn) {
-      DOM.saveBudgetBtn.addEventListener('click', saveBudgetItem);
-    }
-    
-    if (DOM.saveHistoryBtn) {
-      DOM.saveHistoryBtn.addEventListener('click', saveHistoryItem);
-    }
-    
-    if (DOM.saveResourceBtn) {
-      DOM.saveResourceBtn.addEventListener('click', saveResourceItem);
-    }
-    
-    if (DOM.saveAnnouncementBtn) {
-      DOM.saveAnnouncementBtn.addEventListener('click', saveAnnouncementItem);
-    }
-    
-    if (DOM.saveProfileBtn) {
-      DOM.saveProfileBtn.addEventListener('click', saveProfileSettings);
-    }
-    
-    // Content type change
-    const resourceType = document.getElementById('resourceType');
-    if (resourceType) {
-      resourceType.addEventListener('change', function() {
-        const linkRow = document.getElementById('resourceLinkRow');
-        if (this.value === 'link') {
-          linkRow.style.display = 'block';
-        } else {
-          linkRow.style.display = 'none';
-        }
-      });
-    }
-    
-    // File uploads
-    setupFileUploads();
-  }
-
-  // Load issues from localStorage
-  function loadIssues() {
-    const savedIssues = localStorage.getItem('issues');
-    state.issues = savedIssues ? JSON.parse(savedIssues) : [];
-  }
-
-  // Load content items
-  function loadContentItems() {
-    // Load from localStorage
-    ['budget', 'history', 'resources', 'announcements'].forEach(type => {
-      const saved = localStorage.getItem(`content_${type}`);
-      state.contentItems[type] = saved ? JSON.parse(saved) : [];
-    });
-  }
-
-  // Change active section
-  function changeActiveSection(sectionId) {
-    // Update menu items
-    DOM.menuItems.forEach(item => {
-      if (item.getAttribute('data-section') === sectionId) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
-      }
-    });
-    
-    // Update visible section
-    DOM.dashboardSections.forEach(section => {
-      if (section.id === sectionId) {
-        section.classList.add('active');
-      } else {
-        section.classList.remove('active');
-      }
-    });
-    
-    state.menuSection = sectionId;
-  }
-
-  // Update issue counters
-  function updateIssueCounters() {
-    // Count issues by status
-    let pendingCount = 0;
-    let inProgressCount = 0;
-    let resolvedCount = 0;
-    
-    state.issues.forEach(issue => {
-      const status = issue.status.toLowerCase();
-      if (status === 'submitted') {
-        pendingCount++;
-      } else if (status === 'in-progress' || status === 'in-review') {
-        inProgressCount++;
-      } else if (status === 'resolved' || status === 'closed') {
-        resolvedCount++;
-      }
-    });
-    
-    // Update DOM
-    if (DOM.pendingCount) DOM.pendingCount.textContent = pendingCount;
-    if (DOM.inProgressCount) DOM.inProgressCount.textContent = inProgressCount;
-    if (DOM.resolvedCount) DOM.resolvedCount.textContent = resolvedCount;
-  }
-
-  // Populate issue lists
-  function populateIssueLists() {
-    // Clear existing lists
-    if (DOM.pendingIssuesList) DOM.pendingIssuesList.innerHTML = '';
-    if (DOM.inProgressIssuesList) DOM.inProgressIssuesList.innerHTML = '';
-    if (DOM.resolvedIssuesList) DOM.resolvedIssuesList.innerHTML = '';
-    
-    // Group issues by status
-    const pending = [];
-    const inProgress = [];
-    const resolved = [];
-    
-    state.issues.forEach(issue => {
-      const status = issue.status.toLowerCase();
-      if (status === 'submitted') {
-        pending.push(issue);
-      } else if (status === 'in-progress' || status === 'in-review') {
-        inProgress.push(issue);
-      } else if (status === 'resolved' || status === 'closed') {
-        resolved.push(issue);
-      }
-    });
-    
-    // Populate lists
-    if (DOM.pendingIssuesList) {
-      if (pending.length === 0) {
-        DOM.pendingIssuesList.innerHTML = '<div class="empty-message">No pending issues at this time.</div>';
-      } else {
-        pending.forEach(issue => {
-          DOM.pendingIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
-    }
-    
-    if (DOM.inProgressIssuesList) {
-      if (inProgress.length === 0) {
-        DOM.inProgressIssuesList.innerHTML = '<div class="empty-message">No issues in progress at this time.</div>';
-      } else {
-        inProgress.forEach(issue => {
-          DOM.inProgressIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
-    }
-    
-    if (DOM.resolvedIssuesList) {
-      if (resolved.length === 0) {
-        DOM.resolvedIssuesList.innerHTML = '<div class="empty-message">No resolved issues to show.</div>';
-      } else {
-        resolved.forEach(issue => {
-          DOM.resolvedIssuesList.appendChild(createIssueCard(issue));
-        });
-      }
-    }
-  }
-
-  // Create issue card element
-  function createIssueCard(issue) {
-    const card = document.createElement('div');
-    card.className = 'issue-card';
-    card.setAttribute('data-issue-id', issue.id);
-    
-    const statusClass = getStatusClass(issue.status);
-    
-    card.innerHTML = `
-      <div class="issue-card-header">
-        <div>
-          <h3>${issue.type}</h3>
-          <p>Reference ID: #${issue.id}</p>
-        </div>
-        <div class="issue-status ${statusClass}">${issue.status}</div>
-      </div>
-      <p class="issue-description">${issue.description}</p>
-      <div class="issue-meta">
-        <div>
-          <i class="fas fa-map-marker-alt"></i>
-          <span>${issue.location}, Ward ${issue.ward}</span>
-        </div>
-        <div>
-          <i class="fas fa-clock"></i>
-          <span>${new Date(issue.dateSubmitted).toLocaleString()}</span>
-        </div>
-      </div>
-      <div class="issue-actions">
-        <button class="btn btn-primary">
-          <i class="fas fa-eye"></i> View Details
-        </button>
-      </div>
-    `;
-    
-    // Add click event
-    card.addEventListener('click', function() {
-      showIssueDetails(issue.id);
-    });
-    
-    return card;
-  }
-
-  // Show issue details in modal
-  function showIssueDetails(issueId) {
-    // Find the issue
-    const issue = state.issues.find(issue => issue.id === issueId);
-    if (!issue) return;
-    
-    // Populate modal content
-    DOM.issueDetailsContent.innerHTML = `
-      <div class="issue-card-header">
-        <div>
-          <h2>${issue.type}</h2>
-          <p>Reference ID: #${issue.id}</p>
-        </div>
-        <div class="issue-status ${getStatusClass(issue.status)}">${issue.status}</div>
-      </div>
-      
-      <div class="mt-6">
-        <h3>Description</h3>
-        <p>${issue.description}</p>
-      </div>
-      
-      <div class="grid-2 mt-6">
-        <div>
-          <h3>Location</h3>
-          <div class="flex items-center gap-2">
-            <i class="fas fa-map-marker-alt text-terracotta"></i>
-            <span>${issue.location}, Ward ${issue.ward}</span>
-          </div>
-        </div>
-        <div>
-          <h3>Date Submitted</h3>
-          <div class="flex items-center gap-2">
-            <i class="fas fa-clock text-terracotta"></i>
-            <span>${new Date(issue.dateSubmitted).toLocaleString()}</span>
-          </div>
-        </div>
-      </div>
-      
-      ${issue.images && issue.images.length > 0 ? `
-        <div class="mt-6">
-          <h3>Uploaded Images</h3>
-          <div class="issue-images">
-            ${issue.images.map((image, index) => `
-              <div class="issue-image">
-                <img src="${image}" alt="Issue image ${index + 1}">
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      ` : ''}
-      
-      <div class="issue-timeline">
-        <h3>Issue Timeline</h3>
-        ${renderIssueTimeline(issue)}
-      </div>
-      
-      <div class="issue-response-form">
-        <h3>Respond to Issue</h3>
-        <div class="response-options">
-          <div class="response-option" data-status="in-review">
-            <i class="fas fa-search"></i>
-            <span>Mark as In Review</span>
-          </div>
-          <div class="response-option" data-status="in-progress">
-            <i class="fas fa-tools"></i>
-            <span>Mark as In Progress</span>
-          </div>
-          <div class="response-option" data-status="resolved">
-            <i class="fas fa-check-circle"></i>
-            <span>Mark as Resolved</span>
-          </div>
-        </div>
-        
-        <div class="form-row">
-          <label for="responseComment">Add a Comment</label>
-          <textarea id="responseComment" class="form-textarea" rows="4" placeholder="Add details about the action taken or status update"></textarea>
-        </div>
-        
-        <div class="form-actions">
-          <button id="submitResponseBtn" class="btn btn-primary">
-            <i class="fas fa-paper-plane"></i> Submit Response
-          </button>
-        </div>
-      </div>
-    `;
-    
-    // Show the modal
-    DOM.issueDetailsModal.classList.add('active');
-    
-    // Add event listeners for response options
-    const responseOptions = DOM.issueDetailsContent.querySelectorAll('.response-option');
-    responseOptions.forEach(option => {
-      option.addEventListener('click', function() {
-        // Remove selected class from all options
-        responseOptions.forEach(opt => opt.classList.remove('selected'));
-        // Add selected class to clicked option
-        this.classList.add('selected');
-      });
-    });
-    
-    // Add event listener for submit response button
-    const submitResponseBtn = document.getElementById('submitResponseBtn');
-    if (submitResponseBtn) {
-      submitResponseBtn.addEventListener('click', function() {
-        const selectedOption = DOM.issueDetailsContent.querySelector('.response-option.selected');
-        if (!selectedOption) {
-          showNotification('Please select a status update option', 'warning');
-          return;
+        if (email.includes('sarpanch')) {
+          role = 'Sarpanch';
+        } else if (email.includes('uppasarpanch')) {
+          role = 'Uppasarpanch';
         }
         
-        const newStatus = selectedOption.getAttribute('data-status');
-        const comment = document.getElementById('responseComment').value;
-        
-        if (!comment.trim()) {
-          showNotification('Please add a comment with details', 'warning');
-          return;
-        }
-        
-        // Update the issue
-        updateIssueStatus(issue.id, newStatus, comment);
-        
-        // Close the modal
-        DOM.issueDetailsModal.classList.remove('active');
-      });
-    }
-  }
-
-  // Render issue timeline
-  function renderIssueTimeline(issue) {
-    let timelineHTML = '<div class="timeline">';
-    
-    issue.updates.forEach(update => {
-      timelineHTML += `
-        <div class="timeline-item completed">
-          <div class="timeline-icon">
-            <i class="fas fa-${getStatusIcon(update.status)}"></i>
-          </div>
-          <div class="timeline-content">
-            <div class="timeline-header">
-              <h4>${update.status}</h4>
-              <span>${new Date(update.date).toLocaleString()}</span>
-            </div>
-            <p>${update.comment}</p>
-            <div class="text-sm text-gray-500">by ${update.by}</div>
-          </div>
-        </div>
-      `;
-    });
-    
-    timelineHTML += '</div>';
-    return timelineHTML;
-  }
-
-  // Update issue status
-  function updateIssueStatus(issueId, newStatus, comment) {
-    // Find the issue
-    const issueIndex = state.issues.findIndex(issue => issue.id === issueId);
-    if (issueIndex === -1) return;
-    
-    // Create a copy of the issue
-    const updatedIssue = { ...state.issues[issueIndex] };
-    
-    // Update status
-    updatedIssue.status = newStatus;
-    
-    // Add update to timeline
-    updatedIssue.updates.push({
-      id: generateId(),
-      status: newStatus,
-      date: new Date().toISOString(),
-      comment: comment,
-      by: state.currentAuthority.name
-    });
-    
-    // Update issue in state
-    state.issues[issueIndex] = updatedIssue;
-    
-    // Save to localStorage
-    localStorage.setItem('issues', JSON.stringify(state.issues));
-    
-    // Update UI
-    updateIssueCounters();
-    populateIssueLists();
-    
-    showNotification(`Issue has been updated to "${newStatus}" status`, 'success');
-  }
-
-  // Save budget item
-  function saveBudgetItem() {
-    const title = document.getElementById('budgetTitle').value;
-    const description = document.getElementById('budgetDescription').value;
-    const details = document.getElementById('budgetDetails').value;
-    
-    if (!title || !description || !details) {
-      showNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const budgetItem = {
-      id: generateId(),
-      title,
-      description,
-      details,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      images: getUploadedFileUrls('budgetFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.budget.push(budgetItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_budget', JSON.stringify(state.contentItems.budget));
-    
-    // Clear form
-    document.getElementById('budgetTitle').value = '';
-    document.getElementById('budgetDescription').value = '';
-    document.getElementById('budgetDetails').value = '';
-    document.getElementById('budgetFilePreview').innerHTML = '';
-    
-    showNotification('Budget information has been saved successfully', 'success');
-  }
-
-  // Save history item
-  function saveHistoryItem() {
-    const title = document.getElementById('historyTitle').value;
-    const content = document.getElementById('historyContent').value;
-    const year = document.getElementById('historyYear').value;
-    
-    if (!title || !content) {
-      showNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const historyItem = {
-      id: generateId(),
-      title,
-      content,
-      year,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      images: getUploadedFileUrls('historyFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.history.push(historyItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_history', JSON.stringify(state.contentItems.history));
-    
-    // Clear form
-    document.getElementById('historyTitle').value = '';
-    document.getElementById('historyContent').value = '';
-    document.getElementById('historyYear').value = '';
-    document.getElementById('historyFilePreview').innerHTML = '';
-    
-    showNotification('Historical information has been saved successfully', 'success');
-  }
-
-  // Save resource item
-  function saveResourceItem() {
-    const title = document.getElementById('resourceTitle').value;
-    const description = document.getElementById('resourceDescription').value;
-    const type = document.getElementById('resourceType').value;
-    const link = document.getElementById('resourceLink').value;
-    
-    if (!title || !description) {
-      showNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    if (type === 'link' && !link) {
-      showNotification('Please provide a link for the resource', 'warning');
-      return;
-    }
-    
-    const resourceItem = {
-      id: generateId(),
-      title,
-      description,
-      type,
-      link,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      files: getUploadedFileUrls('resourceFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.resources.push(resourceItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_resources', JSON.stringify(state.contentItems.resources));
-    
-    // Clear form
-    document.getElementById('resourceTitle').value = '';
-    document.getElementById('resourceDescription').value = '';
-    document.getElementById('resourceType').value = 'document';
-    document.getElementById('resourceLink').value = '';
-    document.getElementById('resourceFilePreview').innerHTML = '';
-    
-    showNotification('Resource has been saved successfully', 'success');
-  }
-
-  // Save announcement item
-  function saveAnnouncementItem() {
-    const title = document.getElementById('announcementTitle').value;
-    const content = document.getElementById('announcementContent').value;
-    const date = document.getElementById('announcementDate').value;
-    const priority = document.getElementById('announcementPriority').value;
-    
-    if (!title || !content) {
-      showNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    const announcementItem = {
-      id: generateId(),
-      title,
-      content,
-      date,
-      priority,
-      dateCreated: new Date().toISOString(),
-      createdBy: state.currentAuthority.name,
-      images: getUploadedFileUrls('announcementFilePreview')
-    };
-    
-    // Add to state
-    state.contentItems.announcements.push(announcementItem);
-    
-    // Save to localStorage
-    localStorage.setItem('content_announcements', JSON.stringify(state.contentItems.announcements));
-    
-    // Clear form
-    document.getElementById('announcementTitle').value = '';
-    document.getElementById('announcementContent').value = '';
-    document.getElementById('announcementDate').value = '';
-    document.getElementById('announcementPriority').value = 'normal';
-    document.getElementById('announcementFilePreview').innerHTML = '';
-    
-    showNotification('Announcement has been published successfully', 'success');
-  }
-
-  // Save profile settings
-  function saveProfileSettings() {
-    const fullName = document.getElementById('authorityFullName').value;
-    const position = document.getElementById('authorityPosition').value;
-    const email = document.getElementById('authorityContactEmail').value;
-    const currentPassword = document.getElementById('authorityCurrentPassword').value;
-    const newPassword = document.getElementById('authorityNewPassword').value;
-    const confirmPassword = document.getElementById('authorityConfirmPassword').value;
-    
-    if (!fullName || !position || !email) {
-      showNotification('Please fill in all required fields', 'warning');
-      return;
-    }
-    
-    // In a real app, we would verify the current password here
-    
-    if (newPassword && newPassword !== confirmPassword) {
-      showNotification('New passwords do not match', 'error');
-      return;
-    }
-    
-    // Update authority object
-    state.currentAuthority.name = fullName;
-    state.currentAuthority.position = position;
-    state.currentAuthority.email = email;
-    
-    // Save to localStorage
-    localStorage.setItem('currentAuthority', JSON.stringify(state.currentAuthority));
-    
-    // Update UI
-    DOM.authorityName.textContent = fullName;
-    
-    // Clear password fields
-    document.getElementById('authorityCurrentPassword').value = '';
-    document.getElementById('authorityNewPassword').value = '';
-    document.getElementById('authorityConfirmPassword').value = '';
-    
-    showNotification('Profile settings have been updated successfully', 'success');
-  }
-
-  // Set up file uploads
-  function setupFileUploads() {
-    const uploadElements = [
-      { uploadArea: 'budgetFileUpload', input: 'budget-file-input', preview: 'budgetFilePreview' },
-      { uploadArea: 'historyFileUpload', input: 'history-file-input', preview: 'historyFilePreview' },
-      { uploadArea: 'resourceFileUpload', input: 'resource-file-input', preview: 'resourceFilePreview' },
-      { uploadArea: 'announcementFileUpload', input: 'announcement-file-input', preview: 'announcementFilePreview' }
-    ];
-    
-    uploadElements.forEach(element => {
-      const uploadArea = document.getElementById(element.uploadArea);
-      const fileInput = document.getElementById(element.input);
-      const filePreview = document.getElementById(element.preview);
-      
-      if (uploadArea && fileInput && filePreview) {
-        // Click on upload area to trigger file input
-        uploadArea.addEventListener('click', function() {
-          fileInput.click();
-        });
-        
-        // Handle file selection
-        fileInput.addEventListener('change', function() {
-          if (fileInput.files.length > 0) {
-            filePreview.innerHTML = '';
-            
-            Array.from(fileInput.files).forEach(file => {
-              const thumbnail = document.createElement('div');
-              thumbnail.className = 'file-thumbnail';
-              
-              if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                thumbnail.appendChild(img);
-              } else {
-                thumbnail.textContent = file.name.substring(0, 10) + '...';
-              }
-              
-              const removeBtn = document.createElement('div');
-              removeBtn.className = 'file-remove';
-              removeBtn.innerHTML = '&times;';
-              removeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                thumbnail.remove();
-                // Note: We can't actually remove items from a FileList
-              });
-              
-              thumbnail.appendChild(removeBtn);
-              filePreview.appendChild(thumbnail);
-            });
-          }
-        });
-        
-        // Drag and drop functionality
-        uploadArea.addEventListener('dragover', function(e) {
-          e.preventDefault();
-          uploadArea.classList.add('dragover');
-        });
-        
-        uploadArea.addEventListener('dragleave', function() {
-          uploadArea.classList.remove('dragover');
-        });
-        
-        uploadArea.addEventListener('drop', function(e) {
-          e.preventDefault();
-          uploadArea.classList.remove('dragover');
-          
-          if (e.dataTransfer.files.length > 0) {
-            fileInput.files = e.dataTransfer.files;
-            // Trigger change event
-            const event = new Event('change');
-            fileInput.dispatchEvent(event);
-          }
-        });
+        authorityLogin(email, role);
+      } else {
+        showNotification('Please enter valid credentials', 'error');
       }
     });
   }
-
-  // Get uploaded file URLs
-  function getUploadedFileUrls(previewId) {
-    const filePreview = document.getElementById(previewId);
-    const urls = [];
-    
-    if (filePreview) {
-      const thumbnails = filePreview.querySelectorAll('.file-thumbnail img');
-      thumbnails.forEach(thumbnail => {
-        urls.push(thumbnail.src);
-      });
-    }
-    
-    return urls;
+  
+  // If already logged in, redirect to dashboard
+  if (authorityState.isLoggedIn) {
+    window.location.href = 'authorities-dashboard.html';
   }
+}
 
-  // Utility functions
-  function generateId() {
-    return Math.random().toString(36).substring(2, 10);
-  }
-
-  function getStatusClass(status) {
-    status = status.toLowerCase();
-    if (status === 'submitted') return 'reported';
-    if (status === 'in-progress' || status === 'in-review') return 'in-progress';
-    return 'resolved';
-  }
-
-  function getStatusIcon(status) {
-    status = status.toLowerCase();
-    if (status === 'submitted') return 'file-alt';
-    if (status === 'in-review') return 'search';
-    if (status === 'in-progress') return 'tools';
-    if (status === 'resolved') return 'check-circle';
-    if (status === 'closed') return 'lock';
-    return 'info-circle';
-  }
-
-  // Initialize when DOM is loaded
-  document.addEventListener('DOMContentLoaded', init);
-
-  // Return public API
-  return {
-    init
-  };
-})();
-
-// Initialize the authorities module when the document is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  authoritiesModule.init();
-});
-
-// Function to show notifications (if not already defined in main.js)
-function showNotification(message, type = 'info') {
-  // Check if the function is already defined in global scope
-  if (typeof window.showNotification === 'function') {
-    window.showNotification(message, type);
+// Setup dashboard page
+function setupDashboardPage() {
+  // If not logged in, redirect to login page
+  if (!authorityState.isLoggedIn) {
+    window.location.href = 'authorities-login.html';
     return;
   }
   
-  const notificationEl = document.getElementById('notification');
-  if (!notificationEl) return;
-  
-  notificationEl.className = `notification ${type}`;
-  notificationEl.innerHTML = `
-    ${message}
-    <span class="notification-close">&times;</span>
-  `;
-  
-  notificationEl.classList.remove('hidden');
-  
-  // Add close event
-  const closeBtn = notificationEl.querySelector('.notification-close');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      notificationEl.classList.add('fadeOut');
-      setTimeout(() => {
-        notificationEl.classList.add('hidden');
-        notificationEl.classList.remove('fadeOut');
-      }, 300);
+  // Setup content type selection
+  if (contentTypeSelect) {
+    contentTypeSelect.addEventListener('change', function() {
+      const selectedType = this.value;
+      if (selectedType) {
+        updateContentForm(selectedType);
+      }
     });
   }
   
-  // Auto-hide after 5 seconds
-  setTimeout(() => {
-    if (!notificationEl.classList.contains('hidden')) {
-      notificationEl.classList.add('fadeOut');
-      setTimeout(() => {
-        notificationEl.classList.add('hidden');
-        notificationEl.classList.remove('fadeOut');
-      }, 300);
-    }
-  }, 5000);
+  // Setup content form submission
+  if (addContentForm) {
+    addContentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const contentType = contentTypeSelect.value;
+      
+      if (!contentType) {
+        showNotification('Please select a content type', 'warning');
+        return;
+      }
+      
+      saveContent(contentType);
+    });
+  }
+  
+  // Setup logout
+  if (logoutAuthorityBtn) {
+    logoutAuthorityBtn.addEventListener('click', function() {
+      authorityLogout();
+    });
+  }
+  
+  // Initialize dashboard with authority role
+  updateDashboardForRole();
+  
+  // Load content management section
+  loadContentSection();
+  
+  // Load issues management section
+  loadIssuesSection();
 }
+
+// Authority login
+function authorityLogin(email, role) {
+  // In a real app, this would authenticate with backend
+  const authority = {
+    id: generateId(),
+    email: email,
+    role: role,
+    name: role // For simplicity
+  };
+  
+  authorityState.isLoggedIn = true;
+  authorityState.currentAuthority = authority;
+  
+  // Save to localStorage for persistence
+  localStorage.setItem('authorityIsLoggedIn', 'true');
+  localStorage.setItem('currentAuthority', JSON.stringify(authority));
+  
+  showNotification(`Login successful! Welcome, ${role}`, 'success');
+  
+  // Redirect to dashboard
+  setTimeout(() => {
+    window.location.href = 'authorities-dashboard.html';
+  }, 1000);
+}
+
+// Authority logout
+function authorityLogout() {
+  authorityState.isLoggedIn = false;
+  authorityState.currentAuthority = null;
+  
+  // Clear localStorage
+  localStorage.removeItem('authorityIsLoggedIn');
+  localStorage.removeItem('currentAuthority');
+  
+  showNotification('You have been logged out', 'info');
+  
+  // Redirect to login page
+  window.location.href = 'authorities-login.html';
+}
+
+// Update UI based on authority login
+function updateUIForAuthorityLogin() {
+  // This function can be expanded as needed
+  const authorityRoleDisplay = document.getElementById('authorityRoleDisplay');
+  if (authorityRoleDisplay && authorityState.currentAuthority) {
+    authorityRoleDisplay.textContent = authorityState.currentAuthority.role;
+  }
+}
+
+// Update dashboard based on authority role
+function updateDashboardForRole() {
+  if (!authorityState.currentAuthority) return;
+  
+  const role = authorityState.currentAuthority.role;
+  const roleDisplay = document.getElementById('authorityRoleDisplay');
+  
+  if (roleDisplay) {
+    roleDisplay.textContent = role;
+  }
+  
+  // Different roles can have different dashboard views/permissions
+  // This can be expanded as needed
+}
+
+// Load content management section
+function loadContentSection() {
+  if (!contentManagementSection) return;
+  
+  // Initialize the content type select
+  if (contentTypeSelect) {
+    contentTypeSelect.innerHTML = '<option value="">Select Content Type</option>';
+    
+    authorityState.contentTypes.forEach(type => {
+      const option = document.createElement('option');
+      option.value = type;
+      option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+      contentTypeSelect.appendChild(option);
+    });
+  }
+  
+  // Load existing content
+  loadExistingContent();
+}
+
+// Update content form based on selected type
+function updateContentForm(contentType) {
+  if (!contentFormFields) return;
+  
+  let formHTML = '';
+  
+  // Common fields for all content types
+  formHTML += `
+    <div class="form-row">
+      <label for="contentTitle" class="form-label">Title</label>
+      <input type="text" id="contentTitle" class="form-input" required placeholder="Enter title">
+    </div>
+  `;
+  
+  // Type-specific fields
+  switch (contentType) {
+    case 'events':
+      formHTML += `
+        <div class="form-row grid-2">
+          <div>
+            <label for="eventDate" class="form-label">Date & Time</label>
+            <input type="datetime-local" id="eventDate" class="form-input" required>
+          </div>
+          <div>
+            <label for="eventLocation" class="form-label">Location</label>
+            <input type="text" id="eventLocation" class="form-input" required placeholder="Event location">
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="eventDescription" class="form-label">Description</label>
+          <textarea id="eventDescription" class="form-textarea" rows="4" required placeholder="Event description..."></textarea>
+        </div>
+      `;
+      break;
+      
+    case 'budget':
+      formHTML += `
+        <div class="form-row">
+          <label for="fiscalYear" class="form-label">Fiscal Year</label>
+          <input type="text" id="fiscalYear" class="form-input" required placeholder="e.g., 2023-2024">
+        </div>
+        <div class="form-row">
+          <label for="budgetDescription" class="form-label">Description</label>
+          <textarea id="budgetDescription" class="form-textarea" rows="4" required placeholder="Budget overview..."></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Budget Allocations</label>
+          <div id="budgetAllocations">
+            <div class="budget-allocation-item">
+              <div class="grid-3">
+                <div>
+                  <input type="text" class="form-input allocation-category" placeholder="Category" required>
+                </div>
+                <div>
+                  <input type="number" class="form-input allocation-amount" placeholder="Amount (₹)" required>
+                </div>
+                <div>
+                  <input type="number" class="form-input allocation-percentage" placeholder="%" required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="addAllocationBtn" class="btn btn-outline-accent mt-2">
+            <i class="fas fa-plus"></i> Add Allocation
+          </button>
+        </div>
+      `;
+      break;
+      
+    case 'history':
+      formHTML += `
+        <div class="form-row">
+          <label for="historyContent" class="form-label">Historical Content</label>
+          <textarea id="historyContent" class="form-textarea" rows="6" required placeholder="Write about village history..."></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Historical Timeline (Optional)</label>
+          <div id="historyTimeline">
+            <div class="history-timeline-item">
+              <div class="grid-3">
+                <div>
+                  <input type="text" class="form-input timeline-year" placeholder="Year/Period" required>
+                </div>
+                <div>
+                  <input type="text" class="form-input timeline-title" placeholder="Event Title" required>
+                </div>
+                <div>
+                  <input type="text" class="form-input timeline-description" placeholder="Brief Description" required>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" id="addTimelineEventBtn" class="btn btn-outline-accent mt-2">
+            <i class="fas fa-plus"></i> Add Timeline Event
+          </button>
+        </div>
+      `;
+      break;
+      
+    case 'resources':
+      formHTML += `
+        <div class="form-row grid-2">
+          <div>
+            <label for="resourceType" class="form-label">Resource Type</label>
+            <select id="resourceType" class="form-select" required>
+              <option value="">Select Type</option>
+              <option value="document">Document</option>
+              <option value="form">Form</option>
+              <option value="scheme">Government Scheme</option>
+              <option value="education">Educational</option>
+              <option value="health">Health</option>
+              <option value="agriculture">Agriculture</option>
+              <option value="link">External Link</option>
+              <option value="video">Video</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="resourceLink" class="form-label">Resource Link (Optional)</label>
+            <input type="url" id="resourceLink" class="form-input" placeholder="https://example.com">
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="resourceDescription" class="form-label">Description</label>
+          <textarea id="resourceDescription" class="form-textarea" rows="4" required placeholder="Resource description..."></textarea>
+        </div>
+      `;
+      break;
+      
+    case 'announcements':
+      formHTML += `
+        <div class="form-row">
+          <label for="announcementContent" class="form-label">Announcement</label>
+          <textarea id="announcementContent" class="form-textarea" rows="4" required placeholder="Announcement content..."></textarea>
+        </div>
+        <div class="form-row grid-2">
+          <div>
+            <label for="announcementDate" class="form-label">Date</label>
+            <input type="date" id="announcementDate" class="form-input" required>
+          </div>
+          <div>
+            <label for="announcementAuthor" class="form-label">Author (Optional)</label>
+            <input type="text" id="announcementAuthor" class="form-input" placeholder="Author name">
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label checkbox-label">
+            <input type="checkbox" id="announcementImportant">
+            <span>Mark as Important</span>
+          </label>
+        </div>
+      `;
+      break;
+  }
+  
+  contentFormFields.innerHTML = formHTML;
+  
+  // Add event listeners for dynamic form elements
+  if (contentType === 'budget') {
+    const addAllocationBtn = document.getElementById('addAllocationBtn');
+    if (addAllocationBtn) {
+      addAllocationBtn.addEventListener('click', function() {
+        const budgetAllocations = document.getElementById('budgetAllocations');
+        if (budgetAllocations) {
+          const newAllocation = document.createElement('div');
+          newAllocation.className = 'budget-allocation-item mt-2';
+          newAllocation.innerHTML = `
+            <div class="grid-3">
+              <div>
+                <input type="text" class="form-input allocation-category" placeholder="Category" required>
+              </div>
+              <div>
+                <input type="number" class="form-input allocation-amount" placeholder="Amount (₹)" required>
+              </div>
+              <div>
+                <input type="number" class="form-input allocation-percentage" placeholder="%" required>
+              </div>
+            </div>
+          `;
+          budgetAllocations.appendChild(newAllocation);
+        }
+      });
+    }
+  }
+  
+  if (contentType === 'history') {
+    const addTimelineEventBtn = document.getElementById('addTimelineEventBtn');
+    if (addTimelineEventBtn) {
+      addTimelineEventBtn.addEventListener('click', function() {
+        const historyTimeline = document.getElementById('historyTimeline');
+        if (historyTimeline) {
+          const newEvent = document.createElement('div');
+          newEvent.className = 'history-timeline-item mt-2';
+          newEvent.innerHTML = `
+            <div class="grid-3">
+              <div>
+                <input type="text" class="form-input timeline-year" placeholder="Year/Period" required>
+              </div>
+              <div>
+                <input type="text" class="form-input timeline-title" placeholder="Event Title" required>
+              </div>
+              <div>
+                <input type="text" class="form-input timeline-description" placeholder="Brief Description" required>
+              </div>
+            </div>
+          `;
+          historyTimeline.appendChild(newEvent);
+        }
+      });
+    }
+  }
+}
+
+// Save content
+function saveContent(contentType) {
+  const title = document.getElementById('contentTitle').value;
+  if (!title) return;
+  
+  let content;
+  
+  switch (contentType) {
+    case 'events':
+      content = {
+        id: generateId(),
+        title: title,
+        date: document.getElementById('eventDate').value,
+        location: document.getElementById('eventLocation').value,
+        description: document.getElementById('eventDescription').value,
+        createdBy: authorityState.currentAuthority.email,
+        createdAt: new Date().toISOString()
+      };
+      break;
+      
+    case 'budget':
+      const allocations = [];
+      const allocationItems = document.querySelectorAll('.budget-allocation-item');
+      
+      allocationItems.forEach(item => {
+        const category = item.querySelector('.allocation-category').value;
+        const amount = parseFloat(item.querySelector('.allocation-amount').value);
+        const percentage = parseFloat(item.querySelector('.allocation-percentage').value);
+        
+        if (category && !isNaN(amount) && !isNaN(percentage)) {
+          allocations.push({
+            category,
+            amount,
+            percentage
+          });
+        }
+      });
+      
+      content = {
+        id: generateId(),
+        title: title,
+        fiscalYear: document.getElementById('fiscalYear').value,
+        description: document.getElementById('budgetDescription').value,
+        allocations: allocations,
+        createdBy: authorityState.currentAuthority.email,
+        createdAt: new Date().toISOString()
+      };
+      break;
+      
+    case 'history':
+      const timeline = [];
+      const timelineItems = document.querySelectorAll('.history-timeline-item');
+      
+      timelineItems.forEach(item => {
+        const year = item.querySelector('.timeline-year').value;
+        const eventTitle = item.querySelector('.timeline-title').value;
+        const description = item.querySelector('.timeline-description').value;
+        
+        if (year && eventTitle && description) {
+          timeline.push({
+            year,
+            title: eventTitle,
+            description
+          });
+        }
+      });
+      
+      content = {
+        id: generateId(),
+        title: title,
+        content: document.getElementById('historyContent').value,
+        timeline: timeline,
+        createdBy: authorityState.currentAuthority.email,
+        createdAt: new Date().toISOString()
+      };
+      break;
+      
+    case 'resources':
+      content = {
+        id: generateId(),
+        title: title,
+        type: document.getElementById('resourceType').value,
+        description: document.getElementById('resourceDescription').value,
+        link: document.getElementById('resourceLink').value,
+        createdBy: authorityState.currentAuthority.email,
+        createdAt: new Date().toISOString()
+      };
+      break;
+      
+    case 'announcements':
+      content = {
+        id: generateId(),
+        title: title,
+        content: document.getElementById('announcementContent').value,
+        date: document.getElementById('announcementDate').value,
+        author: document.getElementById('announcementAuthor').value,
+        important: document.getElementById('announcementImportant').checked,
+        createdBy: authorityState.currentAuthority.email,
+        createdAt: new Date().toISOString()
+      };
+      break;
+  }
+  
+  if (content) {
+    // Get existing content
+    let existingContent = getContentByType(contentType) || [];
+    
+    // Add new content
+    existingContent.unshift(content); // Add to beginning of array
+    
+    // Save to localStorage
+    localStorage.setItem(`content_${contentType}`, JSON.stringify(existingContent));
+    
+    // Show success message
+    showNotification(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} content added successfully!`, 'success');
+    
+    // Reset form
+    addContentForm.reset();
+    contentFormFields.innerHTML = '';
+    contentTypeSelect.value = '';
+    
+    // Reload content list
+    loadExistingContent();
+  }
+}
+
+// Load existing content
+function loadExistingContent() {
+  if (!contentList) return;
+  
+  contentList.innerHTML = '';
+  
+  authorityState.contentTypes.forEach(type => {
+    const content = getContentByType(type);
+    
+    if (content && content.length > 0) {
+      const typeHeading = document.createElement('h3');
+      typeHeading.className = 'content-type-heading';
+      typeHeading.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+      contentList.appendChild(typeHeading);
+      
+      const typeList = document.createElement('div');
+      typeList.className = 'content-type-list';
+      
+      content.forEach(item => {
+        const contentItem = document.createElement('div');
+        contentItem.className = 'content-item';
+        contentItem.innerHTML = `
+          <div class="content-item-header">
+            <h4>${item.title}</h4>
+            <span class="content-date">${new Date(item.createdAt).toLocaleDateString()}</span>
+          </div>
+        `;
+        typeList.appendChild(contentItem);
+      });
+      
+      contentList.appendChild(typeList);
+    }
+  });
+  
+  if (contentList.innerHTML === '') {
+    contentList.innerHTML = '<p class="no-content">No content has been added yet.</p>';
+  }
+}
+
+// Load issues management section
+function loadIssuesSection() {
+  if (!issueManagementSection) return;
+  
+  // Check authority role
+  if (!authorityState.currentAuthority) return;
+  
+  const role = authorityState.currentAuthority.role;
+  
+  // Load issues based on role
+  const issues = getIssues();
+  
+  if (!issues || issues.length === 0) {
+    if (issuesList) {
+      issuesList.innerHTML = '<p class="no-issues">No issues have been reported yet.</p>';
+    }
+    return;
+  }
+  
+  // Filter issues based on role
+  let filteredIssues = [];
+  
+  switch (role) {
+    case 'Ward Member':
+      // Ward Member sees all submitted issues
+      filteredIssues = issues.filter(issue => 
+        issue.status === 'Submitted' || 
+        issue.assignedTo === role
+      );
+      break;
+      
+    case 'Sarpanch':
+    case 'Uppasarpanch':
+      // These roles see issues that have been forwarded to them
+      filteredIssues = issues.filter(issue => 
+        issue.status !== 'Submitted' && 
+        issue.status !== 'Rejected' &&
+        (issue.assignedTo === 'All Authorities' || issue.assignedTo === role)
+      );
+      break;
+  }
+  
+  // Display issues
+  displayIssues(filteredIssues, role);
+}
+
+// Display issues
+function displayIssues(issues, role) {
+  if (!issuesList) return;
+  
+  issuesList.innerHTML = '';
+  
+  if (issues.length === 0) {
+    issuesList.innerHTML = '<p class="no-issues">No issues found for your role.</p>';
+    return;
+  }
+  
+  issues.forEach(issue => {
+    const issueItem = document.createElement('div');
+    issueItem.className = `issue-item ${getIssueStatusClass(issue.status)}`;
+    issueItem.dataset.issueId = issue.id;
+    
+    issueItem.innerHTML = `
+      <div class="issue-header">
+        <h4>${issue.type}</h4>
+        <div class="issue-status">${issue.status}</div>
+      </div>
+      <div class="issue-meta">
+        <div><i class="fas fa-hashtag"></i> ${issue.id}</div>
+        <div><i class="fas fa-map-marker-alt"></i> Ward ${issue.ward}</div>
+        <div><i class="fas fa-clock"></i> ${new Date(issue.dateSubmitted).toLocaleDateString()}</div>
+      </div>
+      <p class="issue-description">${issue.description.substring(0, 100)}${issue.description.length > 100 ? '...' : ''}</p>
+    `;
+    
+    issuesList.appendChild(issueItem);
+    
+    // Add click event
+    issueItem.addEventListener('click', function() {
+      const issueId = this.dataset.issueId;
+      displayIssueDetail(getIssueById(issueId), role);
+    });
+  });
+}
+
+// Display issue detail
+function displayIssueDetail(issue, role) {
+  if (!issueDetailPanel || !issue) return;
+  
+  issueDetailPanel.innerHTML = `
+    <div class="issue-detail-header">
+      <h3>${issue.type}</h3>
+      <div class="issue-status ${getIssueStatusClass(issue.status)}">${issue.status}</div>
+    </div>
+    
+    <div class="issue-meta">
+      <div><strong>ID:</strong> ${issue.id}</div>
+      <div><strong>Ward:</strong> ${issue.ward}</div>
+      <div><strong>Location:</strong> ${issue.location}</div>
+      <div><strong>Submitted:</strong> ${new Date(issue.dateSubmitted).toLocaleString()}</div>
+      <div><strong>Assigned to:</strong> ${issue.assignedTo || 'Pending Review'}</div>
+    </div>
+    
+    <div class="issue-description-full">
+      <h4>Description</h4>
+      <p>${issue.description}</p>
+    </div>
+    
+    ${issue.images && issue.images.length > 0 ? `
+      <div class="issue-images">
+        <h4>Images</h4>
+        <div class="image-gallery">
+          ${issue.images.map(image => `
+            <div class="image-thumbnail">
+              <img src="${image}" alt="Issue image">
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    ` : ''}
+    
+    <div class="issue-timeline">
+      <h4>Issue Timeline</h4>
+      <div class="timeline">
+        ${issue.updates.map(update => `
+          <div class="timeline-item">
+            <div class="timeline-icon">
+              <i class="fas ${getStatusIcon(update.status)}"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <h5>${update.status}</h5>
+                <span>${new Date(update.date).toLocaleString()}</span>
+              </div>
+              <p>${update.comment}</p>
+              <div class="text-sm text-gray-500">by ${update.by}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  // Add action buttons based on role and issue status
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'issue-actions';
+  
+  if (role === 'Ward Member' && issue.status === 'Submitted') {
+    // Ward Member can forward or reject submitted issues
+    actionsDiv.innerHTML = `
+      <button id="forwardIssueBtn" class="btn btn-primary">
+        <i class="fas fa-share"></i> Forward to Authorities
+      </button>
+      <button id="rejectIssueBtn" class="btn btn-outline-accent">
+        <i class="fas fa-times"></i> Reject Issue
+      </button>
+    `;
+  } else if ((role === 'Sarpanch' || role === 'Uppasarpanch') && 
+             (issue.status === 'In-Review' || issue.status === 'In-Progress')) {
+    // Sarpanch and Uppasarpanch can update and resolve issues
+    actionsDiv.innerHTML = `
+      <button id="updateStatusBtn" class="btn btn-primary">
+        <i class="fas fa-sync-alt"></i> Update Status
+      </button>
+      <button id="resolveIssueBtn" class="btn btn-outline-accent">
+        <i class="fas fa-check"></i> Mark as Resolved
+      </button>
+    `;
+  }
+  
+  // Add comment form for all roles
+  actionsDiv.innerHTML += `
+    <div class="comment-form mt-4">
+      <h4>Add Comment</h4>
+      <textarea id="issueComment" class="form-textarea" rows="3" placeholder="Add a comment or update..."></textarea>
+      <button id="addCommentBtn" class="btn btn-primary mt-2">
+        <i class="fas fa-comment"></i> Add Comment
+      </button>
+    </div>
+  `;
+  
+  issueDetailPanel.appendChild(actionsDiv);
+  
+  // Add event listeners for action buttons
+  const forwardIssueBtn = document.getElementById('forwardIssueBtn');
+  const rejectIssueBtn = document.getElementById('rejectIssueBtn');
+  const updateStatusBtn = document.getElementById('updateStatusBtn');
+  const resolveIssueBtn = document.getElementById('resolveIssueBtn');
+  const addCommentBtn = document.getElementById('addCommentBtn');
+  
+  if (forwardIssueBtn) {
+    forwardIssueBtn.addEventListener('click', function() {
+      updateIssueStatus(issue.id, 'In-Review', 'All Authorities', 'Issue has been reviewed and forwarded to village authorities');
+    });
+  }
+  
+  if (rejectIssueBtn) {
+    rejectIssueBtn.addEventListener('click', function() {
+      updateIssueStatus(issue.id, 'Rejected', 'Ward Member', 'Issue has been reviewed and rejected due to insufficient information or invalid request');
+    });
+  }
+  
+  if (updateStatusBtn) {
+    updateStatusBtn.addEventListener('click', function() {
+      updateIssueStatus(issue.id, 'In-Progress', authorityState.currentAuthority.role, 'Issue is now being addressed by the authorities');
+    });
+  }
+  
+  if (resolveIssueBtn) {
+    resolveIssueBtn.addEventListener('click', function() {
+      updateIssueStatus(issue.id, 'Resolved', authorityState.currentAuthority.role, 'Issue has been successfully resolved');
+    });
+  }
+  
+  if (addCommentBtn) {
+    addCommentBtn.addEventListener('click', function() {
+      const comment = document.getElementById('issueComment').value;
+      if (comment.trim()) {
+        addIssueComment(issue.id, comment);
+      } else {
+        showNotification('Please enter a comment', 'warning');
+      }
+    });
+  }
+}
+
+// Update issue status
+function updateIssueStatus(issueId, status, assignedTo, comment) {
+  if (!authorityState.currentAuthority) return;
+  
+  // Get all issues
+  let allIssues = getIssues();
+  if (!allIssues) return;
+  
+  // Find the issue to update
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  if (issueIndex === -1) return;
+  
+  // Update the issue
+  allIssues[issueIndex].status = status;
+  allIssues[issueIndex].assignedTo = assignedTo;
+  
+  // Add update to issue timeline
+  allIssues[issueIndex].updates.push({
+    id: generateId(),
+    status: status,
+    date: Date.now(),
+    comment: comment,
+    by: authorityState.currentAuthority.role
+  });
+  
+  // Save updated issues
+  localStorage.setItem('issues', JSON.stringify(allIssues));
+  
+  // Show notification
+  showNotification(`Issue status updated to ${status}`, 'success');
+  
+  // Reload issues section
+  loadIssuesSection();
+  
+  // Display updated issue detail
+  displayIssueDetail(allIssues[issueIndex], authorityState.currentAuthority.role);
+}
+
+// Add comment to issue
+function addIssueComment(issueId, comment) {
+  if (!authorityState.currentAuthority) return;
+  
+  // Get all issues
+  let allIssues = getIssues();
+  if (!allIssues) return;
+  
+  // Find the issue to update
+  const issueIndex = allIssues.findIndex(issue => issue.id === issueId);
+  if (issueIndex === -1) return;
+  
+  // Add comment to issue timeline
+  allIssues[issueIndex].updates.push({
+    id: generateId(),
+    status: allIssues[issueIndex].status, // Maintain current status
+    date: Date.now(),
+    comment: comment,
+    by: authorityState.currentAuthority.role
+  });
+  
+  // Save updated issues
+  localStorage.setItem('issues', JSON.stringify(allIssues));
+  
+  // Show notification
+  showNotification('Comment added successfully', 'success');
+  
+  // Clear comment field
+  const commentField = document.getElementById('issueComment');
+  if (commentField) {
+    commentField.value = '';
+  }
+  
+  // Display updated issue detail
+  displayIssueDetail(allIssues[issueIndex], authorityState.currentAuthority.role);
+}
+
+// Helper Functions
+
+// Get content by type from localStorage
+function getContentByType(type) {
+  const content = localStorage.getItem(`content_${type}`);
+  return content ? JSON.parse(content) : null;
+}
+
+// Get all issues from localStorage
+function getIssues() {
+  const issues = localStorage.getItem('issues');
+  return issues ? JSON.parse(issues) : [];
+}
+
+// Get issue by ID
+function getIssueById(id) {
+  const issues = getIssues();
+  return issues.find(issue => issue.id === id);
+}
+
+// Get CSS class for issue status
+function getIssueStatusClass(status) {
+  switch (status.toLowerCase()) {
+    case 'submitted':
+      return 'status-submitted';
+    case 'in-review':
+      return 'status-in-review';
+    case 'in-progress':
+      return 'status-in-progress';
+    case 'resolved':
+      return 'status-resolved';
+    case 'rejected':
+      return 'status-rejected';
+    default:
+      return 'status-submitted';
+  }
+}
+
+// Get icon for status
+function getStatusIcon(status) {
+  switch (status.toLowerCase()) {
+    case 'submitted':
+      return 'fa-paper-plane';
+    case 'in-review':
+      return 'fa-search';
+    case 'in-progress':
+      return 'fa-tools';
+    case 'resolved':
+      return 'fa-check-circle';
+    case 'rejected':
+      return 'fa-times-circle';
+    default:
+      return 'fa-info-circle';
+  }
+}
+
+// Generate a random ID
+function generateId() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
+// Initialize authorities functionality
+document.addEventListener('DOMContentLoaded', function() {
+  initAuthorities();
+});

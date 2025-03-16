@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile - RuralConnect</title>
+    <meta name="description" content="Manage your profile information on RuralConnect." />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
+
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-logo">
+          <a href="index.html">
+            <div class="logo-circle">RC</div>
+            <span>RuralConnect</span>
+          </a>
+        </div>
+        <div class="nav-menu" id="navMenu">
+          <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+          <a href="report-issue.html" class="nav-link"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
+          <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+          <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
+          <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
+          <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
+          <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
+          <a href="authorities-login.html" class="nav-link"><i class="fas fa-user-shield"></i> Authorities</a>
+          <a href="profile.html" class="nav-link active"><i class="fas fa-user"></i> Profile</a>
+          <button class="btn btn-primary login-btn" id="loginBtn">Login</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="py-12 bg-gray-100">
+        <div class="container">
+          <div class="text-center mb-8">
+            <h1>User Profile</h1>
+            <p>Manage your personal information and settings</p>
+          </div>
+          
+          <div class="profile-form" id="profileFormContainer">
+            <form id="profileForm">
+              <div class="form-row">
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" id="fullName" class="form-input" required placeholder="Enter your full name">
+              </div>
+              
+              <div class="form-row">
+                <div class="grid-2">
+                  <div>
+                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                    <input type="tel" id="phoneNumber" class="form-input" required placeholder="Enter your phone number">
+                  </div>
+                  <div>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" required placeholder="Enter your email address">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <label for="address" class="form-label">Address</label>
+                <textarea id="address" class="form-textarea" rows="3" placeholder="Enter your address" required></textarea>
+              </div>
+              
+              <div class="form-row">
+                <div class="grid-2">
+                  <div>
+                    <label for="village" class="form-label">Village</label>
+                    <input type="text" id="village" class="form-input" required placeholder="Enter your village name">
+                  </div>
+                  <div>
+                    <label for="wardNumber" class="form-label">Ward Number</label>
+                    <input type="text" id="wardNumber" class="form-input" required placeholder="Enter your ward number">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-hover-scale">
+                  <i class="fas fa-save"></i> Save Profile
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Profile view (hidden by default) -->
+          <div class="profile-view hidden" id="profileViewContainer">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="profile-name" id="profileName"></div>
+            </div>
+            
+            <div class="profile-details">
+              <div class="profile-section">
+                <h3><i class="fas fa-phone"></i> Contact Information</h3>
+                <div class="profile-info">
+                  <div class="profile-field">
+                    <span class="field-label">Phone:</span>
+                    <span class="field-value" id="profilePhone"></span>
+                  </div>
+                  <div class="profile-field">
+                    <span class="field-label">Email:</span>
+                    <span class="field-value" id="profileEmail"></span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="profile-section">
+                <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+                <div class="profile-info">
+                  <div class="profile-field">
+                    <span class="field-value" id="profileAddress"></span>
+                  </div>
+                  <div class="profile-field">
+                    <span class="field-label">Village:</span>
+                    <span class="field-value" id="profileVillage"></span>
+                  </div>
+                  <div class="profile-field">
+                    <span class="field-label">Ward Number:</span>
+                    <span class="field-value" id="profileWardNumber"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="profile-actions">
+              <button id="editProfileBtn" class="btn btn-outline-accent btn-hover-scale">
+                <i class="fas fa-edit"></i> Edit Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <h3>RuralConnect</h3>
+            <p>Connecting rural communities with digital tools for better governance, 
+              transparency, and citizen participation.</p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          
+          <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="report-issue.html">Report Issue</a></li>
+              <li><a href="events.html">Events</a></li>
+              <li><a href="budget.html">Budget</a></li>
+              <li><a href="history.html">History</a></li>
+              <li><a href="resources.html">Resources</a></li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="footer-bottom">
+          <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Login to RuralConnect</h2>
+        <form id="loginForm">
+          <div class="form-row">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required>
+          </div>
+          <div class="form-row">
+            <label for="password">Password</label>
+            <input type="password" id="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <div class="modal-footer">
+          <p>Don't have an account? <a href="#">Register</a></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification element -->
+    <div id="notification" class="notification hidden"></div>
+
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script src="main.js"></script>
+    <script src="profile.js"></script>
+  </body>
+</html>
