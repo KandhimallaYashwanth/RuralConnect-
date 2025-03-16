@@ -4,8 +4,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Track Your Issues - RuralConnect</title>
-    <meta name="description" content="Track the status of your reported issues in real-time." />
+    <title>Track Issues - RuralConnect</title>
+    <meta name="description" content="Track the status of your reported issues in the village." />
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
@@ -27,7 +27,7 @@
           <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
           <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
           <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-          <a href="authorities-login.html" class="nav-link"><i class="fas fa-user-shield"></i> Authorities</a>
+          <a href="profile.html" class="nav-link"><i class="fas fa-user"></i> Profile</a>
           <button class="btn btn-primary login-btn" id="loginBtn">Login</button>
         </div>
         <div class="hamburger" id="hamburger">
@@ -41,107 +41,81 @@
     <main>
       <section class="py-12 bg-gray-100">
         <div class="container">
-          <div class="text-center mb-8">
-            <h1>Track Your Issues</h1>
-            <p>Monitor the status of all your reported issues and stay updated with the latest developments.</p>
+          <!-- Login Required Container -->
+          <div id="loginRequiredContainer" class="rural-card text-center p-8 hidden">
+            <div class="login-required-message">
+              <div class="login-icon">
+                <i class="fas fa-user-lock"></i>
+              </div>
+              <h2>Login Required</h2>
+              <p>Please login to track your reported issues.</p>
+              
+              <button id="loginToTrackBtn" class="btn btn-primary mt-4">
+                Login to Continue
+                <i class="fas fa-sign-in-alt"></i>
+              </button>
+            </div>
           </div>
           
-          <!-- Issues list view (default view) -->
+          <!-- Issues List Container -->
           <div id="issuesListContainer">
-            <!-- If no issues -->
-            <div id="noIssuesMessage" class="hidden">
-              <div class="report-form text-center">
-                <div class="empty-state">
-                  <div class="empty-icon">
-                    <i class="fas fa-comment-slash"></i>
-                  </div>
-                  <h2>No Issues Reported Yet</h2>
-                  <p>You haven't reported any issues yet. When you do, they'll appear here.</p>
-                  <button class="btn btn-primary" id="goToReportBtn">
-                    Report an Issue
-                  </button>
-                </div>
-              </div>
+            <div class="text-center mb-8">
+              <h1>Track Your Issues</h1>
+              <p>Monitor the status of all your reported issues and stay updated with the latest developments</p>
             </div>
             
-            <!-- List of issues (dynamically populated) -->
-            <div id="issuesList" class="issues-list">
-              <!-- Example issue card (will be dynamically generated) -->
-              <div class="issue-list-card">
-                <div class="issue-card-header">
-                  <div>
-                    <h3>Road Condition</h3>
-                    <p>Reference ID: #RCI-2023-06-15</p>
-                  </div>
-                  <div class="issue-status in-progress">In Progress</div>
-                </div>
-                <p class="issue-description">The road in front of the primary school has potholes causing accidents.</p>
-                <div class="issue-meta">
-                  <div>
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Main Road, Ward 5</span>
-                  </div>
-                  <div>
-                    <i class="fas fa-clock"></i>
-                    <span>15 Jun 2023, 10:30 AM</span>
-                  </div>
-                </div>
-                <div class="issue-actions">
-                  <button class="btn btn-text view-details-btn" data-issue-id="RCI-2023-06-15">
-                    View Details
-                    <i class="fas fa-chevron-right"></i>
-                  </button>
-                </div>
+            <!-- No Issues Message -->
+            <div id="noIssuesMessage" class="rural-card text-center p-8 hidden">
+              <div class="empty-issues-icon">
+                <i class="fas fa-clipboard-list"></i>
               </div>
-              <!-- More issue cards will be dynamically added -->
+              <h2>No Issues Reported Yet</h2>
+              <p>You haven't reported any issues yet. When you do, they'll appear here.</p>
+              
+              <button id="goToReportBtn" class="btn btn-primary mt-4">
+                Report an Issue <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            
+            <!-- Issues List -->
+            <div id="issuesList" class="issues-list hidden">
+              <!-- Issues will be loaded dynamically here -->
             </div>
           </div>
           
-          <!-- Issue detail view (hidden by default) -->
+          <!-- Issue Detail Container -->
           <div id="issueDetailContainer" class="hidden">
-            <button class="back-button" id="backToListBtn">
-              <i class="fas fa-arrow-left"></i>
-              Back to All Issues
+            <button id="backToListBtn" class="back-button mb-4">
+              <i class="fas fa-arrow-left"></i> Back to All Issues
             </button>
             
-            <div class="report-form">
-              <div id="issueDetailContent">
-                <!-- Dynamically filled with selected issue details -->
+            <div class="rural-card mb-6">
+              <div id="issueDetailContent" class="p-6">
+                <!-- Issue details will be loaded dynamically here -->
               </div>
-              
-              <div class="issue-timeline" id="issueTimeline">
-                <!-- Timeline will be dynamically populated -->
+            </div>
+            
+            <div class="rural-card mb-6">
+              <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Issue Timeline</h3>
+                <div id="issueTimeline" class="timeline">
+                  <!-- Timeline will be loaded dynamically here -->
+                </div>
               </div>
-              
-              <div class="comment-section">
-                <h3>Add a Comment</h3>
+            </div>
+            
+            <div class="rural-card">
+              <div class="p-6">
+                <h3 class="text-xl font-bold mb-4">Add a Comment</h3>
                 <form id="commentForm">
-                  <textarea id="commentText" class="form-textarea" rows="3" placeholder="Add your comment or question about this issue..." required></textarea>
-                  <div class="form-actions">
+                  <div class="form-group">
+                    <textarea id="commentText" class="form-control" rows="3" 
+                      placeholder="Add your comment or question about this issue..."></textarea>
+                  </div>
+                  <div class="flex justify-end mt-4">
                     <button type="submit" class="btn btn-primary">Add Comment</button>
                   </div>
                 </form>
-                <div class="authority-updates-note">
-                  <p><i class="fas fa-info-circle"></i> Authorities will review your issue and provide updates through the timeline above.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Login required view (hidden by default) -->
-          <div id="loginRequiredContainer" class="hidden">
-            <div class="report-form text-center">
-              <div class="login-required-message">
-                <div class="login-icon">
-                  <i class="fas fa-user-lock"></i>
-                </div>
-                <h2>Login Required</h2>
-                <p>Please login to track your issues. This helps us provide you with personalized issue tracking.</p>
-                
-                <button id="loginToTrackBtn" class="btn btn-primary">
-                  Login to Continue
-                  <i class="fas fa-sign-in-alt"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -174,8 +148,6 @@
               <li><a href="resources.html">Resources</a></li>
             </ul>
           </div>
-          
-          <!-- More footer content -->
         </div>
         
         <div class="footer-bottom">
@@ -184,32 +156,9 @@
       </div>
     </footer>
 
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Login to RuralConnect</h2>
-        <form id="loginForm">
-          <div class="form-row">
-            <label for="email">Email</label>
-            <input type="email" id="email" required>
-          </div>
-          <div class="form-row">
-            <label for="password">Password</label>
-            <input type="password" id="password" required>
-          </div>
-          <button type="submit" class="btn btn-primary">Login</button>
-        </form>
-        <div class="modal-footer">
-          <p>Don't have an account? <a href="#">Register</a></p>
-        </div>
-      </div>
-    </div>
-
     <!-- Notification element -->
     <div id="notification" class="notification hidden"></div>
 
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script src="main.js"></script>
   </body>
 </html>
