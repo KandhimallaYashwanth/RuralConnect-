@@ -1,4 +1,3 @@
-
 // Global state
 const appState = {
   isLoggedIn: false,
@@ -45,112 +44,10 @@ function init() {
     initIssueTrackingPage();
   } else if (currentPage === '' || currentPage === 'index.html') {
     initHomePage();
-  } else if (currentPage === 'budget.html') {
-    loadContentPage('budget');
-  } else if (currentPage === 'history.html') {
-    loadContentPage('history');
-  } else if (currentPage === 'resources.html') {
-    loadContentPage('resources');
-  } else if (currentPage === 'announcements.html') {
-    loadContentPage('announcements');
   }
   
   // Add authorities link to navigation menu (if not already present)
   addAuthoritiesLink();
-}
-
-// Load content posted by authorities
-function loadContentPage(type) {
-  const contentContainer = document.getElementById(`${type}Container`);
-  if (!contentContainer) return;
-  
-  const contentItems = JSON.parse(localStorage.getItem(`content_${type}`)) || [];
-  
-  if (contentItems.length === 0) {
-    contentContainer.innerHTML = `<div class="empty-message">No ${type} information available at this time.</div>`;
-    return;
-  }
-  
-  let contentHTML = '';
-  
-  contentItems.forEach(item => {
-    let itemHTML = `
-      <div class="content-card">
-        <div class="content-header">
-          <h3>${item.title}</h3>
-          <span class="content-meta">
-            <i class="fas fa-user-shield"></i> ${item.createdBy} (${roleToPosition(item.authorityRole)})
-          </span>
-        </div>
-        <div class="content-body">
-    `;
-    
-    // Different content types have different displays
-    if (type === 'budget') {
-      itemHTML += `
-        <p class="content-description">${item.description}</p>
-        <div class="content-details">${item.details}</div>
-      `;
-    } else if (type === 'history') {
-      itemHTML += `
-        <div class="content-year"><i class="fas fa-calendar-alt"></i> ${item.year}</div>
-        <div class="content-text">${item.content}</div>
-      `;
-    } else if (type === 'resources') {
-      itemHTML += `
-        <p class="content-description">${item.description}</p>
-        ${item.type === 'link' ? `<a href="${item.link}" target="_blank" class="resource-link"><i class="fas fa-external-link-alt"></i> Access Resource</a>` : ''}
-      `;
-    } else if (type === 'announcements') {
-      const priorityClass = item.priority === 'high' ? 'priority-high' : (item.priority === 'medium' ? 'priority-medium' : 'priority-normal');
-      
-      itemHTML += `
-        <div class="announcement-date"><i class="fas fa-calendar-day"></i> ${item.date || new Date(item.dateCreated).toLocaleDateString()}</div>
-        <div class="announcement-priority ${priorityClass}">
-          <i class="fas fa-exclamation-circle"></i> ${item.priority.charAt(0).toUpperCase() + item.priority.slice(1)} Priority
-        </div>
-        <div class="announcement-content">${item.content}</div>
-      `;
-    }
-    
-    // Add images if available
-    const images = item.images || item.files || [];
-    if (images && images.length > 0) {
-      itemHTML += `
-        <div class="content-images">
-          ${images.map((img, index) => `
-            <div class="content-image">
-              <img src="${img}" alt="${item.title} image ${index + 1}">
-            </div>
-          `).join('')}
-        </div>
-      `;
-    }
-    
-    itemHTML += `
-        </div>
-        <div class="content-footer">
-          <span class="content-date">Posted on ${new Date(item.dateCreated).toLocaleDateString()}</span>
-        </div>
-      </div>
-    `;
-    
-    contentHTML += itemHTML;
-  });
-  
-  contentContainer.innerHTML = contentHTML;
-}
-
-// Convert authority role to position title
-function roleToPosition(role) {
-  if (!role) return 'Village Authority';
-  
-  switch(role) {
-    case 'sarpanch': return 'Sarpanch';
-    case 'uppasarpanch': return 'Uppasarpanch';
-    case 'wardmember': return 'Ward Member';
-    default: return 'Village Authority';
-  }
 }
 
 // Initialize report issue page
@@ -262,7 +159,7 @@ function initReportIssuePage() {
         });
       }
       
-      // Create new issue with the authority escalation workflow
+      // Create new issue
       const newIssue = createIssue(issueType, description, location, ward, imageUrls);
       
       // Save issue to local storage
@@ -337,13 +234,8 @@ function initIssueTrackingPage() {
   if (loginRequiredContainer) loginRequiredContainer.classList.add('hidden');
   if (issuesListContainer) issuesListContainer.classList.remove('hidden');
   
-  // Filter issues for the current user
-  const userIssues = appState.issues.filter(issue => {
-    return issue.reportedBy === appState.currentUser.id;
-  });
-  
   // Load user's issues
-  if (userIssues.length === 0) {
+  if (appState.issues.length === 0) {
     if (noIssuesMessage) noIssuesMessage.classList.remove('hidden');
     if (issuesList) issuesList.classList.add('hidden');
     
@@ -360,7 +252,7 @@ function initIssueTrackingPage() {
       issuesList.classList.remove('hidden');
       issuesList.innerHTML = '';
       
-      userIssues.forEach(issue => {
+      appState.issues.forEach(issue => {
         const issueCard = document.createElement('div');
         issueCard.className = 'issue-list-card';
         issueCard.setAttribute('data-issue-id', issue.id);
@@ -483,7 +375,8 @@ function initHomePage() {
   // Explore resources button
   if (exploreResourcesBtn) {
     exploreResourcesBtn.addEventListener('click', function() {
-      window.location.href = 'resources.html';
+      // In a real app, you would scroll to resources section or navigate to resources page
+      showNotification('Resources section is coming soon!', 'info');
     });
   }
 }
@@ -536,16 +429,6 @@ function showIssueDetail(issueId) {
         </div>
       </div>
       
-      ${issue.escalationLevel ? `
-        <div class="mt-4">
-          <h3>Current Handler</h3>
-          <div class="flex items-center gap-2 mt-2">
-            <i class="fas fa-user-shield text-terracotta"></i>
-            <span>${getAuthorityFromLevel(issue.escalationLevel)}</span>
-          </div>
-        </div>
-      ` : ''}
-      
       ${issue.images && issue.images.length > 0 ? `
         <div class="mt-6">
           <h3>Uploaded Images</h3>
@@ -564,16 +447,6 @@ function showIssueDetail(issueId) {
   // Render issue timeline
   if (issueTimeline) {
     renderIssueTimeline(issue, issueTimeline);
-  }
-}
-
-// Get authority title from escalation level
-function getAuthorityFromLevel(level) {
-  switch(level) {
-    case 3: return 'Sarpanch';
-    case 2: return 'Uppasarpanch';
-    case 1: return 'Ward Member';
-    default: return 'Local Authority';
   }
 }
 
@@ -632,7 +505,7 @@ function getStatusClass(status) {
   }
 }
 
-// Create a new issue with authority workflow integration
+// Create a new issue
 function createIssue(type, description, location, ward, images = []) {
   const id = generateId();
   const now = Date.now();
@@ -646,15 +519,12 @@ function createIssue(type, description, location, ward, images = []) {
     dateSubmitted: now,
     status: 'Submitted',
     images,
-    reportedBy: appState.currentUser.id,
-    escalationLevel: 1, // Start at Ward Member level
-    assignedTo: 'wardmember', // Initially assigned to Ward Member
     updates: [
       {
         id: generateId(),
-        status: 'Submitted to Ward Member',
+        status: 'Submitted',
         date: now,
-        comment: 'Issue has been submitted and is awaiting review by the Ward Member.',
+        comment: 'Issue has been submitted successfully',
         by: appState.currentUser ? appState.currentUser.name : 'System'
       }
     ]
