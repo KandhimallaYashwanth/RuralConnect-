@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Report Issue - RuralConnect</title>
-    <meta name="description" content="Report local issues in your village for resolution." />
+    <meta name="description" content="Report local issues and concerns to village authorities." />
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
@@ -43,7 +43,7 @@
         <div class="container">
           <div class="text-center mb-8">
             <h1>Report an Issue</h1>
-            <p>Report local issues in your area to bring them to the attention of the authorities</p>
+            <p>Report local problems or concerns to bring them to the attention of village authorities</p>
           </div>
           
           <!-- Login Required Container -->
@@ -53,7 +53,7 @@
                 <i class="fas fa-user-lock"></i>
               </div>
               <h2>Login Required</h2>
-              <p>Please login to report an issue in your village.</p>
+              <p>Please login to report an issue.</p>
               
               <button id="loginToReportBtn" class="btn btn-primary mt-4">
                 Login to Continue
@@ -64,10 +64,10 @@
           
           <!-- Issue Form Container -->
           <div id="issueFormContainer" class="rural-card p-6">
-            <form id="issueForm" class="space-y-6">
+            <form id="issueForm" class="space-y-4">
               <div class="form-group">
-                <label for="issueType">Issue Type</label>
-                <select id="issueType" name="issueType" class="form-control" required>
+                <label for="issueType" class="form-label">Issue Type</label>
+                <select id="issueType" class="form-control" required>
                   <option value="">Select Issue Type</option>
                   <option value="Road Condition">Road Condition</option>
                   <option value="Water Supply">Water Supply</option>
@@ -82,85 +82,78 @@
               </div>
               
               <div class="form-group">
-                <label for="description">Description</label>
-                <div class="input-with-icon">
-                  <i class="fas fa-comment-alt"></i>
-                  <textarea id="description" name="description" class="form-control" rows="4" 
-                    placeholder="Describe the issue in detail..." required></textarea>
-                </div>
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" class="form-control" rows="4" 
+                  placeholder="Please describe the issue in detail..." required></textarea>
               </div>
               
-              <div class="form-row">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
-                  <label for="ward">Ward Number</label>
-                  <input type="text" id="ward" name="ward" class="form-control" 
+                  <label for="ward" class="form-label">Ward Number</label>
+                  <input type="text" id="ward" class="form-control" 
                     placeholder="Enter your ward number" required>
                 </div>
                 
                 <div class="form-group">
-                  <label for="location">Location</label>
-                  <div class="input-with-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" id="location" name="location" class="form-control" 
-                      placeholder="Enter location or use current location" required>
-                  </div>
+                  <label for="location" class="form-label">Location</label>
+                  <input type="text" id="location" class="form-control" 
+                    placeholder="Enter specific location" required>
                 </div>
               </div>
               
               <div class="form-group">
-                <label>Upload Images/Videos</label>
+                <label class="form-label">Upload Photos/Videos</label>
                 <div class="file-upload-container">
-                  <div class="file-upload-area">
-                    <i class="fas fa-camera"></i>
+                  <div class="file-upload-message">
+                    <i class="fas fa-cloud-upload-alt"></i>
                     <p>Drag & drop files here or click to browse</p>
-                    <input type="file" id="file-input" multiple accept="image/*,video/*" class="hidden">
-                    <button type="button" id="uploadBtn" class="btn btn-outline mt-2">
-                      <i class="fas fa-upload"></i> Upload Files
-                    </button>
                   </div>
-                  <div id="filePreview" class="file-preview"></div>
+                  <button type="button" id="uploadBtn" class="btn btn-secondary">
+                    <i class="fas fa-upload"></i> Select Files
+                  </button>
+                  <input type="file" id="file-input" multiple accept="image/*,video/*" class="hidden">
+                </div>
+                <div id="filePreview" class="file-preview">
+                  <!-- File previews will be displayed here -->
                 </div>
               </div>
               
-              <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary">
-                  Submit Issue <i class="fas fa-paper-plane"></i>
-                </button>
+              <div class="flex justify-end mt-6">
+                <button type="submit" class="btn btn-primary">Submit Issue</button>
               </div>
             </form>
           </div>
           
-          <!-- Success Container (Hidden by Default) -->
+          <!-- Issue Success Container -->
           <div id="issueSuccessContainer" class="rural-card p-6 hidden">
-            <div class="issue-success-header">
+            <div class="success-message text-center mb-6">
               <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
               </div>
-              <h2>Issue Submitted Successfully!</h2>
-              <p>Your issue has been registered with the following details:</p>
+              <h2>Issue Reported Successfully!</h2>
+              <p>Your issue has been submitted to the village authorities.</p>
             </div>
             
-            <div id="submittedIssueDetails" class="issue-card my-6">
-              <!-- This will be populated dynamically -->
+            <div id="submittedIssueDetails" class="issue-card mb-6">
+              <!-- Issue details will be loaded dynamically here -->
             </div>
             
-            <div class="issue-next-steps">
-              <h3>What happens next?</h3>
+            <div class="what-happens-next mb-6">
+              <h3>What Happens Next?</h3>
               <ol>
-                <li>Your issue has been submitted to the local authorities</li>
-                <li>It will be reviewed by the Ward Member within 48 hours</li>
-                <li>You'll receive updates as your issue progresses</li>
-                <li>You can track the status of your issue any time</li>
+                <li>Your issue has been submitted to the Ward Member</li>
+                <li>They will review your issue within 48 hours</li>
+                <li>If valid, it will be forwarded to the Sarpanch and Uppasarpanch</li>
+                <li>You will receive updates as the issue progresses</li>
               </ol>
             </div>
             
-            <div class="flex flex-wrap justify-center gap-4 mt-6">
+            <div class="flex justify-center gap-4">
               <button id="trackIssueBtn" class="btn btn-primary">
-                Track Your Issues <i class="fas fa-search"></i>
+                <i class="fas fa-search"></i> Track This Issue
               </button>
-              
               <button id="reportAnotherBtn" class="btn btn-outline">
-                Report Another Issue
+                <i class="fas fa-plus"></i> Report Another Issue
               </button>
             </div>
           </div>
@@ -200,25 +193,6 @@
         </div>
       </div>
     </footer>
-
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
-      <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <h2>Login to RuralConnect</h2>
-        <form id="loginForm">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" class="form-control" required>
-          </div>
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-          </div>
-          <button type="submit" class="btn btn-primary w-full">Login</button>
-        </form>
-      </div>
-    </div>
 
     <!-- Notification element -->
     <div id="notification" class="notification hidden"></div>

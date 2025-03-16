@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Profile - RuralConnect</title>
-    <meta name="description" content="Manage your user profile on RuralConnect." />
+    <meta name="description" content="Manage your RuralConnect profile information." />
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
@@ -43,89 +43,115 @@
         <div class="container">
           <div class="text-center mb-8">
             <h1>Your Profile</h1>
-            <p>Manage your personal information and contact details</p>
+            <p>Manage your personal information and settings</p>
           </div>
-
-          <div class="rural-card my-8" id="profileFormContainer">
-            <h2 class="text-2xl font-bold mb-4">Personal Information</h2>
+          
+          <!-- Profile Form Container -->
+          <div id="profileFormContainer" class="rural-card p-6">
             <form id="profileForm" class="space-y-4">
               <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" class="form-control" required>
+                <label for="fullName" class="form-label">Full Name</label>
+                <input type="text" id="fullName" class="form-control" placeholder="Enter your full name" required>
               </div>
-
+              
               <div class="form-group">
-                <label for="phoneNumber">Phone Number</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" required>
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input type="tel" id="phoneNumber" class="form-control" placeholder="Enter your phone number" required>
               </div>
-
+              
               <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email address">
               </div>
-
+              
               <div class="form-group">
-                <label for="address">Address</label>
-                <textarea id="address" name="address" class="form-control" rows="3"></textarea>
+                <label for="address" class="form-label">Address</label>
+                <textarea id="address" class="form-control" rows="3" placeholder="Enter your address"></textarea>
               </div>
-
-              <div class="form-row">
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="form-group">
-                  <label for="village">Village</label>
-                  <input type="text" id="village" name="village" class="form-control">
+                  <label for="village" class="form-label">Village</label>
+                  <input type="text" id="village" class="form-control" placeholder="Enter your village name" required>
                 </div>
-
+                
                 <div class="form-group">
-                  <label for="wardNumber">Ward Number</label>
-                  <input type="text" id="wardNumber" name="wardNumber" class="form-control">
+                  <label for="wardNumber" class="form-label">Ward Number</label>
+                  <input type="text" id="wardNumber" class="form-control" placeholder="Enter your ward number" required>
                 </div>
               </div>
-
-              <div class="flex justify-end">
-                <button type="submit" class="btn btn-primary">
-                  Save Profile
-                </button>
+              
+              <div class="flex justify-end mt-6">
+                <button type="submit" class="btn btn-primary">Save Profile</button>
               </div>
             </form>
           </div>
-
-          <div class="rural-card my-8 hidden" id="profileViewContainer">
-            <div class="profile-header">
-              <h2 class="text-2xl font-bold">Your Profile</h2>
-              <button id="editProfileBtn" class="btn btn-outline">
-                <i class="fas fa-edit"></i> Edit Profile
-              </button>
+          
+          <!-- Profile View Container -->
+          <div id="profileViewContainer" class="rural-card p-6 hidden">
+            <div class="profile-header mb-6">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                  </div>
+                  <div>
+                    <h2 id="profileName" class="text-xl font-bold">User Name</h2>
+                    <p class="text-sm text-gray-500">Community Member</p>
+                  </div>
+                </div>
+                <button id="editProfileBtn" class="btn btn-outline">
+                  <i class="fas fa-edit"></i> Edit Profile
+                </button>
+              </div>
             </div>
-
-            <div class="profile-info">
-              <div class="profile-item">
-                <span class="profile-label">Name:</span>
-                <span class="profile-value" id="profileName"></span>
+            
+            <div class="profile-details">
+              <div class="profile-section mb-4">
+                <h3 class="section-title">Contact Information</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="info-group">
+                    <div class="info-label">
+                      <i class="fas fa-phone"></i> Phone
+                    </div>
+                    <div id="profilePhone" class="info-value">Not provided</div>
+                  </div>
+                  
+                  <div class="info-group">
+                    <div class="info-label">
+                      <i class="fas fa-envelope"></i> Email
+                    </div>
+                    <div id="profileEmail" class="info-value">Not provided</div>
+                  </div>
+                </div>
               </div>
-
-              <div class="profile-item">
-                <span class="profile-label">Phone Number:</span>
-                <span class="profile-value" id="profilePhone"></span>
-              </div>
-
-              <div class="profile-item">
-                <span class="profile-label">Email:</span>
-                <span class="profile-value" id="profileEmail"></span>
-              </div>
-
-              <div class="profile-item">
-                <span class="profile-label">Address:</span>
-                <span class="profile-value" id="profileAddress"></span>
-              </div>
-
-              <div class="profile-item">
-                <span class="profile-label">Village:</span>
-                <span class="profile-value" id="profileVillage"></span>
-              </div>
-
-              <div class="profile-item">
-                <span class="profile-label">Ward Number:</span>
-                <span class="profile-value" id="profileWardNumber"></span>
+              
+              <div class="profile-section mb-4">
+                <h3 class="section-title">Address Information</h3>
+                <div class="grid grid-cols-1 gap-4">
+                  <div class="info-group">
+                    <div class="info-label">
+                      <i class="fas fa-home"></i> Address
+                    </div>
+                    <div id="profileAddress" class="info-value">Not provided</div>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="info-group">
+                      <div class="info-label">
+                        <i class="fas fa-map-marker-alt"></i> Village
+                      </div>
+                      <div id="profileVillage" class="info-value">Not provided</div>
+                    </div>
+                    
+                    <div class="info-group">
+                      <div class="info-label">
+                        <i class="fas fa-map"></i> Ward Number
+                      </div>
+                      <div id="profileWardNumber" class="info-value">Not provided</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -166,6 +192,9 @@
       </div>
     </footer>
 
+    <!-- Notification element -->
+    <div id="notification" class="notification hidden"></div>
+
     <!-- Login Modal -->
     <div id="loginModal" class="modal">
       <div class="modal-content">
@@ -174,19 +203,16 @@
         <form id="loginForm">
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" class="form-control" required>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
           </div>
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" required>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
           </div>
-          <button type="submit" class="btn btn-primary w-full">Login</button>
+          <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
       </div>
     </div>
-
-    <!-- Notification element -->
-    <div id="notification" class="notification hidden"></div>
 
     <script src="main.js"></script>
     <script src="profile.js"></script>

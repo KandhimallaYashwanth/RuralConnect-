@@ -536,85 +536,107 @@ document.addEventListener('DOMContentLoaded', function() {
             <i class="fas fa-bullhorn"></i>
           </div>
           <h2>Village Announcements</h2>
-          <p>Village authorities haven't posted any announcements yet. This section will be updated with important notices and information for village residents.</p>
+          <p>Village authorities haven't posted any announcements yet. Check back soon for important updates and news.</p>
           
-          <div class="sample-announcements">
+          <div class="announcements-list">
             <div class="announcement-card">
               <div class="announcement-header">
-                <h3>Welcome to the Village Announcements Page</h3>
+                <h3>Welcome to RuralConnect</h3>
                 <div class="announcement-meta">
                   <span class="announcement-date">
                     <i class="fas fa-calendar-day"></i> ${new Date().toLocaleDateString()}
                   </span>
+                  <span class="announcement-author">
+                    <i class="fas fa-user"></i> System
+                  </span>
                 </div>
               </div>
               <div class="announcement-content">
-                <p>This is where important village announcements will be posted. Check back regularly for updates about village meetings, special events, government programs, and other important information.</p>
+                <p>Welcome to RuralConnect, your platform for village information, issue reporting, and community engagement. This space will be used by village authorities to share important announcements and updates.</p>
               </div>
             </div>
             
             <div class="announcement-card">
               <div class="announcement-header">
-                <h3>How Announcements Work</h3>
+                <h3>Sample: Upcoming Gram Sabha Meeting</h3>
                 <div class="announcement-meta">
                   <span class="announcement-date">
-                    <i class="fas fa-calendar-day"></i> ${new Date().toLocaleDateString()}
+                    <i class="fas fa-calendar-day"></i> ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+                  </span>
+                  <span class="announcement-author">
+                    <i class="fas fa-user"></i> System
                   </span>
                 </div>
               </div>
               <div class="announcement-content">
-                <p>Village authorities will post official announcements here that will be visible to all residents. Important announcements may also be highlighted for special attention.</p>
+                <p>This is an example of what an announcement might look like. When authorities post real announcements, they will appear here.</p>
+              </div>
+              <div class="announcement-important">
+                <i class="fas fa-exclamation-circle"></i> Important Announcement
               </div>
             </div>
-          </div>
-          
-          <div class="announcements-note">
-            <p><strong>Note:</strong> This is a demo of how announcements will appear. Real announcements from village authorities will be posted soon.</p>
           </div>
         </div>
       `;
     }
   }
   
-  // Helper Functions
-  
-  // Get content by type from localStorage
+  // Helper function to get content by type from localStorage
   function getContentByType(type) {
-    const content = localStorage.getItem(`content_${type}`);
-    return content ? JSON.parse(content) : null;
+    const contentKey = `village_content_${type}`;
+    const contentJson = localStorage.getItem(contentKey);
+    return contentJson ? JSON.parse(contentJson) : null;
   }
   
-  // Format event date
+  // Helper function to format event date
   function formatEventDate(dateString) {
     const date = new Date(dateString);
+    
+    // Get day (1-31)
+    const day = date.getDate();
+    
+    // Get month (Jan, Feb, etc.)
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
     
-    return {
-      day: date.getDate(),
-      month: months[date.getMonth()],
-      time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
+    // Get time (e.g., "9:00 AM")
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    
+    const minStr = minutes < 10 ? '0' + minutes : minutes;
+    const time = hours + ':' + minStr + ' ' + ampm;
+    
+    return { day, month, time };
   }
   
-  // Get resource icon based on type
-  function getResourceIcon(type) {
-    const icons = {
-      'document': 'fa-file-alt',
-      'form': 'fa-file-signature',
-      'scheme': 'fa-handshake',
-      'education': 'fa-graduation-cap',
-      'health': 'fa-heartbeat',
-      'agriculture': 'fa-seedling',
-      'link': 'fa-link',
-      'video': 'fa-video',
-      'other': 'fa-file'
-    };
-    
-    return icons[type] || 'fa-file';
-  }
-  
-  // Format number with commas
+  // Helper function for number formatting
   function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  
+  // Helper function to get Font Awesome icon class based on resource type
+  function getResourceIcon(type) {
+    switch (type) {
+      case 'government':
+        return 'fa-landmark';
+      case 'health':
+        return 'fa-hospital';
+      case 'education':
+        return 'fa-graduation-cap';
+      case 'agriculture':
+        return 'fa-tractor';
+      case 'employment':
+        return 'fa-briefcase';
+      case 'document':
+        return 'fa-file-alt';
+      case 'finance':
+        return 'fa-rupee-sign';
+      default:
+        return 'fa-link';
+    }
   }
 });
