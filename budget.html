@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
 
-  <body>
+  <body class="budget-page">
     <nav class="navbar">
       <div class="container">
         <div class="nav-logo">
@@ -47,7 +47,19 @@
           </div>
           
           <div id="budgetContainer" class="budget-container">
-            <!-- Dynamic content will be loaded here -->
+            <!-- Default content - shown when no budgets available -->
+            <div id="defaultBudgetContent" class="default-content">
+              <div class="empty-state">
+                <div class="icon-container">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h2>No Budget Information Available</h2>
+                <p>Budget information will be posted by village authorities soon.</p>
+              </div>
+            </div>
+            
+            <!-- Dynamic content - populated with posted budgets -->
+            <div id="dynamicBudgetContent" class="dynamic-content hidden"></div>
           </div>
         </div>
       </section>

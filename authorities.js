@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Implement content posting functionality
         setupContentPosting();
+        
+        // Setup content type dynamic form fields
+        setupDynamicFormFields();
     }
     
     // Check for logout button on any page
@@ -244,29 +247,74 @@ function setupContentPosting() {
         const contentTitle = document.getElementById('contentTitle').value;
         const contentDescription = document.getElementById('contentDescription').value;
         
+        // Validate form
+        if (!contentType || !contentTitle || !contentDescription) {
+            showNotification('Please fill all required fields', 'warning');
+            return;
+        }
+        
         // Additional fields based on content type
         let additionalData = {};
         
         switch(contentType) {
             case 'budget':
+                const allocated = document.getElementById('budgetAllocated').value;
+                const expenditure = document.getElementById('budgetExpenditure').value;
+                const completion = document.getElementById('budgetCompletion').value;
+                
+                // Validate budget-specific fields
+                if (!allocated || !expenditure || !completion) {
+                    showNotification('Please fill all budget-related fields', 'warning');
+                    return;
+                }
+                
                 additionalData = {
-                    allocated: document.getElementById('budgetAllocated').value,
-                    expenditure: document.getElementById('budgetExpenditure').value,
-                    completion: document.getElementById('budgetCompletion').value
+                    allocated: parseFloat(allocated),
+                    expenditure: parseFloat(expenditure),
+                    completion: completion
                 };
                 break;
             case 'event':
+                const date = document.getElementById('eventDate').value;
+                const time = document.getElementById('eventTime').value;
+                const location = document.getElementById('eventLocation').value;
+                const attendees = document.getElementById('eventAttendees').value;
+                
+                // Validate event-specific fields
+                if (!date || !time || !location) {
+                    showNotification('Please fill all event-related fields', 'warning');
+                    return;
+                }
+                
                 additionalData = {
-                    date: document.getElementById('eventDate').value,
-                    time: document.getElementById('eventTime').value,
-                    location: document.getElementById('eventLocation').value,
-                    attendees: document.getElementById('eventAttendees').value
+                    date: date,
+                    time: time,
+                    location: location,
+                    attendees: attendees || '0'
                 };
                 break;
             case 'resource':
+                const resourceType = document.getElementById('resourceType').value;
+                const resourceLink = document.getElementById('resourceLink').value;
+                
+                // Validate resource-specific fields
+                if (!resourceType || !resourceLink) {
+                    showNotification('Please fill all resource-related fields', 'warning');
+                    return;
+                }
+                
                 additionalData = {
-                    resourceType: document.getElementById('resourceType').value,
-                    resourceLink: document.getElementById('resourceLink').value
+                    resourceType: resourceType,
+                    resourceLink: resourceLink
+                };
+                break;
+            case 'history':
+                // No additional fields for history
+                break;
+            case 'announcement':
+                // No additional fields for announcements
+                additionalData = {
+                    postedDate: new Date().toISOString()
                 };
                 break;
         }
@@ -292,11 +340,51 @@ function setupContentPosting() {
         localStorage.setItem('villageContent', JSON.stringify(villageContent));
         
         // Show success notification
-        showNotification(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} content posted successfully!`, 'success');
+        const typeName = contentType.charAt(0).toUpperCase() + contentType.slice(1);
+        showNotification(`${typeName} content posted successfully!`, 'success');
         
         // Reset form
         contentForm.reset();
+        
+        // Reset dynamic fields
+        const allDynamicFields = document.querySelectorAll('.dynamic-fields');
+        allDynamicFields.forEach(field => field.classList.add('hidden'));
     });
+}
+
+// Setup dynamic form fields based on content type
+function setupDynamicFormFields() {
+    const contentTypeSelect = document.getElementById('contentType');
+    if (!contentTypeSelect) return;
+    
+    const handleContentTypeChange = () => {
+        const selectedType = contentTypeSelect.value;
+        
+        // Hide all dynamic field groups
+        const allDynamicFields = document.querySelectorAll('.dynamic-fields');
+        allDynamicFields.forEach(field => field.classList.add('hidden'));
+        
+        // Show the selected type fields
+        const selectedFields = document.getElementById(`${selectedType}Fields`);
+        if (selectedFields) {
+            selectedFields.classList.remove('hidden');
+        }
+    };
+    
+    // Initial setup
+    handleContentTypeChange();
+    
+    // Add change event listener
+    contentTypeSelect.addEventListener('change', handleContentTypeChange);
+}
+
+// Helper function to show notifications
+function showNotification(message, type = 'info') {
+    if (window.notify) {
+        window.notify(message, type);
+    } else {
+        alert(message);
+    }
 }
 
 // Helper function to format status for display

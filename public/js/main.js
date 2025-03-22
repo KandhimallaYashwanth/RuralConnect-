@@ -1,4 +1,3 @@
-
 // Mobile menu toggle
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
@@ -62,6 +61,16 @@ const handleAuth = () => {
       // If there's a redirect to the report issue page
       if (redirectPath === '/report-issue' || redirectPath === 'report-issue.html') {
         window.location.href = 'report-issue.html';
+      } else if (redirectPath === '/budget' || redirectPath === 'budget.html') {
+        window.location.href = 'budget.html';
+      } else if (redirectPath === '/resources' || redirectPath === 'resources.html') {
+        window.location.href = 'resources.html';
+      } else if (redirectPath === '/history' || redirectPath === 'history.html') {
+        window.location.href = 'history.html';
+      } else if (redirectPath === '/announcements' || redirectPath === 'announcements.html') {
+        window.location.href = 'announcements.html';
+      } else {
+        window.location.href = redirectPath;
       }
     }
   }
@@ -1119,3 +1128,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.head.appendChild(style);
   }
 });
+
+// Add
+

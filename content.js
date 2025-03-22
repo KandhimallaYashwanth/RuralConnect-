@@ -13,6 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const isAnnouncementsPage = document.querySelector('body').classList.contains('announcements-page') || 
                            window.location.pathname.includes('announcements.html');
     
+    // Check login status
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    
+    // Redirect if not logged in and accessing restricted pages
+    if (!isLoggedIn && (isBudgetPage || isResourcesPage || isHistoryPage || isAnnouncementsPage)) {
+        // Redirect to index.html with events section highlighted
+        window.location.href = 'index.html#events-section';
+        return;
+    }
+    
     // Get all village content from localStorage
     const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
     
