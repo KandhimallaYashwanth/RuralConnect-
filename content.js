@@ -1,4 +1,3 @@
-
 // Content management for public pages
 document.addEventListener('DOMContentLoaded', function() {
     // Check which page we're on
@@ -47,7 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 let budgetHTML = '<div class="budget-cards">';
                 budgetItems.forEach(budget => {
-                    const utilized = Math.round((budget.expenditure / budget.allocated) * 100);
+                    // Calculate utilization percentage
+                    const utilized = budget.expenditure && budget.allocated 
+                        ? Math.round((budget.expenditure / budget.allocated) * 100)
+                        : 0;
                     
                     budgetHTML += `
                         <div class="budget-card">
@@ -55,11 +57,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="budget-details">
                                 <div class="budget-item">
                                     <span class="label">Allocated:</span>
-                                    <span class="value">₹${formatNumber(budget.allocated)}</span>
+                                    <span class="value">₹${formatNumber(budget.allocated || 0)}</span>
                                 </div>
                                 <div class="budget-item">
                                     <span class="label">Expenditure:</span>
-                                    <span class="value">₹${formatNumber(budget.expenditure)}</span>
+                                    <span class="value">₹${formatNumber(budget.expenditure || 0)}</span>
                                 </div>
                                 <div class="budget-item">
                                     <span class="label">Utilization:</span>
@@ -70,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </div>
                                 <div class="budget-item">
                                     <span class="label">Completion:</span>
-                                    <span class="value">${budget.completion}</span>
+                                    <span class="value">${budget.completion || 'In Progress'}</span>
                                 </div>
                             </div>
                             <p class="budget-description">${budget.description}</p>
@@ -81,6 +83,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 budgetHTML += '</div>';
                 
                 dynamicContent.innerHTML = budgetHTML;
+                
+                // Add event listeners to the View Details buttons
+                const detailButtons = dynamicContent.querySelectorAll('.budget-details-btn');
+                detailButtons.forEach((button, index) => {
+                    button.addEventListener('click', () => {
+                        showBudgetDetails(budgetItems[index]);
+                    });
+                });
             }
         }
     }
@@ -272,6 +282,98 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Function to show budget details in a modal
+function showBudgetDetails(budget) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('budgetDetailsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'budgetDetailsModal';
+        modal.className = 'modal';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        
+        const closeBtn = document.createElement('span');
+        closeBtn.className = 'close-modal';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.onclick = function() {
+            modal.classList.remove('show');
+        };
+        
+        const modalBody = document.createElement('div');
+        modalBody.id = 'budgetDetailsBody';
+        
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(modalBody);
+        modal.appendChild(modalContent);
+        
+        document.body.appendChild(modal);
+    }
+    
+    // Populate modal with budget details
+    const modalBody = document.getElementById('budgetDetailsBody');
+    if (modalBody) {
+        const utilized = budget.expenditure && budget.allocated 
+            ? Math.round((budget.expenditure / budget.allocated) * 100)
+            : 0;
+        
+        const postedDate = new Date(budget.postedDate);
+        const formattedDate = postedDate.toLocaleDateString('en-IN', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        });
+        
+        modalBody.innerHTML = `
+            <h2>${budget.title}</h2>
+            <div class="budget-modal-details">
+                <div class="budget-modal-row">
+                    <span class="label">Posted By:</span>
+                    <span class="value">${budget.postedBy || 'Village Authority'}</span>
+                </div>
+                <div class="budget-modal-row">
+                    <span class="label">Posted Date:</span>
+                    <span class="value">${formattedDate}</span>
+                </div>
+                <div class="budget-modal-row">
+                    <span class="label">Total Allocated:</span>
+                    <span class="value">₹${formatNumber(budget.allocated || 0)}</span>
+                </div>
+                <div class="budget-modal-row">
+                    <span class="label">Total Expenditure:</span>
+                    <span class="value">₹${formatNumber(budget.expenditure || 0)}</span>
+                </div>
+                <div class="budget-modal-row">
+                    <span class="label">Utilization:</span>
+                    <span class="value">${utilized}%</span>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-bar" style="width: ${utilized}%"></div>
+                </div>
+                <div class="budget-modal-row">
+                    <span class="label">Completion Status:</span>
+                    <span class="value">${budget.completion || 'In Progress'}</span>
+                </div>
+                <div class="budget-modal-description">
+                    <h3>Description:</h3>
+                    <p>${budget.description}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Show modal
+    modal.classList.add('show');
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.classList.remove('show');
+        }
+    };
+}
 
 // Helper function to format numbers with commas
 function formatNumber(num) {

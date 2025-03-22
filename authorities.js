@@ -1,4 +1,3 @@
-
 // Authorities login and management functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on the authorities login page
@@ -352,7 +351,7 @@ function setupContentPosting() {
     });
 }
 
-// Setup dynamic form fields based on content type
+// Setup content type dynamic form fields
 function setupDynamicFormFields() {
     const contentTypeSelect = document.getElementById('contentType');
     if (!contentTypeSelect) return;
