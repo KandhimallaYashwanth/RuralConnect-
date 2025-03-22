@@ -1,4 +1,3 @@
-
 // Global state
 const appState = {
   isLoggedIn: false,
@@ -63,11 +62,40 @@ function initReportIssuePage() {
   const loginToReportBtn = document.getElementById('loginToReportBtn');
   const trackIssueBtn = document.getElementById('trackIssueBtn');
   const reportAnotherBtn = document.getElementById('reportAnotherBtn');
+  const mapContainer = document.getElementById('mapContainer');
   
   // Check if user is logged in
   if (!appState.isLoggedIn) {
     issueFormContainer.classList.add('hidden');
     loginRequiredContainer.classList.remove('hidden');
+  }
+  
+  // Initialize map (simplified for this example)
+  if (mapContainer) {
+    mapContainer.addEventListener('click', function(e) {
+      // In a real app, you would get actual coordinates
+      // For this demo, we'll just add a marker at the click position
+      const marker = document.createElement('div');
+      marker.className = 'map-marker';
+      marker.style.left = (e.offsetX - 12) + 'px';
+      marker.style.top = (e.offsetY - 24) + 'px';
+      marker.innerHTML = '<i class="fas fa-map-marker-alt"></i>';
+      
+      // Clear existing markers
+      const existingMarkers = mapContainer.querySelectorAll('.map-marker');
+      existingMarkers.forEach(m => m.remove());
+      
+      mapContainer.appendChild(marker);
+      
+      // Set coordinates (simulated)
+      document.getElementById('locationCoordinates').value = `${e.offsetX},${e.offsetY}`;
+      
+      // Remove placeholder if it exists
+      const placeholder = mapContainer.querySelector('.map-placeholder');
+      if (placeholder) {
+        placeholder.style.display = 'none';
+      }
+    });
   }
   
   // Login to report button
@@ -93,6 +121,17 @@ function initReportIssuePage() {
       issueFormContainer.classList.remove('hidden');
       issueForm.reset();
       filePreview.innerHTML = '';
+      
+      // Reset map
+      if (mapContainer) {
+        const existingMarkers = mapContainer.querySelectorAll('.map-marker');
+        existingMarkers.forEach(m => m.remove());
+        
+        const placeholder = mapContainer.querySelector('.map-placeholder');
+        if (placeholder) {
+          placeholder.style.display = 'flex';
+        }
+      }
     });
   }
   
@@ -149,6 +188,7 @@ function initReportIssuePage() {
       const description = document.getElementById('description').value;
       const ward = document.getElementById('ward').value;
       const location = document.getElementById('location').value;
+      const coordinates = document.getElementById('locationCoordinates').value;
       
       // Create image URLs for uploaded files
       const imageUrls = [];
@@ -160,8 +200,8 @@ function initReportIssuePage() {
         });
       }
       
-      // Create new issue
-      const newIssue = createIssue(issueType, description, location, ward, imageUrls);
+      // Create new issue - send to Ward Member by default
+      const newIssue = createIssue(issueType, description, location, ward, coordinates, imageUrls);
       
       // Save issue to local storage
       appState.issues.push(newIssue);
@@ -507,7 +547,7 @@ function getStatusClass(status) {
 }
 
 // Create a new issue
-function createIssue(type, description, location, ward, images = []) {
+function createIssue(type, description, location, ward, coordinates, images = []) {
   const id = generateId();
   const now = Date.now();
   
@@ -517,15 +557,17 @@ function createIssue(type, description, location, ward, images = []) {
     description,
     location,
     ward,
+    coordinates,
     dateSubmitted: now,
     status: 'Submitted',
+    assignedTo: 'Ward Member', // Initially assigned to Ward Member
     images,
     updates: [
       {
         id: generateId(),
         status: 'Submitted',
         date: now,
-        comment: 'Issue has been submitted successfully',
+        comment: 'Issue has been submitted successfully and is pending review by the Ward Member.',
         by: appState.currentUser ? appState.currentUser.name : 'System'
       }
     ]

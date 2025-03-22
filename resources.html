@@ -47,7 +47,57 @@
           </div>
           
           <div id="resourcesContainer" class="resources-container">
+            <!-- Default content that shows when no resources are posted by authorities -->
+            <div id="defaultResourcesContent" class="default-content">
+              <div class="resource-cards">
+                <div class="resource-card">
+                  <div class="resource-card-icon">
+                    <i class="fas fa-file-alt"></i>
+                  </div>
+                  <div class="resource-card-content">
+                    <h3>MGNREGA Job Card Application</h3>
+                    <p class="resource-type">Employment Scheme</p>
+                    <a href="#" class="resource-link">Download</a>
+                  </div>
+                </div>
+                <div class="resource-card">
+                  <div class="resource-card-icon">
+                    <i class="fas fa-hands-helping"></i>
+                  </div>
+                  <div class="resource-card-content">
+                    <h3>PM Kisan Samman Nidhi Scheme</h3>
+                    <p class="resource-type">Agriculture Support</p>
+                    <a href="#" class="resource-link">View Details</a>
+                  </div>
+                </div>
+                <div class="resource-card">
+                  <div class="resource-card-icon">
+                    <i class="fas fa-home"></i>
+                  </div>
+                  <div class="resource-card-content">
+                    <h3>Pradhan Mantri Awas Yojana</h3>
+                    <p class="resource-type">Housing Scheme</p>
+                    <a href="#" class="resource-link">Apply Online</a>
+                  </div>
+                </div>
+                <div class="resource-card">
+                  <div class="resource-card-icon">
+                    <i class="fas fa-heart"></i>
+                  </div>
+                  <div class="resource-card-content">
+                    <h3>Ayushman Bharat</h3>
+                    <p class="resource-type">Healthcare Scheme</p>
+                    <a href="#" class="resource-link">Check Eligibility</a>
+                  </div>
+                </div>
+              </div>
+              <div class="no-resources-message text-center mt-8">
+                <p>More resources will be added by village authorities.</p>
+              </div>
+            </div>
+            
             <!-- Dynamic content will be loaded here -->
+            <div id="dynamicResourcesContent" class="dynamic-content hidden"></div>
           </div>
         </div>
       </section>
@@ -89,6 +139,7 @@
     <!-- Notification element -->
     <div id="notification" class="notification hidden"></div>
 
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script src="main.js"></script>
     <script src="content.js"></script>
   </body>

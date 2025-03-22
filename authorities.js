@@ -6,6 +6,13 @@ let authorityState = {
   contentTypes: ['events', 'budget', 'history', 'resources', 'announcements']
 };
 
+// Predefined authority credentials
+const authorityCredentials = [
+  { email: "sarpanch@gmail.com", password: "sarpanch", role: "Sarpanch" },
+  { email: "uppasarpanch@gmail.com", password: "uppasarpanch", role: "Uppasarpanch" },
+  { email: "wardmember@gmail.com", password: "wardmember", role: "Ward Member" }
+];
+
 // DOM elements
 const authoritiesLoginForm = document.getElementById('authoritiesLoginForm');
 const authorityDashboard = document.getElementById('authorityDashboard');
@@ -50,20 +57,15 @@ function setupLoginPage() {
       const email = document.getElementById('authorityEmail').value;
       const password = document.getElementById('authorityPassword').value;
       
-      // Simple validation - in a real app this would be authenticated against a server
-      if (email && password) {
-        // Determine authority role based on email
-        let role = 'Ward Member'; // Default role
-        
-        if (email.includes('sarpanch')) {
-          role = 'Sarpanch';
-        } else if (email.includes('uppasarpanch')) {
-          role = 'Uppasarpanch';
-        }
-        
-        authorityLogin(email, role);
+      // Validate credentials against predefined authorities
+      const authority = authorityCredentials.find(auth => 
+        auth.email === email && auth.password === password
+      );
+      
+      if (authority) {
+        authorityLogin(email, authority.role);
       } else {
-        showNotification('Please enter valid credentials', 'error');
+        showNotification('Invalid credentials. Please try again.', 'error');
       }
     });
   }
