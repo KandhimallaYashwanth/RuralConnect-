@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Track Issues - RuralConnect</title>
     <meta name="description" content="Track the status of your reported issues in the village." />
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
 
@@ -60,63 +60,12 @@
           <!-- Issues List Container -->
           <div id="issuesListContainer">
             <div class="text-center mb-8">
-              <h1>Track Your Issues</h1>
-              <p>Monitor the status of all your reported issues and stay updated with the latest developments</p>
+              <h1>Track Your Reported Issues</h1>
+              <p>View and monitor the status of issues you've reported to village authorities</p>
             </div>
             
-            <!-- No Issues Message -->
-            <div id="noIssuesMessage" class="rural-card text-center p-8 hidden">
-              <div class="empty-issues-icon">
-                <i class="fas fa-clipboard-list"></i>
-              </div>
-              <h2>No Issues Reported Yet</h2>
-              <p>You haven't reported any issues yet. When you do, they'll appear here.</p>
-              
-              <button id="goToReportBtn" class="btn btn-primary mt-4">
-                Report an Issue <i class="fas fa-plus"></i>
-              </button>
-            </div>
-            
-            <!-- Issues List -->
-            <div id="issuesList" class="issues-list hidden">
-              <!-- Issues will be loaded dynamically here -->
-            </div>
-          </div>
-          
-          <!-- Issue Detail Container -->
-          <div id="issueDetailContainer" class="hidden">
-            <button id="backToListBtn" class="back-button mb-4">
-              <i class="fas fa-arrow-left"></i> Back to All Issues
-            </button>
-            
-            <div class="rural-card mb-6">
-              <div id="issueDetailContent" class="p-6">
-                <!-- Issue details will be loaded dynamically here -->
-              </div>
-            </div>
-            
-            <div class="rural-card mb-6">
-              <div class="p-6">
-                <h3 class="text-xl font-bold mb-4">Issue Timeline</h3>
-                <div id="issueTimeline" class="timeline">
-                  <!-- Timeline will be loaded dynamically here -->
-                </div>
-              </div>
-            </div>
-            
-            <div class="rural-card">
-              <div class="p-6">
-                <h3 class="text-xl font-bold mb-4">Add a Comment</h3>
-                <form id="commentForm">
-                  <div class="form-group">
-                    <textarea id="commentText" class="form-control" rows="3" 
-                      placeholder="Add your comment or question about this issue..."></textarea>
-                  </div>
-                  <div class="flex justify-end mt-4">
-                    <button type="submit" class="btn btn-primary">Add Comment</button>
-                  </div>
-                </form>
-              </div>
+            <div id="issueTrackingContainer">
+              <!-- Issues will be loaded here dynamically by content.js -->
             </div>
           </div>
         </div>
@@ -159,6 +108,7 @@
     <!-- Notification element -->
     <div id="notification" class="notification hidden"></div>
 
-    <script src="main.js"></script>
+    <script src="public/js/main.js"></script>
+    <script src="content.js"></script>
   </body>
 </html>

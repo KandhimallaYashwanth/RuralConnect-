@@ -1,53 +1,132 @@
-// Content management for public-facing pages
+
+// Content management for RuralConnect
 document.addEventListener('DOMContentLoaded', function() {
-    // Check if user is logged in
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    
-    // Handle different sections based on the current page
-    const currentPage = window.location.pathname.split('/').pop();
-    
-    // Redirect to home page events section if not logged in
-    if (!isLoggedIn && (
-        currentPage === 'budget.html' || 
-        currentPage === 'resources.html' || 
-        currentPage === 'history.html' || 
-        currentPage === 'announcements.html'
-    )) {
-        localStorage.setItem('redirectAfterLogin', currentPage);
-        notify('Please login to view this section', 'warning');
-        window.location.href = 'index.html#events-section';
-        return;
+    // Check if we're on the home page
+    const budgetPreviewContainer = document.getElementById('budgetPreviewContainer');
+    if (budgetPreviewContainer) {
+        loadBudgetPreview();
     }
     
-    // Load appropriate content based on the current page
-    switch (currentPage) {
-        case 'budget.html':
-            loadBudgetContent();
-            setupBudgetModal();
-            break;
-        case 'events.html':
-            loadEventsContent();
-            break;
-        case 'resources.html':
-            loadResourcesContent();
-            break;
-        case 'history.html':
-            loadHistoryContent();
-            break;
-        case 'announcements.html':
-            loadAnnouncementsContent();
-            break;
-        case 'index.html':
-        case '':
-            // Load preview sections for the landing page
-            loadBudgetPreview();
-            loadEventsPreview();
-            loadResourcesPreview();
-            break;
+    // Check if we're on the budget page
+    const budgetContainer = document.getElementById('budgetContainer');
+    if (budgetContainer) {
+        loadBudgetContent();
+        setupBudgetModal();
+    }
+    
+    // Check if we're on the events page
+    const eventsContainer = document.getElementById('eventsContainer');
+    if (eventsContainer) {
+        loadEventsContent();
+    }
+    
+    // Check if we're on the history page
+    const historyContainer = document.getElementById('historyContainer');
+    if (historyContainer) {
+        loadHistoryContent();
+    }
+    
+    // Check if we're on the resources page
+    const resourcesContainer = document.getElementById('resourcesContainer');
+    if (resourcesContainer) {
+        loadResourcesContent();
+    }
+    
+    // Check if we're on the announcements page
+    const announcementsContainer = document.getElementById('announcementsContainer');
+    if (announcementsContainer) {
+        loadAnnouncementsContent();
+    }
+    
+    // Check if we're on the issue tracking page
+    const issueTrackingContainer = document.getElementById('issueTrackingContainer');
+    if (issueTrackingContainer) {
+        loadIssueTracking();
     }
 });
 
-// Load budget content
+// Load budget preview on home page
+function loadBudgetPreview() {
+    const budgetPreviewContainer = document.getElementById('budgetPreviewContainer');
+    if (!budgetPreviewContainer) return;
+    
+    // Get budget content from localStorage
+    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
+    const budgetContent = villageContent.filter(content => content.type === 'budget');
+    
+    if (budgetContent.length === 0) {
+        budgetPreviewContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <h2>No Budget Information Available</h2>
+                <p>Budget information will be posted by village authorities soon.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Get the latest 3 budgets
+    const latestBudgets = budgetContent.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate)).slice(0, 3);
+    
+    let budgetHTML = '<div class="budget-cards">';
+    
+    latestBudgets.forEach(budget => {
+        const completionPercentage = budget.completion || 0;
+        
+        budgetHTML += `
+            <div class="budget-card" data-id="${budget.id}">
+                <div class="budget-header">
+                    <h3>${budget.title}</h3>
+                </div>
+                <div class="budget-body">
+                    <div class="budget-amount">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</div>
+                    <div class="budget-description">${budget.description}</div>
+                    
+                    <div class="budget-stats">
+                        <div class="stat">
+                            <span class="stat-label">Allocated</span>
+                            <span class="stat-value">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Expenditure</span>
+                            <span class="stat-value">₹${budget.expenditure ? budget.expenditure.toLocaleString() : '0'}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-wrapper">
+                        <div class="progress-label">
+                            <span>Completion</span>
+                            <span>${completionPercentage}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress" style="width: ${completionPercentage}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-meta">
+                        <span>Posted by ${budget.postedBy}</span>
+                        <span>${new Date(budget.postedDate).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    budgetHTML += '</div>';
+    budgetHTML += `
+        <div class="text-center mt-8">
+            <a href="budget.html" class="btn btn-primary">
+                <i class="fas fa-money-bill-wave"></i> View All Budget Details
+            </a>
+        </div>
+    `;
+    
+    budgetPreviewContainer.innerHTML = budgetHTML;
+}
+
+// Load full budget content on budget page
 function loadBudgetContent() {
     const budgetContainer = document.getElementById('budgetContainer');
     if (!budgetContainer) return;
@@ -104,23 +183,24 @@ function loadBudgetContent() {
                         </div>
                     </div>
                     
+                    <div class="budget-meta">
+                        <span>Posted by ${budget.postedBy}</span>
+                        <span>${new Date(budget.postedDate).toLocaleDateString()}</span>
+                    </div>
+                    
                     <button class="btn btn-outline-accent w-full mt-4 view-budget-details" data-id="${budget.id}">
                         <i class="fas fa-info-circle"></i> View Details
                     </button>
-                    
-                    <div class="budget-meta">
-                        <span><i class="fas fa-user"></i> Posted by: ${budget.postedBy}</span>
-                        <span><i class="fas fa-clock"></i> ${new Date(budget.postedDate).toLocaleDateString()}</span>
-                    </div>
                 </div>
             </div>
         `;
     });
     
     budgetHTML += '</div>';
+    
     budgetContainer.innerHTML = budgetHTML;
     
-    // Add event listeners for budget detail buttons
+    // Add event listeners to view budget details buttons
     document.querySelectorAll('.view-budget-details').forEach(button => {
         button.addEventListener('click', function() {
             const budgetId = this.getAttribute('data-id');
@@ -132,20 +212,21 @@ function loadBudgetContent() {
 // Setup budget detail modal
 function setupBudgetModal() {
     const modal = document.getElementById('budgetDetailModal');
-    const modalClose = document.getElementById('modalClose');
+    if (!modal) return;
     
-    if (modal && modalClose) {
+    const modalClose = document.getElementById('modalClose');
+    if (modalClose) {
         modalClose.addEventListener('click', function() {
             modal.classList.remove('active');
         });
-        
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modal.classList.remove('active');
-            }
-        });
     }
+    
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.classList.remove('active');
+        }
+    });
 }
 
 // Show budget details in modal
@@ -156,122 +237,61 @@ function showBudgetDetails(budgetId) {
     
     if (!modal || !modalTitle || !modalBody) return;
     
-    // Get budget data
+    // Get budget details from localStorage
     const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const budget = villageContent.find(content => content.id === budgetId);
+    const budget = villageContent.find(item => item.id === budgetId);
     
-    if (!budget) return;
+    if (!budget) {
+        modalBody.innerHTML = '<p>Budget information not found.</p>';
+        return;
+    }
     
     modalTitle.textContent = budget.title;
     
+    // Format budget details for modal
     const completionPercentage = budget.completion || 0;
-    const remaining = (budget.allocated || 0) - (budget.expenditure || 0);
     
-    modalBody.innerHTML = `
-        <div class="budget-detail">
-            <p class="mb-4">${budget.description}</p>
+    const detailsHTML = `
+        <div class="budget-details">
+            <div class="budget-amount-lg">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</div>
+            <p class="budget-desc">${budget.description}</p>
             
-            <div class="budget-detail-stats grid grid-cols-2 gap-4 mb-6">
-                <div class="stat-card bg-gray-100 p-4 rounded-lg text-center">
-                    <div class="text-xl font-bold text-leaf">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</div>
-                    <div class="text-sm text-gray-600">Total Allocated</div>
+            <div class="budget-details-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Allocated Amount</span>
+                    <span class="detail-value">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</span>
                 </div>
-                <div class="stat-card bg-gray-100 p-4 rounded-lg text-center">
-                    <div class="text-xl font-bold text-terracotta">₹${budget.expenditure ? budget.expenditure.toLocaleString() : '0'}</div>
-                    <div class="text-sm text-gray-600">Total Expenditure</div>
+                <div class="detail-item">
+                    <span class="detail-label">Current Expenditure</span>
+                    <span class="detail-value">₹${budget.expenditure ? budget.expenditure.toLocaleString() : '0'}</span>
                 </div>
-                <div class="stat-card bg-gray-100 p-4 rounded-lg text-center">
-                    <div class="text-xl font-bold text-sky">₹${remaining.toLocaleString()}</div>
-                    <div class="text-sm text-gray-600">Remaining Budget</div>
+                <div class="detail-item">
+                    <span class="detail-label">Remaining Budget</span>
+                    <span class="detail-value">₹${budget.allocated && budget.expenditure ? (budget.allocated - budget.expenditure).toLocaleString() : '0'}</span>
                 </div>
-                <div class="stat-card bg-gray-100 p-4 rounded-lg text-center">
-                    <div class="text-xl font-bold text-mustard">${completionPercentage}%</div>
-                    <div class="text-sm text-gray-600">Completion</div>
+                <div class="detail-item">
+                    <span class="detail-label">Completion Status</span>
+                    <span class="detail-value">${completionPercentage}%</span>
                 </div>
             </div>
             
-            <div class="progress-wrapper mb-6">
-                <div class="progress-label">
-                    <span>Project Completion</span>
-                    <span>${completionPercentage}%</span>
-                </div>
+            <div class="progress-wrapper mt-4">
                 <div class="progress-bar">
                     <div class="progress" style="width: ${completionPercentage}%"></div>
                 </div>
             </div>
             
-            <div class="budget-meta-detail">
-                <div class="meta-item mb-2">
-                    <span class="font-semibold">Posted by:</span> ${budget.postedBy}
-                </div>
-                <div class="meta-item mb-2">
-                    <span class="font-semibold">Posted on:</span> ${new Date(budget.postedDate).toLocaleString()}
-                </div>
+            <div class="budget-posted-by mt-4">
+                <div><strong>Posted by:</strong> ${budget.postedBy}</div>
+                <div><strong>Posted on:</strong> ${new Date(budget.postedDate).toLocaleDateString()}</div>
             </div>
         </div>
     `;
     
+    modalBody.innerHTML = detailsHTML;
+    
+    // Show modal
     modal.classList.add('active');
-}
-
-// Load budget preview on landing page
-function loadBudgetPreview() {
-    const budgetPreviewContainer = document.getElementById('budgetPreviewContainer');
-    if (!budgetPreviewContainer) return;
-    
-    // Get budget content from localStorage
-    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const budgetContent = villageContent.filter(content => content.type === 'budget');
-    
-    // Display only the latest 3 budgets
-    const recentBudgets = budgetContent.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate)).slice(0, 3);
-    
-    if (recentBudgets.length === 0) {
-        budgetPreviewContainer.innerHTML = `
-            <div class="empty-state">
-                <p>No budget information available yet.</p>
-                <a href="budget.html" class="btn btn-outline-accent mt-4">View All Budgets</a>
-            </div>
-        `;
-        return;
-    }
-    
-    let budgetHTML = '<div class="budget-cards">';
-    
-    recentBudgets.forEach(budget => {
-        const completionPercentage = budget.completion || 0;
-        
-        budgetHTML += `
-            <div class="budget-card">
-                <div class="budget-header">
-                    <h3>${budget.title}</h3>
-                </div>
-                <div class="budget-body">
-                    <div class="budget-amount">₹${budget.allocated ? budget.allocated.toLocaleString() : '0'}</div>
-                    <div class="budget-description">${budget.description.substring(0, 100)}${budget.description.length > 100 ? '...' : ''}</div>
-                    
-                    <div class="progress-wrapper">
-                        <div class="progress-label">
-                            <span>Completion</span>
-                            <span>${completionPercentage}%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: ${completionPercentage}%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    budgetHTML += '</div>';
-    budgetHTML += `
-        <div class="text-center mt-8">
-            <a href="budget.html" class="btn btn-primary">View All Budgets</a>
-        </div>
-    `;
-    
-    budgetPreviewContainer.innerHTML = budgetHTML;
 }
 
 // Load events content
@@ -289,143 +309,164 @@ function loadEventsContent() {
                 <div class="empty-icon">
                     <i class="fas fa-calendar-alt"></i>
                 </div>
-                <h2>No Events Available</h2>
-                <p>Events will be posted by village authorities soon.</p>
+                <h2>No Events Scheduled</h2>
+                <p>Stay tuned for upcoming village events.</p>
             </div>
         `;
         return;
     }
     
-    // Sort events by date (upcoming first)
-    const sortedEvents = eventsContent.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // Sort events by date
+    const upcomingEvents = eventsContent.filter(event => new Date(event.date) >= new Date())
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    let eventsHTML = '<div class="events-grid">';
+    const pastEvents = eventsContent.filter(event => new Date(event.date) < new Date())
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    sortedEvents.forEach(event => {
-        const eventDate = new Date(event.date);
-        const isUpcoming = eventDate >= new Date();
-        
+    let eventsHTML = '';
+    
+    // Display upcoming events
+    if (upcomingEvents.length > 0) {
         eventsHTML += `
-            <div class="event-card ${isUpcoming ? 'upcoming' : 'past'}">
-                <div class="event-header">
-                    <span>${isUpcoming ? 'Upcoming' : 'Past'}</span>
-                    <h3>${event.title}</h3>
-                </div>
-                
-                <div class="event-details">
-                    <div class="event-detail">
-                        <i class="fas fa-calendar-day"></i>
-                        <span>${eventDate.toLocaleDateString()}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-clock"></i>
-                        <span>${event.time}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${event.location}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-users"></i>
-                        <span>Expected: ${event.attendees} attendees</span>
-                    </div>
-                </div>
-                
-                <p>${event.description}</p>
-                
-                <button class="btn btn-outline-accent w-full mt-4 view-event-details" data-id="${event.id}">
-                    <i class="fas fa-info-circle"></i> Event Details
-                </button>
-                
-                <div class="event-meta">
-                    <span><i class="fas fa-user"></i> Posted by: ${event.postedBy}</span>
-                    <span><i class="fas fa-clock"></i> ${new Date(event.postedDate).toLocaleDateString()}</span>
-                </div>
-            </div>
+            <h2 class="text-center mb-6">Upcoming Events</h2>
+            <div class="events-grid">
         `;
-    });
-    
-    eventsHTML += '</div>';
-    eventsContainer.innerHTML = eventsHTML;
-    
-    // Add event listeners for event detail buttons
-    document.querySelectorAll('.view-event-details').forEach(button => {
-        button.addEventListener('click', function() {
-            const eventId = this.getAttribute('data-id');
-            showEventDetails(eventId);
+        
+        upcomingEvents.forEach(event => {
+            const eventDate = new Date(event.date);
+            
+            eventsHTML += `
+                <div class="event-card">
+                    <div class="event-header">
+                        <span>${event.location}</span>
+                        <h3>${event.title}</h3>
+                    </div>
+                    
+                    <div class="event-details">
+                        <div class="event-detail">
+                            <i class="fas fa-calendar-day"></i>
+                            <span>${eventDate.toDateString()}</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-clock"></i>
+                            <span>${event.time}</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${event.location}</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-users"></i>
+                            <span>Expected: ${event.attendees || 'N/A'}</span>
+                        </div>
+                    </div>
+                    
+                    <p>${event.description}</p>
+                    
+                    <div class="event-meta mt-4">
+                        <span>Posted by ${event.postedBy}</span>
+                        <span>${new Date(event.postedDate).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `;
         });
-    });
+        
+        eventsHTML += '</div>';
+    }
+    
+    // Display past events
+    if (pastEvents.length > 0) {
+        eventsHTML += `
+            <h2 class="text-center mb-6 mt-8">Past Events</h2>
+            <div class="events-grid">
+        `;
+        
+        pastEvents.forEach(event => {
+            const eventDate = new Date(event.date);
+            
+            eventsHTML += `
+                <div class="event-card">
+                    <div class="event-header">
+                        <span class="past-event">${event.location}</span>
+                        <h3>${event.title}</h3>
+                    </div>
+                    
+                    <div class="event-details">
+                        <div class="event-detail">
+                            <i class="fas fa-calendar-day"></i>
+                            <span>${eventDate.toDateString()}</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-clock"></i>
+                            <span>${event.time}</span>
+                        </div>
+                        <div class="event-detail">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${event.location}</span>
+                        </div>
+                    </div>
+                    
+                    <p>${event.description}</p>
+                    
+                    <div class="event-meta mt-4">
+                        <span>Posted by ${event.postedBy}</span>
+                        <span>${new Date(event.postedDate).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        eventsHTML += '</div>';
+    }
+    
+    eventsContainer.innerHTML = eventsHTML;
 }
 
-// Load events preview on landing page
-function loadEventsPreview() {
-    const eventsPreviewContainer = document.getElementById('eventsPreviewContainer');
-    if (!eventsPreviewContainer) return;
+// Load history content
+function loadHistoryContent() {
+    const historyContainer = document.getElementById('historyContainer');
+    if (!historyContainer) return;
     
-    // Get events content from localStorage
+    // Get history content from localStorage
     const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const eventsContent = villageContent.filter(content => content.type === 'event');
+    const historyContent = villageContent.filter(content => content.type === 'history');
     
-    // Get only upcoming events and sort by date (closest first)
-    const today = new Date();
-    const upcomingEvents = eventsContent
-        .filter(event => new Date(event.date) >= today)
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .slice(0, 3); // Get only the next 3 events
-    
-    if (upcomingEvents.length === 0) {
-        // If no upcoming events, show the default events from the HTML
+    if (historyContent.length === 0) {
+        historyContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h2>No Historical Records Available</h2>
+                <p>Check back later for historical information about our village.</p>
+            </div>
+        `;
         return;
     }
     
-    let eventsHTML = '<div class="events-grid">';
+    // Sort history content by date
+    const sortedHistory = historyContent.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
     
-    upcomingEvents.forEach(event => {
-        const eventDate = new Date(event.date);
-        
-        eventsHTML += `
-            <div class="event-card">
-                <div class="event-header">
-                    <span>Upcoming</span>
-                    <h3>${event.title}</h3>
-                </div>
-                
-                <div class="event-details">
-                    <div class="event-detail">
-                        <i class="fas fa-calendar-day"></i>
-                        <span>${eventDate.toLocaleDateString()}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-clock"></i>
-                        <span>${event.time}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>${event.location}</span>
-                    </div>
-                    <div class="event-detail">
-                        <i class="fas fa-users"></i>
-                        <span>Expected: ${event.attendees} attendees</span>
+    let historyHTML = '<div class="history-timeline">';
+    
+    sortedHistory.forEach((history, index) => {
+        historyHTML += `
+            <div class="history-item">
+                <div class="history-content">
+                    <h3>${history.title}</h3>
+                    <p>${history.description}</p>
+                    <div class="history-meta">
+                        <span>Posted by ${history.postedBy}</span>
+                        <span>${new Date(history.postedDate).toLocaleDateString()}</span>
                     </div>
                 </div>
-                
-                <p>${event.description.substring(0, 100)}${event.description.length > 100 ? '...' : ''}</p>
-                
-                <button class="btn btn-outline-accent w-full mt-4">
-                    <i class="fas fa-info-circle"></i> Event Details
-                </button>
             </div>
         `;
     });
     
-    eventsHTML += '</div>';
-    eventsHTML += `
-        <div class="text-center mt-8">
-            <a href="events.html" class="btn btn-primary">View All Events</a>
-        </div>
-    `;
+    historyHTML += '</div>';
     
-    eventsPreviewContainer.innerHTML = eventsHTML;
+    historyContainer.innerHTML = historyHTML;
 }
 
 // Load resources content
@@ -444,176 +485,54 @@ function loadResourcesContent() {
                     <i class="fas fa-file-alt"></i>
                 </div>
                 <h2>No Resources Available</h2>
-                <p>Resources will be posted by village authorities soon.</p>
+                <p>Check back later for resources and documents.</p>
             </div>
         `;
         return;
     }
     
-    let resourcesHTML = '<div class="resources-grid">';
-    
+    // Sort resources by type
+    const resourcesByType = {};
     resourcesContent.forEach(resource => {
-        let resourceIcon = 'fas fa-file-alt';
-        
-        // Set icon based on resource type
-        switch(resource.resourceType) {
-            case 'document':
-                resourceIcon = 'fas fa-file-pdf';
-                break;
-            case 'form':
-                resourceIcon = 'fas fa-file-alt';
-                break;
-            case 'guide':
-                resourceIcon = 'fas fa-book';
-                break;
-            case 'contact':
-                resourceIcon = 'fas fa-address-card';
-                break;
+        if (!resourcesByType[resource.resourceType]) {
+            resourcesByType[resource.resourceType] = [];
         }
-        
-        resourcesHTML += `
-            <div class="resource-card">
-                <div class="resource-icon">
-                    <i class="${resourceIcon}"></i>
-                </div>
-                <div class="resource-details">
-                    <h3>${resource.title}</h3>
-                    <p>${resource.description}</p>
-                    <div class="resource-meta">
-                        <span>Type: ${resource.resourceType}</span>
-                        <a href="${resource.resourceLink}" target="_blank" class="download-btn">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
+        resourcesByType[resource.resourceType].push(resource);
     });
     
-    resourcesHTML += '</div>';
+    let resourcesHTML = '';
+    
+    // Display resources by type
+    Object.keys(resourcesByType).forEach(type => {
+        resourcesHTML += `
+            <h2 class="text-center mb-6 mt-8">${type} Resources</h2>
+            <div class="resources-grid">
+        `;
+        
+        resourcesByType[type].forEach(resource => {
+            resourcesHTML += `
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="resource-details">
+                        <h3>${resource.title}</h3>
+                        <p>${resource.description}</p>
+                        <div class="resource-meta">
+                            <span>Posted on ${new Date(resource.postedDate).toLocaleDateString()}</span>
+                            <a href="${resource.resourceLink}" target="_blank" class="download-btn">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        resourcesHTML += '</div>';
+    });
+    
     resourcesContainer.innerHTML = resourcesHTML;
-}
-
-// Load resources preview on landing page
-function loadResourcesPreview() {
-    const resourcesPreviewContainer = document.getElementById('resourcesPreviewContainer');
-    if (!resourcesPreviewContainer) return;
-    
-    // Get resources content from localStorage
-    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const resourcesContent = villageContent.filter(content => content.type === 'resource');
-    
-    // Get the latest 4 resources
-    const recentResources = resourcesContent
-        .sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate))
-        .slice(0, 4);
-    
-    if (recentResources.length === 0) {
-        // If no resources, keep the default resources from the HTML
-        return;
-    }
-    
-    let resourcesHTML = '<div class="resources-grid">';
-    
-    recentResources.forEach(resource => {
-        let resourceIcon = 'fas fa-file-alt';
-        
-        // Set icon based on resource type
-        switch(resource.resourceType) {
-            case 'document':
-                resourceIcon = 'fas fa-file-pdf';
-                break;
-            case 'form':
-                resourceIcon = 'fas fa-file-alt';
-                break;
-            case 'guide':
-                resourceIcon = 'fas fa-book';
-                break;
-            case 'contact':
-                resourceIcon = 'fas fa-address-card';
-                break;
-        }
-        
-        resourcesHTML += `
-            <div class="resource-card">
-                <div class="resource-icon">
-                    <i class="${resourceIcon}"></i>
-                </div>
-                <div class="resource-details">
-                    <h3>${resource.title}</h3>
-                    <p>${resource.description.substring(0, 80)}${resource.description.length > 80 ? '...' : ''}</p>
-                    <div class="resource-meta">
-                        <span>Type: ${resource.resourceType}</span>
-                        <a href="${resource.resourceLink}" target="_blank" class="download-btn">
-                            <i class="fas fa-download"></i> Download
-                        </a>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    resourcesHTML += '</div>';
-    resourcesHTML += `
-        <div class="text-center mt-8">
-            <a href="resources.html" class="btn btn-primary">
-                <i class="fas fa-file-alt"></i> Explore All Resources
-            </a>
-        </div>
-    `;
-    
-    resourcesPreviewContainer.innerHTML = resourcesHTML;
-}
-
-// Load history content
-function loadHistoryContent() {
-    const historyContainer = document.getElementById('historyContainer');
-    if (!historyContainer) return;
-    
-    // Get history content from localStorage
-    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const historyContent = villageContent.filter(content => content.type === 'history');
-    
-    if (historyContent.length === 0) {
-        historyContainer.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="fas fa-history"></i>
-                </div>
-                <h2>No Historical Information Available</h2>
-                <p>Historical information will be posted by village authorities soon.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    // Sort history by posted date (newest first)
-    const sortedHistory = historyContent.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
-    
-    let historyHTML = '<div class="history-timeline">';
-    
-    sortedHistory.forEach(history => {
-        historyHTML += `
-            <div class="history-item">
-                <div class="history-marker"></div>
-                <div class="history-content">
-                    <div class="history-header">
-                        <h3>${history.title}</h3>
-                        <span>${new Date(history.postedDate).toLocaleDateString()}</span>
-                    </div>
-                    <div class="history-body">
-                        <p>${history.description}</p>
-                    </div>
-                    <div class="history-meta">
-                        <span>Posted by: ${history.postedBy}</span>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    historyHTML += '</div>';
-    historyContainer.innerHTML = historyHTML;
 }
 
 // Load announcements content
@@ -632,197 +551,189 @@ function loadAnnouncementsContent() {
                     <i class="fas fa-bullhorn"></i>
                 </div>
                 <h2>No Announcements Available</h2>
-                <p>Announcements will be posted by village authorities soon.</p>
+                <p>Check back later for village announcements.</p>
             </div>
         `;
         return;
     }
     
-    // Sort announcements by posted date (newest first)
+    // Sort announcements by date (newest first)
     const sortedAnnouncements = announcementsContent.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
     
     let announcementsHTML = '<div class="announcements-list">';
     
     sortedAnnouncements.forEach(announcement => {
         const postedDate = new Date(announcement.postedDate);
-        const isRecent = (new Date() - postedDate) / (1000 * 60 * 60 * 24) < 7; // Less than 7 days old
         
         announcementsHTML += `
-            <div class="announcement-card ${isRecent ? 'recent' : ''}">
-                ${isRecent ? '<div class="new-badge">New</div>' : ''}
+            <div class="announcement-card">
                 <div class="announcement-header">
                     <h3>${announcement.title}</h3>
-                    <span>${postedDate.toLocaleDateString()}</span>
+                    <span class="announcement-date">${postedDate.toLocaleDateString()}</span>
                 </div>
-                <div class="announcement-body">
+                <div class="announcement-content">
                     <p>${announcement.description}</p>
                 </div>
-                <div class="announcement-meta">
-                    <span>Posted by: ${announcement.postedBy}</span>
-                    <span>${formatTimeAgo(postedDate)}</span>
+                <div class="announcement-footer">
+                    <span>Posted by ${announcement.postedBy}</span>
                 </div>
             </div>
         `;
     });
     
     announcementsHTML += '</div>';
+    
     announcementsContainer.innerHTML = announcementsHTML;
 }
 
-// Format currency
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: 0
-    }).format(amount);
-}
-
-// Format time ago
-function formatTimeAgo(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
+// Load issue tracking
+function loadIssueTracking() {
+    const issueTrackingContainer = document.getElementById('issueTrackingContainer');
+    if (!issueTrackingContainer) return;
     
-    let interval = Math.floor(seconds / 31536000);
-    if (interval > 1) return interval + ' years ago';
+    // Check if user is logged in
+    const isUserLoggedIn = localStorage.getItem('isUserLoggedIn') === 'true';
+    const userEmail = localStorage.getItem('userEmail');
     
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) return interval + ' months ago';
-    
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) return interval + ' days ago';
-    
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) return interval + ' hours ago';
-    
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) return interval + ' minutes ago';
-    
-    return Math.floor(seconds) + ' seconds ago';
-}
-
-// Show event details
-function showEventDetails(eventId) {
-    // Get event data
-    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-    const event = villageContent.find(content => content.id === eventId);
-    
-    if (!event) return;
-    
-    // Create modal if it doesn't exist
-    let modal = document.getElementById('eventDetailModal');
-    
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'eventDetailModal';
-        modal.className = 'modal';
-        
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="eventModalTitle">Event Details</h3>
-                    <button class="modal-close" id="eventModalClose">&times;</button>
-                </div>
-                <div class="modal-body" id="eventModalBody">
-                    <!-- Event details will be loaded here -->
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        
-        // Add event listener to close button
-        document.getElementById('eventModalClose').addEventListener('click', function() {
-            modal.classList.remove('active');
-        });
-        
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                modal.classList.remove('active');
+    if (!isUserLoggedIn) {
+        // Show login required message
+        const loginRequiredContainer = document.getElementById('loginRequiredContainer');
+        if (loginRequiredContainer) {
+            loginRequiredContainer.classList.remove('hidden');
+            
+            // Setup login button
+            const loginToTrackBtn = document.getElementById('loginToTrackBtn');
+            if (loginToTrackBtn) {
+                loginToTrackBtn.addEventListener('click', function() {
+                    // Use the showLoginModal function from main.js
+                    if (window.showLoginModal) {
+                        window.showLoginModal();
+                    } else {
+                        alert('Please login to track issues.');
+                    }
+                });
             }
-        });
+        }
+        
+        return;
     }
     
-    // Update modal content
-    const modalTitle = document.getElementById('eventModalTitle');
-    const modalBody = document.getElementById('eventModalBody');
+    // Get issues from localStorage
+    let villageIssues = JSON.parse(localStorage.getItem('villageIssues')) || [];
     
-    modalTitle.textContent = event.title;
+    // Filter issues for current user
+    const userIssues = villageIssues.filter(issue => issue.reportedBy === userEmail);
     
-    const eventDate = new Date(event.date);
-    const isUpcoming = eventDate >= new Date();
+    if (userIssues.length === 0) {
+        issueTrackingContainer.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h2>No Issues Reported</h2>
+                <p>You haven't reported any issues yet. Click the button below to report a new issue.</p>
+                <a href="report-issue.html" class="btn btn-primary mt-4">
+                    <i class="fas fa-plus"></i> Report an Issue
+                </a>
+            </div>
+        `;
+        return;
+    }
     
-    modalBody.innerHTML = `
-        <div class="event-detail">
-            <p class="mb-4">${event.description}</p>
-            
-            <div class="event-detail-info">
-                <div class="detail-item">
-                    <div class="detail-label">Date</div>
-                    <div class="detail-value">${eventDate.toLocaleDateString()}</div>
+    // Sort issues by date (newest first)
+    const sortedIssues = userIssues.sort((a, b) => new Date(b.dateReported) - new Date(a.dateReported));
+    
+    let issuesHTML = '<div class="issues-list">';
+    
+    sortedIssues.forEach(issue => {
+        const reportedDate = new Date(issue.dateReported);
+        
+        issuesHTML += `
+            <div class="issue-card">
+                <div class="issue-header">
+                    <h3>${issue.type}</h3>
+                    <div class="issue-status ${issue.status}">${formatIssueStatus(issue.status)}</div>
                 </div>
-                <div class="detail-item">
-                    <div class="detail-label">Time</div>
-                    <div class="detail-value">${event.time}</div>
+                
+                <p>${issue.description}</p>
+                
+                <div class="issue-meta">
+                    <span><i class="fas fa-map-marker-alt"></i> ${issue.location}</span>
+                    <span><i class="fas fa-sort-numeric-up"></i> Ward ${issue.ward}</span>
+                    <span><i class="fas fa-calendar-alt"></i> ${reportedDate.toLocaleDateString()}</span>
+                    <span><i class="fas fa-tag"></i> ${issue.id}</span>
                 </div>
-                <div class="detail-item">
-                    <div class="detail-label">Location</div>
-                    <div class="detail-value">${event.location}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Expected Attendees</div>
-                    <div class="detail-value">${event.attendees}</div>
-                </div>
-                <div class="detail-item">
-                    <div class="detail-label">Status</div>
-                    <div class="detail-value status-badge ${isUpcoming ? 'upcoming' : 'past'}">
-                        ${isUpcoming ? 'Upcoming' : 'Past Event'}
+                
+                <div class="issue-timeline">
+                    <div class="timeline-item ${issue.status !== 'pending' ? 'completed' : 'active'}">
+                        <div class="timeline-icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>Issue Reported</h4>
+                                <span>${reportedDate.toLocaleDateString()}</span>
+                            </div>
+                            <p>Issue submitted with details and location.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item ${issue.status !== 'pending' ? 'completed' : 'pending'}">
+                        <div class="timeline-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>Reviewed by Ward Member</h4>
+                                <span>${issue.reviewDate ? new Date(issue.reviewDate).toLocaleDateString() : 'Pending'}</span>
+                            </div>
+                            <p>${issue.status === 'rejected' ? 'Issue rejected by ward member.' : issue.status === 'pending' ? 'Waiting for ward member review.' : 'Issue verified and forwarded to village authorities.'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item ${issue.status === 'in-progress' || issue.status === 'resolved' ? 'completed' : issue.status === 'forwarded' ? 'active' : 'pending'}">
+                        <div class="timeline-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>Work in Progress</h4>
+                                <span>${issue.progressDate ? new Date(issue.progressDate).toLocaleDateString() : 'Pending'}</span>
+                            </div>
+                            <p>${issue.status === 'in-progress' ? 'Work has started on resolving the issue.' : issue.status === 'resolved' ? 'Work completed successfully.' : 'Waiting for authorities to start work.'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item ${issue.status === 'resolved' ? 'completed' : 'pending'}">
+                        <div class="timeline-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h4>Resolution</h4>
+                                <span>${issue.resolveDate ? new Date(issue.resolveDate).toLocaleDateString() : 'Pending'}</span>
+                            </div>
+                            <p>${issue.status === 'resolved' ? 'Issue has been successfully resolved.' : 'Issue will be marked as resolved once work is completed.'}</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="event-meta-detail">
-                <div class="meta-item mb-2">
-                    <span class="font-semibold">Posted by:</span> ${event.postedBy}
-                </div>
-                <div class="meta-item mb-2">
-                    <span class="font-semibold">Posted on:</span> ${new Date(event.postedDate).toLocaleString()}
-                </div>
-            </div>
-            
-            ${isUpcoming ? `
-                <div class="event-actions">
-                    <button class="btn btn-primary add-to-calendar">
-                        <i class="fas fa-calendar-plus"></i> Add to Calendar
-                    </button>
-                </div>
-            ` : ''}
-        </div>
-    `;
+        `;
+    });
     
-    // Add event listener to "Add to Calendar" button
-    const addToCalendarBtn = modalBody.querySelector('.add-to-calendar');
-    if (addToCalendarBtn) {
-        addToCalendarBtn.addEventListener('click', function() {
-            // Create calendar event URL (Google Calendar format)
-            const eventTitle = encodeURIComponent(event.title);
-            const eventDesc = encodeURIComponent(event.description);
-            const eventLoc = encodeURIComponent(event.location);
-            
-            // Format date and time for Google Calendar
-            const startDate = new Date(event.date + 'T' + event.time);
-            const endDate = new Date(startDate.getTime() + 2 * 60 * 60 * 1000); // Add 2 hours
-            
-            const startDateStr = startDate.toISOString().replace(/-|:|\.\d+/g, '');
-            const endDateStr = endDate.toISOString().replace(/-|:|\.\d+/g, '');
-            
-            const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${eventTitle}&details=${eventDesc}&location=${eventLoc}&dates=${startDateStr}/${endDateStr}`;
-            
-            // Open calendar in new tab
-            window.open(calendarUrl, '_blank');
-        });
+    issuesHTML += '</div>';
+    
+    issueTrackingContainer.innerHTML = issuesHTML;
+}
+
+// Format issue status for display
+function formatIssueStatus(status) {
+    switch(status) {
+        case 'pending': return 'Pending Review';
+        case 'forwarded': return 'Forwarded';
+        case 'in-progress': return 'In Progress';
+        case 'resolved': return 'Resolved';
+        case 'rejected': return 'Rejected';
+        default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
-    
-    // Show modal
-    modal.classList.add('active');
 }

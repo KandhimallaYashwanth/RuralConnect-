@@ -4,24 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RuralConnect - Authorities Dashboard</title>
+    <title>RuralConnect - Authority Dashboard</title>
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        .dashboard-header {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-welcome {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
         .dashboard-tabs {
             display: flex;
-            overflow-x: auto;
             border-bottom: 1px solid var(--gray-200);
             margin-bottom: 2rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 1px;
         }
         
         .dashboard-tab {
             padding: 1rem 1.5rem;
-            color: var(--gray-600);
             font-weight: 500;
-            border-bottom: 2px solid transparent;
+            color: var(--gray-600);
             cursor: pointer;
-            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .dashboard-tab:hover {
+            color: var(--terracotta);
         }
         
         .dashboard-tab.active {
@@ -29,62 +52,130 @@
             border-bottom-color: var(--terracotta);
         }
         
-        .dashboard-tab:hover:not(.active) {
-            color: var(--terracotta-dark);
-            border-bottom-color: var(--gray-300);
+        .dashboard-content {
+            margin-bottom: 2rem;
         }
         
-        .tab-content {
+        .tab-pane {
             display: none;
         }
         
-        .tab-content.active {
+        .tab-pane.active {
             display: block;
         }
         
-        .issue-card {
-            margin-bottom: 1.5rem;
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
         }
         
-        .action-btn {
-            margin-left: 0.5rem;
+        .issue-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .issue-content {
+            padding: 1.25rem;
+        }
+        
+        .issue-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .issue-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .issue-status {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
         
         .status-pending {
-            background-color: rgba(126, 200, 227, 0.2);
-            color: var(--sky);
+            background-color: #fff3cd;
+            color: #856404;
         }
         
         .status-forwarded {
-            background-color: rgba(240, 192, 90, 0.2);
-            color: var(--earth);
+            background-color: #cce5ff;
+            color: #004085;
         }
         
         .status-in-progress {
-            background-color: rgba(240, 192, 90, 0.2);
-            color: var(--earth);
+            background-color: #d1ecf1;
+            color: #0c5460;
         }
         
         .status-resolved {
-            background-color: rgba(77, 114, 77, 0.2);
-            color: var(--leaf);
+            background-color: #d4edda;
+            color: #155724;
         }
         
         .status-rejected {
-            background-color: rgba(205, 93, 69, 0.2);
-            color: var(--terracotta);
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .content-form {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .form-grid .form-row:last-child {
+            grid-column: span 2;
         }
         
         .dynamic-fields {
             margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            background-color: var(--gray-100);
-            border-radius: var(--border-radius);
-            color: var(--gray-500);
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid .form-row:last-child {
+                grid-column: span 1;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
@@ -103,7 +194,7 @@
                 </a>
             </div>
             
-            <button id="logoutBtn" class="btn btn-outline-accent">
+            <button class="btn login-btn" id="logoutBtn">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
             
@@ -115,233 +206,175 @@
         </div>
     </div>
 
-    <main class="section-padding">
+    <main class="section-padding" id="authorityDashboard">
         <div class="container">
             <div class="dashboard-header">
-                <h1>Welcome, <span id="authorityRole">Authority</span></h1>
-                <p class="text-gray-600">Manage village activities and respond to community needs</p>
+                <div class="dashboard-welcome">
+                    <h1>Welcome, <span id="authorityRole">Authority</span></h1>
+                    <p>Manage village development activities and respond to community issues</p>
+                </div>
+                <button class="btn btn-primary" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
             
             <div class="dashboard-tabs">
                 <div class="dashboard-tab active" data-tab="issues">
-                    <i class="fas fa-exclamation-circle"></i> Issues Management
+                    <i class="fas fa-exclamation-circle"></i> Issues
                 </div>
                 <div class="dashboard-tab" data-tab="budget">
                     <i class="fas fa-money-bill-wave"></i> Budget
                 </div>
-                <div class="dashboard-tab" data-tab="events">
+                <div class="dashboard-tab" data-tab="event">
                     <i class="fas fa-calendar-alt"></i> Events
                 </div>
-                <div class="dashboard-tab" data-tab="announcements">
+                <div class="dashboard-tab" data-tab="announcement">
                     <i class="fas fa-bullhorn"></i> Announcements
+                </div>
+                <div class="dashboard-tab" data-tab="resource">
+                    <i class="fas fa-file-alt"></i> Resources
                 </div>
                 <div class="dashboard-tab" data-tab="history">
                     <i class="fas fa-history"></i> History
                 </div>
-                <div class="dashboard-tab" data-tab="resources">
-                    <i class="fas fa-file-alt"></i> Resources
-                </div>
-                <div class="dashboard-tab" data-tab="gallery">
-                    <i class="fas fa-images"></i> Gallery
-                </div>
             </div>
             
-            <div id="issuesContent" class="tab-content active">
-                <div class="dashboard-card">
-                    <h2>Issues Requiring Attention</h2>
-                    <p class="text-gray-600 mb-6">Manage and respond to issues reported by village residents</p>
-                    
-                    <div id="issuesContainer">
-                        <!-- Issues will be populated here by JS -->
+            <div class="dashboard-content">
+                <!-- Issues Tab -->
+                <div class="tab-pane active" id="issuesTab">
+                    <h2 class="mb-6">Reported Issues</h2>
+                    <div id="issuesContainer" class="issues-grid">
+                        <!-- Issues will be loaded here by authorities.js -->
                         <div class="empty-state">
-                            <i class="fas fa-inbox fa-3x mb-4"></i>
-                            <h3>No issues to display</h3>
-                            <p>When residents report issues, they will appear here for your review.</p>
+                            <div class="empty-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <h3>No Issues to Display</h3>
+                            <p>There are currently no issues assigned to you.</p>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div id="budgetContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Budget Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage village budget information</p>
-                    
-                    <form id="contentPostingForm" class="content-form">
-                        <div class="form-row">
-                            <label for="contentType" class="form-label">Content Type</label>
-                            <select id="contentType" class="form-select">
-                                <option value="budget">Budget</option>
-                                <option value="event">Event</option>
-                                <option value="announcement">Announcement</option>
-                                <option value="history">History</option>
-                                <option value="resource">Resource</option>
-                                <option value="gallery">Gallery</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-row">
-                            <label for="contentTitle" class="form-label">Title</label>
-                            <input type="text" id="contentTitle" class="form-input" placeholder="Enter title" required>
-                        </div>
-                        
-                        <div class="form-row">
-                            <label for="contentDescription" class="form-label">Description</label>
-                            <textarea id="contentDescription" class="form-textarea" rows="4" placeholder="Enter description" required></textarea>
-                        </div>
-                        
-                        <!-- Budget-specific fields -->
-                        <div id="budgetFields" class="dynamic-fields">
-                            <div class="form-row">
-                                <label for="budgetAllocated" class="form-label">Allocated Amount (₹)</label>
-                                <input type="number" id="budgetAllocated" class="form-input" placeholder="Enter allocated amount" min="0" step="1000">
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="budgetExpenditure" class="form-label">Expenditure (₹)</label>
-                                <input type="number" id="budgetExpenditure" class="form-input" placeholder="Enter expenditure amount" min="0" step="1000">
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="budgetCompletion" class="form-label">Completion Status (%)</label>
-                                <input type="number" id="budgetCompletion" class="form-input" placeholder="Enter completion percentage" min="0" max="100">
-                            </div>
-                        </div>
-                        
-                        <!-- Event-specific fields -->
-                        <div id="eventFields" class="dynamic-fields hidden">
-                            <div class="form-row">
-                                <label for="eventDate" class="form-label">Event Date</label>
-                                <input type="date" id="eventDate" class="form-input">
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="eventTime" class="form-label">Event Time</label>
-                                <input type="time" id="eventTime" class="form-input">
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="eventLocation" class="form-label">Location</label>
-                                <input type="text" id="eventLocation" class="form-input" placeholder="Enter event location">
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="eventAttendees" class="form-label">Expected Attendees</label>
-                                <input type="number" id="eventAttendees" class="form-input" placeholder="Enter expected number of attendees" min="0">
-                            </div>
-                        </div>
-                        
-                        <!-- Resource-specific fields -->
-                        <div id="resourceFields" class="dynamic-fields hidden">
-                            <div class="form-row">
-                                <label for="resourceType" class="form-label">Resource Type</label>
-                                <select id="resourceType" class="form-select">
-                                    <option value="document">Document</option>
-                                    <option value="form">Form</option>
-                                    <option value="guide">Guide</option>
-                                    <option value="contact">Contact Information</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-row">
-                                <label for="resourceLink" class="form-label">Resource Link</label>
-                                <input type="url" id="resourceLink" class="form-input" placeholder="Enter resource link">
-                            </div>
-                        </div>
-                        
-                        <!-- Gallery-specific fields -->
-                        <div id="galleryFields" class="dynamic-fields hidden">
-                            <div class="form-row">
-                                <label class="form-label">Image Upload</label>
-                                <div class="file-upload">
-                                    <input type="file" id="galleryImage" class="hidden" accept="image/*">
-                                    <div class="file-upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <p class="file-upload-text">Drag & drop an image or click to browse</p>
-                                    <button type="button" class="btn btn-outline">Select Image</button>
+                
+                <!-- Content Management Tab -->
+                <div class="tab-pane" id="contentManagementTab">
+                    <div class="content-form">
+                        <h2 class="mb-6">Post New Content</h2>
+                        <form id="contentPostingForm">
+                            <div class="form-grid">
+                                <div class="form-row">
+                                    <label for="contentType" class="form-label">Content Type</label>
+                                    <select id="contentType" class="form-select" required>
+                                        <option value="budget">Budget</option>
+                                        <option value="event">Event</option>
+                                        <option value="announcement">Announcement</option>
+                                        <option value="resource">Resource</option>
+                                        <option value="history">History</option>
+                                    </select>
                                 </div>
-                                <div class="file-preview"></div>
+                                
+                                <div class="form-row">
+                                    <label for="contentTitle" class="form-label">Title</label>
+                                    <input type="text" id="contentTitle" class="form-input" placeholder="Enter title" required>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <label for="contentDescription" class="form-label">Description</label>
+                                    <textarea id="contentDescription" class="form-textarea" placeholder="Enter description" required></textarea>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> Post Content
-                            </button>
-                        </div>
-                    </form>
+                            
+                            <!-- Budget-specific fields -->
+                            <div id="budgetFields" class="dynamic-fields">
+                                <h3 class="mb-4">Budget Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="budgetAllocated" class="form-label">Allocated Amount (₹)</label>
+                                        <input type="number" id="budgetAllocated" class="form-input" placeholder="Enter allocated amount" min="0" step="1000">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="budgetExpenditure" class="form-label">Current Expenditure (₹)</label>
+                                        <input type="number" id="budgetExpenditure" class="form-input" placeholder="Enter current expenditure" min="0" step="1000">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="budgetCompletion" class="form-label">Completion Percentage (%)</label>
+                                        <input type="number" id="budgetCompletion" class="form-input" placeholder="Enter completion percentage" min="0" max="100">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Event-specific fields -->
+                            <div id="eventFields" class="dynamic-fields hidden">
+                                <h3 class="mb-4">Event Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="eventDate" class="form-label">Event Date</label>
+                                        <input type="date" id="eventDate" class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventTime" class="form-label">Event Time</label>
+                                        <input type="time" id="eventTime" class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventLocation" class="form-label">Location</label>
+                                        <input type="text" id="eventLocation" class="form-input" placeholder="Enter event location">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventAttendees" class="form-label">Expected Attendees</label>
+                                        <input type="number" id="eventAttendees" class="form-input" placeholder="Enter expected number of attendees" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resource-specific fields -->
+                            <div id="resourceFields" class="dynamic-fields hidden">
+                                <h3 class="mb-4">Resource Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="resourceType" class="form-label">Resource Type</label>
+                                        <select id="resourceType" class="form-select">
+                                            <option value="Form">Form</option>
+                                            <option value="Document">Document</option>
+                                            <option value="Guidelines">Guidelines</option>
+                                            <option value="Contact Information">Contact Information</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="resourceLink" class="form-label">Resource Link</label>
+                                        <input type="url" id="resourceLink" class="form-input" placeholder="Enter URL to the resource">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="form-row mt-6">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Post Content
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                     
-                    <div class="content-list mt-8">
-                        <h3>Posted Budget Information</h3>
+                    <!-- Posted Content -->
+                    <div class="posted-content">
+                        <h2 class="mb-6">Posted Budget Items</h2>
                         <div id="postedBudgetsContainer">
-                            <!-- Posted budgets will be displayed here -->
+                            <!-- Posted budget items will be loaded here by authorities.js -->
                         </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="eventsContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Events Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage village events</p>
-                    
-                    <!-- Event content will be loaded in setupContentTab() function -->
-                    <div id="postedEventsContainer">
-                        <!-- Posted events will be displayed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div id="announcementsContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Announcements Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage village announcements</p>
-                    
-                    <!-- Announcements content will be loaded in setupContentTab() function -->
-                    <div id="postedAnnouncementsContainer">
-                        <!-- Posted announcements will be displayed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div id="historyContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Village History Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage historical information</p>
-                    
-                    <!-- History content will be loaded in setupContentTab() function -->
-                    <div id="postedHistoryContainer">
-                        <!-- Posted history will be displayed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div id="resourcesContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Resources Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage useful resources</p>
-                    
-                    <!-- Resources content will be loaded in setupContentTab() function -->
-                    <div id="postedResourcesContainer">
-                        <!-- Posted resources will be displayed here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div id="galleryContent" class="tab-content">
-                <div class="dashboard-card">
-                    <h2>Gallery Management</h2>
-                    <p class="text-gray-600 mb-6">Post, update and manage village gallery</p>
-                    
-                    <!-- Gallery content will be loaded in setupContentTab() function -->
-                    <div id="postedGalleryContainer">
-                        <!-- Posted gallery items will be displayed here -->
                     </div>
                 </div>
             </div>
         </div>
     </main>
+    
+    <!-- Notification element -->
+    <div id="notification" class="notification hidden"></div>
     
     <footer class="footer">
         <div class="container">
@@ -359,10 +392,7 @@
                 <div class="footer-links">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="#issues">Issues Management</a></li>
-                        <li><a href="#budget">Budget</a></li>
-                        <li><a href="#events">Events</a></li>
-                        <li><a href="#resources">Resources</a></li>
+                        <li><a href="authorities-dashboard.html">Dashboard</a></li>
                     </ul>
                 </div>
                 
@@ -374,16 +404,6 @@
                         <li><i class="fas fa-envelope"></i> info@ruralconnect.com</li>
                     </ul>
                 </div>
-                
-                <div class="footer-newsletter">
-                    <h3>Language Preference</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">Hindi</button>
-                        <button class="lang-btn">Telugu</button>
-                        <button class="lang-btn">Tamil</button>
-                    </div>
-                </div>
             </div>
             
             <div class="footer-bottom">
@@ -391,147 +411,57 @@
             </div>
         </div>
     </footer>
-    
+
     <script src="public/js/main.js"></script>
     <script src="authorities.js"></script>
     <script>
-        // Additional dashboard specific functionality
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab switching functionality
-            const tabs = document.querySelectorAll('.dashboard-tab');
+            // Setup dashboard tabs
+            const dashboardTabs = document.querySelectorAll('.dashboard-tab');
             
-            tabs.forEach(tab => {
+            // Tab click handler
+            dashboardTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    // Remove active class from all tabs and content
-                    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                    
-                    // Add active class to clicked tab
+                    // Update active tab
+                    dashboardTabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Show corresponding content
-                    const tabId = this.getAttribute('data-tab');
-                    document.getElementById(tabId + 'Content').classList.add('active');
+                    // Show content management tab for all content types except issues
+                    const tabName = this.getAttribute('data-tab');
+                    const issuesTab = document.getElementById('issuesTab');
+                    const contentManagementTab = document.getElementById('contentManagementTab');
                     
-                    // If it's not the issues tab, load the content
-                    if (tabId !== 'issues') {
-                        setupContentTab(tabId);
+                    if (tabName === 'issues') {
+                        issuesTab.classList.add('active');
+                        contentManagementTab.classList.remove('active');
+                    } else {
+                        issuesTab.classList.remove('active');
+                        contentManagementTab.classList.add('active');
+                        
+                        // Update content type in form
+                        const contentTypeSelect = document.getElementById('contentType');
+                        if (contentTypeSelect) {
+                            contentTypeSelect.value = tabName;
+                            
+                            // Trigger the change event to update dynamic fields
+                            const event = new Event('change');
+                            contentTypeSelect.dispatchEvent(event);
+                        }
+                        
+                        // Update posted content heading
+                        const postedContentHeading = contentManagementTab.querySelector('h2');
+                        if (postedContentHeading) {
+                            const contentTypeCapitalized = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+                            postedContentHeading.textContent = `Posted ${contentTypeCapitalized} Items`;
+                        }
+                        
+                        // Load content for the selected tab
+                        if (window.loadPostedContent) {
+                            window.loadPostedContent(tabName);
+                        }
                     }
                 });
             });
-            
-            // Function to setup content tabs with their respective content
-            function setupContentTab(contentType) {
-                const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-                const filteredContent = villageContent.filter(content => content.type === contentType);
-                const containerElement = document.getElementById(`posted${contentType.charAt(0).toUpperCase() + contentType.slice(1)}sContainer`);
-                
-                if (!containerElement) return;
-                
-                if (filteredContent.length === 0) {
-                    containerElement.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-folder-open fa-3x mb-4"></i>
-                            <h3>No ${contentType} content posted yet</h3>
-                            <p>Use the form to add ${contentType} information.</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let contentHTML = '<div class="content-cards">';
-                
-                filteredContent.forEach(item => {
-                    let additionalHTML = '';
-                    
-                    switch(contentType) {
-                        case 'budget':
-                            additionalHTML = `
-                                <div class="content-stats">
-                                    <div class="stat">
-                                        <span class="stat-label">Allocated</span>
-                                        <span class="stat-value">₹${item.allocated.toLocaleString()}</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-label">Expenditure</span>
-                                        <span class="stat-value">₹${item.expenditure.toLocaleString()}</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-label">Completion</span>
-                                        <span class="stat-value">${item.completion}%</span>
-                                    </div>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: ${item.completion}%"></div>
-                                </div>
-                            `;
-                            break;
-                        case 'event':
-                            additionalHTML = `
-                                <div class="content-details">
-                                    <div><i class="fas fa-calendar-day"></i> ${new Date(item.date).toLocaleDateString()}</div>
-                                    <div><i class="fas fa-clock"></i> ${item.time}</div>
-                                    <div><i class="fas fa-map-marker-alt"></i> ${item.location}</div>
-                                    <div><i class="fas fa-users"></i> Expected: ${item.attendees} attendees</div>
-                                </div>
-                            `;
-                            break;
-                        case 'resource':
-                            additionalHTML = `
-                                <div class="content-details">
-                                    <div><i class="fas fa-file-alt"></i> Type: ${item.resourceType}</div>
-                                    <div><i class="fas fa-link"></i> <a href="${item.resourceLink}" target="_blank">View Resource</a></div>
-                                </div>
-                            `;
-                            break;
-                    }
-                    
-                    contentHTML += `
-                        <div class="content-card" data-id="${item.id}">
-                            <div class="content-header">
-                                <h3>${item.title}</h3>
-                                <div class="content-actions">
-                                    <button class="btn-icon delete-content" data-id="${item.id}" data-type="${contentType}">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <p>${item.description}</p>
-                            ${additionalHTML}
-                            <div class="content-meta">
-                                <span><i class="fas fa-user"></i> Posted by: ${item.postedBy}</span>
-                                <span><i class="fas fa-clock"></i> ${new Date(item.postedDate).toLocaleDateString()}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                contentHTML += '</div>';
-                containerElement.innerHTML = contentHTML;
-                
-                // Add event listeners for delete buttons
-                document.querySelectorAll('.delete-content').forEach(button => {
-                    button.addEventListener('click', function() {
-                        const contentId = this.getAttribute('data-id');
-                        const contentType = this.getAttribute('data-type');
-                        deleteContent(contentId, contentType);
-                    });
-                });
-            }
-            
-            // Function to delete content
-            function deleteContent(contentId, contentType) {
-                if (confirm('Are you sure you want to delete this item?')) {
-                    let villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
-                    villageContent = villageContent.filter(item => item.id !== contentId);
-                    localStorage.setItem('villageContent', JSON.stringify(villageContent));
-                    
-                    notify(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} item deleted successfully`, 'success');
-                    
-                    // Refresh the content display
-                    setupContentTab(contentType);
-                }
-            }
         });
     </script>
 </body>
