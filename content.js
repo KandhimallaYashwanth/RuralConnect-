@@ -1,4 +1,3 @@
-
 // Content management for RuralConnect
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on the home page
@@ -605,117 +604,70 @@ function loadIssueTracking() {
             const loginToTrackBtn = document.getElementById('loginToTrackBtn');
             if (loginToTrackBtn) {
                 loginToTrackBtn.addEventListener('click', function() {
-                    // Use the showLoginModal function from main.js
-                    if (window.showLoginModal) {
-                        window.showLoginModal();
-                    } else {
-                        alert('Please login to track issues.');
-                    }
+                    showLoginModal();
                 });
             }
         }
-        
         return;
     }
     
-    // Get issues from localStorage
-    let villageIssues = JSON.parse(localStorage.getItem('villageIssues')) || [];
+    // Get issue ID from URL if available
+    const urlParams = new URLSearchParams(window.location.search);
+    const issueId = urlParams.get('id');
     
-    // Filter issues for current user
+    // Get issues from localStorage
+    const villageIssues = JSON.parse(localStorage.getItem('villageIssues')) || [];
+    
+    // Filter issues by current user's email
     const userIssues = villageIssues.filter(issue => issue.reportedBy === userEmail);
     
+    // If no issues found
     if (userIssues.length === 0) {
         issueTrackingContainer.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-search"></i>
                 </div>
-                <h2>No Issues Reported</h2>
-                <p>You haven't reported any issues yet. Click the button below to report a new issue.</p>
-                <a href="report-issue.html" class="btn btn-primary mt-4">
-                    <i class="fas fa-plus"></i> Report an Issue
-                </a>
+                <h2>No Issues Found</h2>
+                <p>You haven't reported any issues yet. <a href="report-issue.html">Report an issue</a> to start tracking.</p>
             </div>
         `;
         return;
     }
     
-    // Sort issues by date (newest first)
-    const sortedIssues = userIssues.sort((a, b) => new Date(b.dateReported) - new Date(a.dateReported));
-    
-    let issuesHTML = '<div class="issues-list">';
-    
-    sortedIssues.forEach(issue => {
-        const reportedDate = new Date(issue.dateReported);
+    // If issueId is provided, show that specific issue
+    if (issueId) {
+        const issue = userIssues.find(issue => issue.id === issueId);
         
+        if (issue) {
+            // Display issue details
+            issueTrackingContainer.innerHTML = generateIssueDetailsHTML(issue);
+            return;
+        }
+    }
+    
+    // Otherwise, show all user issues
+    let issuesHTML = '<h2 class="mb-6">My Reported Issues</h2>';
+    issuesHTML += '<div class="issues-list">';
+    
+    userIssues.forEach(issue => {
         issuesHTML += `
             <div class="issue-card">
                 <div class="issue-header">
                     <h3>${issue.type}</h3>
-                    <div class="issue-status ${issue.status}">${formatIssueStatus(issue.status)}</div>
+                    <span class="issue-status status-${issue.status}">${formatStatus(issue.status)}</span>
                 </div>
-                
-                <p>${issue.description}</p>
-                
-                <div class="issue-meta">
-                    <span><i class="fas fa-map-marker-alt"></i> ${issue.location}</span>
-                    <span><i class="fas fa-sort-numeric-up"></i> Ward ${issue.ward}</span>
-                    <span><i class="fas fa-calendar-alt"></i> ${reportedDate.toLocaleDateString()}</span>
-                    <span><i class="fas fa-tag"></i> ${issue.id}</span>
+                <div class="issue-content">
+                    <p>${truncateText(issue.description, 100)}</p>
+                    <div class="issue-meta">
+                        <span><i class="fas fa-map-marker-alt"></i> ${issue.location}</span>
+                        <span><i class="fas fa-calendar-alt"></i> ${new Date(issue.dateReported).toLocaleDateString()}</span>
+                    </div>
                 </div>
-                
-                <div class="issue-timeline">
-                    <div class="timeline-item ${issue.status !== 'pending' ? 'completed' : 'active'}">
-                        <div class="timeline-icon">
-                            <i class="fas fa-flag"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Issue Reported</h4>
-                                <span>${reportedDate.toLocaleDateString()}</span>
-                            </div>
-                            <p>Issue submitted with details and location.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item ${issue.status !== 'pending' ? 'completed' : 'pending'}">
-                        <div class="timeline-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Reviewed by Ward Member</h4>
-                                <span>${issue.reviewDate ? new Date(issue.reviewDate).toLocaleDateString() : 'Pending'}</span>
-                            </div>
-                            <p>${issue.status === 'rejected' ? 'Issue rejected by ward member.' : issue.status === 'pending' ? 'Waiting for ward member review.' : 'Issue verified and forwarded to village authorities.'}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item ${issue.status === 'in-progress' || issue.status === 'resolved' ? 'completed' : issue.status === 'forwarded' ? 'active' : 'pending'}">
-                        <div class="timeline-icon">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Work in Progress</h4>
-                                <span>${issue.progressDate ? new Date(issue.progressDate).toLocaleDateString() : 'Pending'}</span>
-                            </div>
-                            <p>${issue.status === 'in-progress' ? 'Work has started on resolving the issue.' : issue.status === 'resolved' ? 'Work completed successfully.' : 'Waiting for authorities to start work.'}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item ${issue.status === 'resolved' ? 'completed' : 'pending'}">
-                        <div class="timeline-icon">
-                            <i class="fas fa-check-double"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Resolution</h4>
-                                <span>${issue.resolveDate ? new Date(issue.resolveDate).toLocaleDateString() : 'Pending'}</span>
-                            </div>
-                            <p>${issue.status === 'resolved' ? 'Issue has been successfully resolved.' : 'Issue will be marked as resolved once work is completed.'}</p>
-                        </div>
-                    </div>
+                <div class="issue-actions">
+                    <a href="issue-tracking.html?id=${issue.id}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
                 </div>
             </div>
         `;
@@ -726,8 +678,197 @@ function loadIssueTracking() {
     issueTrackingContainer.innerHTML = issuesHTML;
 }
 
-// Format issue status for display
-function formatIssueStatus(status) {
+// Generate detailed HTML for a specific issue
+function generateIssueDetailsHTML(issue) {
+    const statusClass = `status-${issue.status}`;
+    const statusText = formatStatus(issue.status);
+    
+    let timelineEvents = [];
+    
+    // Add reported event
+    timelineEvents.push({
+        date: new Date(issue.dateReported),
+        title: 'Issue Reported',
+        description: `You reported this issue on ${new Date(issue.dateReported).toLocaleDateString()}`,
+        status: 'completed',
+        icon: 'fas fa-flag'
+    });
+    
+    // Add review event if applicable
+    if (issue.reviewedBy) {
+        timelineEvents.push({
+            date: new Date(issue.reviewDate),
+            title: issue.status === 'rejected' ? 'Issue Rejected' : 'Issue Forwarded',
+            description: issue.status === 'rejected' 
+                ? `Your issue was reviewed and rejected by ${issue.reviewedBy}`
+                : `Your issue was reviewed and forwarded to higher authorities by ${issue.reviewedBy}`,
+            status: 'completed',
+            icon: issue.status === 'rejected' ? 'fas fa-times-circle' : 'fas fa-share'
+        });
+    }
+    
+    // Add in-progress event if applicable
+    if (issue.assignedTo) {
+        timelineEvents.push({
+            date: new Date(issue.progressDate),
+            title: 'Work In Progress',
+            description: `Work on this issue has been started by ${issue.assignedTo}`,
+            status: 'completed',
+            icon: 'fas fa-tools'
+        });
+    }
+    
+    // Add resolved event if applicable
+    if (issue.resolvedBy) {
+        timelineEvents.push({
+            date: new Date(issue.resolveDate),
+            title: 'Issue Resolved',
+            description: `This issue has been marked as resolved by ${issue.resolvedBy}`,
+            status: 'completed',
+            icon: 'fas fa-check-circle'
+        });
+    }
+    
+    // Add pending events based on current status
+    if (issue.status === 'pending') {
+        timelineEvents.push({
+            date: null,
+            title: 'Under Review',
+            description: 'Waiting for ward member to review this issue',
+            status: 'current',
+            icon: 'fas fa-spinner'
+        });
+        
+        timelineEvents.push({
+            date: null,
+            title: 'Approval Pending',
+            description: 'Waiting for authorities to approve this issue',
+            status: 'pending',
+            icon: 'fas fa-hourglass-half'
+        });
+        
+        timelineEvents.push({
+            date: null,
+            title: 'Work Pending',
+            description: 'Waiting for authorities to start work on this issue',
+            status: 'pending',
+            icon: 'fas fa-tools'
+        });
+        
+        timelineEvents.push({
+            date: null,
+            title: 'Resolution Pending',
+            description: 'Issue will be resolved after work completion',
+            status: 'pending',
+            icon: 'fas fa-check-circle'
+        });
+    } else if (issue.status === 'forwarded') {
+        timelineEvents.push({
+            date: null,
+            title: 'Work Pending',
+            description: 'Waiting for authorities to start work on this issue',
+            status: 'current',
+            icon: 'fas fa-tools'
+        });
+        
+        timelineEvents.push({
+            date: null,
+            title: 'Resolution Pending',
+            description: 'Issue will be resolved after work completion',
+            status: 'pending',
+            icon: 'fas fa-check-circle'
+        });
+    } else if (issue.status === 'in-progress') {
+        timelineEvents.push({
+            date: null,
+            title: 'Resolution Pending',
+            description: 'Work is in progress, waiting for completion',
+            status: 'current',
+            icon: 'fas fa-check-circle'
+        });
+    }
+    
+    // Generate HTML for timeline
+    let timelineHTML = '<div class="issue-timeline">';
+    
+    timelineEvents.forEach((event, index) => {
+        let statusIndicatorClass = 'timeline-status-indicator ';
+        
+        if (event.status === 'completed') {
+            statusIndicatorClass += 'completed';
+        } else if (event.status === 'current') {
+            statusIndicatorClass += 'current';
+        } else {
+            statusIndicatorClass += 'pending';
+        }
+        
+        timelineHTML += `
+            <div class="timeline-item">
+                <div class="${statusIndicatorClass}">
+                    <i class="${event.icon}"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>${event.title}</h4>
+                    <p>${event.description}</p>
+                    ${event.date ? `<span class="timeline-date">${event.date.toLocaleDateString()}</span>` : ''}
+                </div>
+            </div>
+        `;
+    });
+    
+    timelineHTML += '</div>';
+    
+    let html = `
+        <div class="issue-details-container">
+            <div class="issue-details-header">
+                <div>
+                    <h2>${issue.type}</h2>
+                    <div class="issue-id">ID: ${issue.id}</div>
+                </div>
+                <span class="issue-status status-${issue.status}">${statusText}</span>
+            </div>
+            
+            <div class="issue-details-content">
+                <div class="issue-description">
+                    <h3>Description</h3>
+                    <p>${issue.description}</p>
+                </div>
+                
+                <div class="issue-meta-details">
+                    <div class="meta-item">
+                        <span class="meta-label"><i class="fas fa-map-marker-alt"></i> Location:</span>
+                        <span class="meta-value">${issue.location}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label"><i class="fas fa-sort-numeric-up"></i> Ward Number:</span>
+                        <span class="meta-value">${issue.ward}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label"><i class="fas fa-calendar-alt"></i> Reported Date:</span>
+                        <span class="meta-value">${new Date(issue.dateReported).toLocaleDateString()}</span>
+                    </div>
+                </div>
+                
+                <h3 class="mt-8 mb-4">Issue Timeline</h3>
+                ${timelineHTML}
+                
+                <div class="issue-actions mt-8">
+                    <a href="issue-tracking.html" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i> Back to All Issues
+                    </a>
+                    <a href="report-issue.html" class="btn btn-primary">
+                        <i class="fas fa-plus-circle"></i> Report Another Issue
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
+
+// Helper functions
+function formatStatus(status) {
     switch(status) {
         case 'pending': return 'Pending Review';
         case 'forwarded': return 'Forwarded';
@@ -736,4 +877,9 @@ function formatIssueStatus(status) {
         case 'rejected': return 'Rejected';
         default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
+}
+
+function truncateText(text, maxLength) {
+    if (text.length <= maxLength) return text;
+    return text.substr(0, maxLength) + '...';
 }
