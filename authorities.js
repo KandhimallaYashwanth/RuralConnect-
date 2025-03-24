@@ -1,3 +1,4 @@
+
 // Authorities login and management functionality
 document.addEventListener('DOMContentLoaded', function() {
     // Check if we're on the authorities login page
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check if we're on the dashboard page
     const dashboardContainer = document.getElementById('authorityDashboard');
-    if (dashboardContainer) {
+    if (document.querySelector('.dashboard-tabs')) {
         if (!isAuthorityLoggedIn) {
             // Redirect to login if not logged in
             window.location.href = 'authorities-login.html';
@@ -67,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Setup content type dynamic form fields
         setupDynamicFormFields();
+        
+        // Load the posted content for each tab
+        loadPostedContent();
     }
     
     // Check for logout button on any page
@@ -348,6 +352,13 @@ function setupContentPosting() {
         // Reset dynamic fields
         const allDynamicFields = document.querySelectorAll('.dynamic-fields');
         allDynamicFields.forEach(field => field.classList.add('hidden'));
+        
+        // Show the first set of fields (budget by default)
+        const budgetFields = document.getElementById('budgetFields');
+        if (budgetFields) budgetFields.classList.remove('hidden');
+        
+        // Reload posted content for the current tab
+        loadPostedContent(contentType);
     });
 }
 
@@ -377,6 +388,145 @@ function setupDynamicFormFields() {
     contentTypeSelect.addEventListener('change', handleContentTypeChange);
 }
 
+// Load posted content for a specific tab
+function loadPostedContent(activeTabType = null) {
+    // If no tab type is specified, find the active tab
+    if (!activeTabType) {
+        const activeTab = document.querySelector('.dashboard-tab.active');
+        if (activeTab) {
+            activeTabType = activeTab.getAttribute('data-tab');
+        } else {
+            activeTabType = 'budget'; // Default to budget tab
+        }
+    }
+    
+    // Get content from localStorage
+    const villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
+    
+    // Filter content by type
+    const filteredContent = villageContent.filter(content => content.type === activeTabType);
+    
+    // Find the container for the content
+    const containerSelector = `#posted${activeTabType.charAt(0).toUpperCase() + activeTabType.slice(1)}sContainer`;
+    const contentContainer = document.querySelector(containerSelector);
+    
+    if (!contentContainer) return;
+    
+    // If there's no content yet, show an empty state
+    if (filteredContent.length === 0) {
+        contentContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-folder-open fa-3x mb-4"></i>
+                <h3>No ${activeTabType} content posted yet</h3>
+                <p>Use the form to add ${activeTabType} information.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Create HTML for the content cards
+    let contentHTML = '<div class="content-cards">';
+    
+    filteredContent.forEach(item => {
+        // Create different HTML based on content type
+        let additionalHTML = '';
+        
+        switch(activeTabType) {
+            case 'budget':
+                const allocated = item.allocated ? item.allocated.toLocaleString() : '0';
+                const expenditure = item.expenditure ? item.expenditure.toLocaleString() : '0';
+                const completion = item.completion || '0';
+                
+                additionalHTML = `
+                    <div class="content-stats">
+                        <div class="stat">
+                            <span class="stat-label">Allocated</span>
+                            <span class="stat-value">₹${allocated}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Expenditure</span>
+                            <span class="stat-value">₹${expenditure}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Completion</span>
+                            <span class="stat-value">${completion}%</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${completion}%"></div>
+                    </div>
+                `;
+                break;
+            case 'event':
+                additionalHTML = `
+                    <div class="content-details">
+                        <div><i class="fas fa-calendar-day"></i> ${new Date(item.date).toLocaleDateString()}</div>
+                        <div><i class="fas fa-clock"></i> ${item.time}</div>
+                        <div><i class="fas fa-map-marker-alt"></i> ${item.location}</div>
+                        <div><i class="fas fa-users"></i> Expected: ${item.attendees} attendees</div>
+                    </div>
+                `;
+                break;
+            case 'resource':
+                additionalHTML = `
+                    <div class="content-details">
+                        <div><i class="fas fa-file-alt"></i> Type: ${item.resourceType}</div>
+                        <div><i class="fas fa-link"></i> <a href="${item.resourceLink}" target="_blank">View Resource</a></div>
+                    </div>
+                `;
+                break;
+        }
+        
+        contentHTML += `
+            <div class="content-card" data-id="${item.id}">
+                <div class="content-header">
+                    <h3>${item.title}</h3>
+                    <div class="content-actions">
+                        <button class="btn-icon delete-content" data-id="${item.id}" data-type="${item.type}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <p>${item.description}</p>
+                ${additionalHTML}
+                <div class="content-meta">
+                    <span><i class="fas fa-user"></i> Posted by: ${item.postedBy}</span>
+                    <span><i class="fas fa-clock"></i> ${new Date(item.postedDate).toLocaleDateString()}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    contentHTML += '</div>';
+    contentContainer.innerHTML = contentHTML;
+    
+    // Add event listeners for delete buttons
+    document.querySelectorAll('.delete-content').forEach(button => {
+        button.addEventListener('click', function() {
+            const contentId = this.getAttribute('data-id');
+            const contentType = this.getAttribute('data-type');
+            
+            // Confirm before deleting
+            if (confirm('Are you sure you want to delete this item?')) {
+                // Get current content
+                let villageContent = JSON.parse(localStorage.getItem('villageContent')) || [];
+                
+                // Remove the content item
+                villageContent = villageContent.filter(item => item.id !== contentId);
+                
+                // Save updated content
+                localStorage.setItem('villageContent', JSON.stringify(villageContent));
+                
+                // Show notification
+                showNotification(`${contentType.charAt(0).toUpperCase() + contentType.slice(1)} deleted successfully`, 'success');
+                
+                // Reload content
+                loadPostedContent(contentType);
+            }
+        });
+    });
+}
+
 // Helper function to show notifications
 function showNotification(message, type = 'info') {
     if (window.notify) {
@@ -397,3 +547,139 @@ function formatStatus(status) {
         default: return status.charAt(0).toUpperCase() + status.slice(1);
     }
 }
+
+// Add CSS styles for tabs and content
+document.addEventListener('DOMContentLoaded', function() {
+    if (!document.getElementById('authorities-dashboard-styles')) {
+        const style = document.createElement('style');
+        style.id = 'authorities-dashboard-styles';
+        style.textContent = `
+            .dashboard-card {
+                background-color: var(--white);
+                border-radius: var(--border-radius);
+                padding: 2rem;
+                box-shadow: var(--box-shadow);
+                margin-bottom: 2rem;
+            }
+            
+            .content-form {
+                max-width: 800px;
+            }
+            
+            .content-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 2rem;
+                margin-top: 2rem;
+            }
+            
+            .content-card {
+                background-color: var(--white);
+                border-radius: var(--border-radius);
+                box-shadow: var(--box-shadow);
+                padding: 1.5rem;
+                border: 1px solid var(--gray-200);
+            }
+            
+            .content-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 1px solid var(--gray-200);
+            }
+            
+            .content-actions {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            .btn-icon {
+                width: 2rem;
+                height: 2rem;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: none;
+                border: none;
+                color: var(--gray-600);
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            
+            .btn-icon:hover {
+                background-color: var(--gray-200);
+                color: var(--terracotta);
+            }
+            
+            .content-stats {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+                margin: 1.5rem 0;
+            }
+            
+            .stat {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .stat-label {
+                font-size: 0.875rem;
+                color: var(--gray-500);
+            }
+            
+            .stat-value {
+                font-weight: 700;
+                color: var(--terracotta);
+            }
+            
+            .progress-bar {
+                height: 8px;
+                background-color: var(--gray-200);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 1.5rem;
+            }
+            
+            .progress {
+                height: 100%;
+                background-color: var(--leaf);
+                transition: width 0.5s ease;
+            }
+            
+            .content-details {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin: 1rem 0;
+                font-size: 0.875rem;
+                color: var(--gray-700);
+            }
+            
+            .content-meta {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.75rem;
+                color: var(--gray-500);
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid var(--gray-200);
+            }
+            
+            @media (max-width: 768px) {
+                .content-cards {
+                    grid-template-columns: 1fr;
+                }
+                
+                .content-stats {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});

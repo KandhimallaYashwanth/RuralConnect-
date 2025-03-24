@@ -1,135 +1,130 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authorities Login - RuralConnect</title>
-    <meta name="description" content="Login page for authorities to manage issues and content on RuralConnect." />
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  </head>
-
-  <body>
-    <nav class="navbar">
-      <div class="container">
-        <div class="nav-logo">
-          <a href="index.html">
-            <div class="logo-circle">RC</div>
-            <span>RuralConnect</span>
-          </a>
-        </div>
-        <div class="nav-menu" id="navMenu">
-          <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
-          <a href="report-issue.html" class="nav-link"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
-          <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-          <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
-          <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
-          <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
-          <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-          <a href="authorities-login.html" class="nav-link active"><i class="fas fa-user-shield"></i> Authorities</a>
-          <button class="btn btn-primary login-btn" id="loginBtn">Login</button>
-        </div>
-        <div class="hamburger" id="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-    </nav>
-
-    <main>
-      <section class="py-12 bg-gray-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuralConnect - Authorities Login</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
         <div class="container">
-          <div class="text-center mb-8">
-            <h1>Authorities Login</h1>
-            <p>Access the administrative dashboard to manage reported issues and content.</p>
-          </div>
-          
-          <div class="authorities-login-form">
-            <div class="report-form">
-              <form id="authoritiesLoginForm">
-                <div class="form-row">
-                  <label for="authorityEmail" class="form-label">Email</label>
-                  <input type="email" id="authorityEmail" class="form-input" required placeholder="Enter your official email">
-                </div>
-                <div class="form-row">
-                  <label for="authorityPassword" class="form-label">Password</label>
-                  <input type="password" id="authorityPassword" class="form-input" required placeholder="Enter your password">
-                </div>
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-sign-in-alt"></i> Login as Authority
-                  </button>
-                </div>
-                <div class="text-center mt-4">
-                  <p class="text-gray-600">Only authorized personnel have access to this section.</p>
-                  <div class="authority-credentials mt-4">
-                    <h3>Demo Credentials:</h3>
-                    <div class="credentials-container">
-                      <div class="credential-box">
-                        <h4>Sarpanch:</h4>
-                        <p>Email: sarpanch@gmail.com</p>
-                        <p>Password: sarpanch</p>
-                      </div>
-                      <div class="credential-box">
-                        <h4>Uppasarpanch:</h4>
-                        <p>Email: uppasarpanch@gmail.com</p>
-                        <p>Password: uppasarpanch</p>
-                      </div>
-                      <div class="credential-box">
-                        <h4>Ward Member:</h4>
-                        <p>Email: wardmember@gmail.com</p>
-                        <p>Password: wardmember</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+            <div class="nav-logo">
+                <a href="index.html">
+                    <div class="logo-circle">RC</div>
+                    RuralConnect
+                </a>
             </div>
-          </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-      </section>
-    </main>
+    </div>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-about">
-            <h3>RuralConnect</h3>
-            <p>Connecting rural communities with digital tools for better governance, 
-              transparency, and citizen participation.</p>
-            <div class="social-links">
-              <a href="#"><i class="fab fa-facebook-f"></i></a>
-              <a href="#"><i class="fab fa-twitter"></i></a>
-              <a href="#"><i class="fab fa-instagram"></i></a>
+    <main class="section-padding">
+        <div class="container">
+            <div class="auth-card">
+                <h2 class="text-center mb-6">Authority Login</h2>
+                <p class="text-center text-gray-600 mb-6">Log in to manage village development activities</p>
+                
+                <form id="authoritiesLoginForm" class="auth-form">
+                    <div class="form-row">
+                        <label for="authorityEmail" class="form-label">Email</label>
+                        <input type="email" id="authorityEmail" class="form-input" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="authorityPassword" class="form-label">Password</label>
+                        <div class="password-input-container">
+                            <input type="password" id="authorityPassword" class="form-input" placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <button type="submit" class="btn btn-primary w-full">Log In</button>
+                    </div>
+                </form>
+                
+                <div class="auth-help-text text-center mt-4">
+                    <p>For testing use:</p>
+                    <ul class="test-accounts">
+                        <li><strong>Sarpanch:</strong> sarpanch@gmail.com / sarpanch</li>
+                        <li><strong>Uppasarpanch:</strong> uppasarpanch@gmail.com / uppasarpanch</li>
+                        <li><strong>Ward Member:</strong> wardmember@gmail.com / wardmember</li>
+                    </ul>
+                </div>
             </div>
-          </div>
-          
-          <div class="footer-links">
-            <h3>Quick Links</h3>
-            <ul>
-              <li><a href="index.html">Home</a></li>
-              <li><a href="report-issue.html">Report Issue</a></li>
-              <li><a href="events.html">Events</a></li>
-              <li><a href="budget.html">Budget</a></li>
-              <li><a href="history.html">History</a></li>
-              <li><a href="resources.html">Resources</a></li>
-            </ul>
-          </div>
         </div>
-        
-        <div class="footer-bottom">
-          <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>About RuralConnect</h3>
+                    <p>Empowering rural communities through technology, transparency and participation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="index.html#features">Features</a></li>
+                        <li><a href="index.html#events-preview">Events</a></li>
+                        <li><a href="index.html#resources-preview">Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Village Office, Main Road</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> info@ruralconnect.com</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-newsletter">
+                    <h3>Language Preference</h3>
+                    <div class="language-buttons">
+                        <button class="lang-btn active">English</button>
+                        <button class="lang-btn">Hindi</button>
+                        <button class="lang-btn">Telugu</button>
+                        <button class="lang-btn">Tamil</button>
+                    </div>
+                    
+                    <h3 class="mt-4">Get Mobile App</h3>
+                    <div class="app-buttons">
+                        <button class="app-btn"><i class="fab fa-google-play"></i> Play Store</button>
+                        <button class="app-btn"><i class="fab fa-apple"></i> App Store</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 RuralConnect. All rights reserved.</p>
+            </div>
         </div>
-      </div>
     </footer>
 
-    <!-- Notification element -->
-    <div id="notification" class="notification hidden"></div>
-
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script src="main.js"></script>
+    <script src="public/js/main.js"></script>
     <script src="authorities.js"></script>
-  </body>
+</body>
 </html>
