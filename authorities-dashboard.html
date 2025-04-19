@@ -7,356 +7,365 @@
     <title>RuralConnect - Authority Dashboard</title>
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .dashboard-header {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .dashboard-welcome {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .dashboard-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding-bottom: 1px;
+        }
+        
+        .dashboard-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .dashboard-tab:hover {
+            color: var(--terracotta);
+        }
+        
+        .dashboard-tab.active {
+            color: var(--terracotta);
+            border-bottom-color: var(--terracotta);
+        }
+        
+        .dashboard-content {
+            margin-bottom: 2rem;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .issues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .issue-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .issue-content {
+            padding: 1.25rem;
+        }
+        
+        .issue-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .issue-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1.25rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        .issue-status {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-forwarded {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-in-progress {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-resolved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .content-form {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .form-grid .form-row:last-child {
+            grid-column: span 2;
+        }
+        
+        .dynamic-fields {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+        
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid .form-row:last-child {
+                grid-column: span 1;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="navbar">
         <div class="container">
             <div class="nav-logo">
-                <a href="index.html">
+                <a href="authorities-dashboard.html">
                     <div class="logo-circle">RC</div>
                     RuralConnect
                 </a>
             </div>
             <div class="nav-menu" id="navMenu">
-                <a href="index.html" class="nav-link">
-                    <i class="fas fa-home"></i> Home
-                </a>
                 <a href="authorities-dashboard.html" class="nav-link active">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </div>
+            
+            <button class="btn login-btn" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+            
             <div class="hamburger" id="hamburger">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
-            <button id="logoutBtn" class="btn btn-outline">Logout</button>
         </div>
     </div>
 
-    <main class="dashboard-container" id="authorityDashboard">
+    <main class="section-padding" id="authorityDashboard">
         <div class="container">
             <div class="dashboard-header">
                 <div class="dashboard-welcome">
-                    <div class="welcome-text">
-                        <h2>Welcome, Authority</h2>
-                        <p>Manage village development activities and respond to citizen reports</p>
-                    </div>
-                    <div class="authority-badge">
-                        Role: <span id="authorityRole">Authority</span>
-                    </div>
+                    <h1>Welcome, <span id="authorityRole">Authority</span></h1>
+                    <p>Manage village development activities and respond to community issues</p>
                 </div>
-                
-                <div class="dashboard-tabs">
-                    <button class="dashboard-tab active" data-tab="issues">
-                        <i class="fas fa-exclamation-circle"></i> Issues
-                    </button>
-                    <button class="dashboard-tab" data-tab="budget">
-                        <i class="fas fa-money-bill-wave"></i> Budget
-                    </button>
-                    <button class="dashboard-tab" data-tab="event">
-                        <i class="fas fa-calendar-alt"></i> Events
-                    </button>
-                    <button class="dashboard-tab" data-tab="announcement">
-                        <i class="fas fa-bullhorn"></i> Announcements
-                    </button>
-                    <button class="dashboard-tab" data-tab="history">
-                        <i class="fas fa-history"></i> History
-                    </button>
-                    <button class="dashboard-tab" data-tab="resource">
-                        <i class="fas fa-folder-open"></i> Resources
-                    </button>
-                    <button class="dashboard-tab" data-tab="gallery">
-                        <i class="fas fa-images"></i> Gallery
-                    </button>
+                <button class="btn btn-primary" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            
+            <div class="dashboard-tabs">
+                <div class="dashboard-tab active" data-tab="issues">
+                    <i class="fas fa-exclamation-circle"></i> Issues
+                </div>
+                <div class="dashboard-tab" data-tab="budget">
+                    <i class="fas fa-money-bill-wave"></i> Budget
+                </div>
+                <div class="dashboard-tab" data-tab="event">
+                    <i class="fas fa-calendar-alt"></i> Events
+                </div>
+                <div class="dashboard-tab" data-tab="announcement">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </div>
+                <div class="dashboard-tab" data-tab="resource">
+                    <i class="fas fa-file-alt"></i> Resources
+                </div>
+                <div class="dashboard-tab" data-tab="history">
+                    <i class="fas fa-history"></i> History
                 </div>
             </div>
             
             <div class="dashboard-content">
                 <!-- Issues Tab -->
                 <div class="tab-pane active" id="issuesTab">
-                    <div class="dashboard-card">
-                        <h3>Citizen Issues</h3>
-                        <p>Review and manage issues reported by village residents</p>
-                        
-                        <div id="issuesContainer" class="issues-container">
-                            <!-- Dynamic content will be loaded here -->
+                    <h2 class="mb-6">Reported Issues</h2>
+                    <div id="issuesContainer" class="issues-grid">
+                        <!-- Issues will be loaded here by authorities.js -->
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <h3>No Issues to Display</h3>
+                            <p>There are currently no issues assigned to you.</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Budget Tab -->
-                <div class="tab-pane" id="budgetTab">
-                    <div class="dashboard-card">
-                        <h3>Post Budget Information</h3>
-                        <p>Add budget allocations and expenditure details for village projects</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="budget">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">Project Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., Road Construction Project" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Project Description</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide details about the budget project..." required></textarea>
-                            </div>
-                            
-                            <div id="budgetFields" class="dynamic-fields">
-                                <div class="form-group">
-                                    <label for="budgetAllocated">Allocated Amount (₹)</label>
-                                    <input type="number" id="budgetAllocated" class="form-input" min="0" placeholder="Enter amount in Rupees" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="budgetExpenditure">Current Expenditure (₹)</label>
-                                    <input type="number" id="budgetExpenditure" class="form-input" min="0" placeholder="Enter amount in Rupees" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="budgetCompletion">Completion Percentage (%)</label>
-                                    <input type="number" id="budgetCompletion" class="form-input" min="0" max="100" placeholder="Enter percentage (0-100)" required>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Budget Information
-                            </button>
-                        </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Budget Information</h3>
-                        <div id="postedBudgetsContainer">
-                            <!-- Posted budgets will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Events Tab -->
-                <div class="tab-pane" id="eventTab">
-                    <div class="dashboard-card">
-                        <h3>Post Event Information</h3>
-                        <p>Add upcoming events and gatherings in the village</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="event">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">Event Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., Village Sports Tournament" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Event Description</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide details about the event..." required></textarea>
-                            </div>
-                            
-                            <div id="eventFields" class="dynamic-fields hidden">
-                                <div class="form-group">
-                                    <label for="eventDate">Event Date</label>
-                                    <input type="date" id="eventDate" class="form-input" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="eventTime">Event Time</label>
-                                    <input type="time" id="eventTime" class="form-input" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="eventLocation">Location</label>
-                                    <input type="text" id="eventLocation" class="form-input" placeholder="e.g., Village Community Hall" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="eventAttendees">Expected Attendees</label>
-                                    <input type="number" id="eventAttendees" class="form-input" min="0" placeholder="Enter estimated number of attendees">
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Event Information
-                            </button>
-                        </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Events</h3>
-                        <div id="postedEventsContainer">
-                            <!-- Posted events will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Announcements Tab -->
-                <div class="tab-pane" id="announcementTab">
-                    <div class="dashboard-card">
-                        <h3>Post Announcement</h3>
-                        <p>Share important announcements with village residents</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="announcement">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">Announcement Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., Water Supply Maintenance" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Announcement Content</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide details about the announcement..." required></textarea>
-                            </div>
-                            
-                            <div id="announcementFields" class="dynamic-fields hidden">
-                                <!-- No additional fields for announcements -->
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Announcement
-                            </button>
-                        </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Announcements</h3>
-                        <div id="postedAnnouncementsContainer">
-                            <!-- Posted announcements will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- History Tab -->
-                <div class="tab-pane" id="historyTab">
-                    <div class="dashboard-card">
-                        <h3>Post Historical Information</h3>
-                        <p>Share historical facts and events about the village</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="history">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">History Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., The Foundation of Our Village" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Historical Content</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide historical information..." required></textarea>
-                            </div>
-                            
-                            <div id="historyFields" class="dynamic-fields hidden">
-                                <!-- No additional fields for history -->
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Historical Information
-                            </button>
-                        </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Historical Information</h3>
-                        <div id="postedHistorysContainer">
-                            <!-- Posted history will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Resources Tab -->
-                <div class="tab-pane" id="resourceTab">
-                    <div class="dashboard-card">
-                        <h3>Post Resource Information</h3>
-                        <p>Share important documents and resources with village residents</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="resource">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">Resource Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., Water Conservation Guidelines" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Resource Description</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide details about the resource..." required></textarea>
-                            </div>
-                            
-                            <div id="resourceFields" class="dynamic-fields hidden">
-                                <div class="form-group">
-                                    <label for="resourceType">Resource Type</label>
-                                    <select id="resourceType" class="form-select" required>
-                                        <option value="">Select resource type</option>
-                                        <option value="Document">Document</option>
-                                        <option value="Form">Form</option>
-                                        <option value="Guide">Guide</option>
-                                        <option value="Scheme">Government Scheme</option>
-                                        <option value="Other">Other</option>
+                <!-- Content Management Tab -->
+                <div class="tab-pane" id="contentManagementTab">
+                    <div class="content-form">
+                        <h2 class="mb-6">Post New Content</h2>
+                        <form id="contentPostingForm">
+                            <div class="form-grid">
+                                <div class="form-row">
+                                    <label for="contentType" class="form-label">Content Type</label>
+                                    <select id="contentType" class="form-select" required>
+                                        <option value="budget">Budget</option>
+                                        <option value="event">Event</option>
+                                        <option value="announcement">Announcement</option>
+                                        <option value="resource">Resource</option>
+                                        <option value="history">History</option>
                                     </select>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="resourceLink">Resource Link</label>
-                                    <input type="url" id="resourceLink" class="form-input" placeholder="Enter URL to the resource document" required>
-                                </div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Resource
-                            </button>
-                        </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Resources</h3>
-                        <div id="postedResourcesContainer">
-                            <!-- Posted resources will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Gallery Tab -->
-                <div class="tab-pane" id="galleryTab">
-                    <div class="dashboard-card">
-                        <h3>Post Gallery Image</h3>
-                        <p>Share photos of village events and projects</p>
-                        
-                        <form class="content-form" id="contentPostingForm">
-                            <input type="hidden" id="contentType" value="gallery">
-                            
-                            <div class="form-group">
-                                <label for="contentTitle">Image Title</label>
-                                <input type="text" id="contentTitle" class="form-input" placeholder="e.g., New School Building Inauguration" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="contentDescription">Image Description</label>
-                                <textarea id="contentDescription" class="form-textarea" placeholder="Provide details about the image..." required></textarea>
-                            </div>
-                            
-                            <div id="galleryFields" class="dynamic-fields hidden">
-                                <div class="form-group">
-                                    <label for="galleryImage">Image Link</label>
-                                    <input type="url" id="galleryImage" class="form-input" placeholder="Enter URL to the image" required>
+                                <div class="form-row">
+                                    <label for="contentTitle" class="form-label">Title</label>
+                                    <input type="text" id="contentTitle" class="form-input" placeholder="Enter title" required>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <label for="galleryDate">Date Taken</label>
-                                    <input type="date" id="galleryDate" class="form-input" required>
+                                <div class="form-row">
+                                    <label for="contentDescription" class="form-label">Description</label>
+                                    <textarea id="contentDescription" class="form-textarea" placeholder="Enter description" required></textarea>
                                 </div>
                             </div>
                             
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus-circle"></i> Post Image
-                            </button>
+                            <!-- Budget-specific fields -->
+                            <div id="budgetFields" class="dynamic-fields">
+                                <h3 class="mb-4">Budget Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="budgetAllocated" class="form-label">Allocated Amount (₹)</label>
+                                        <input type="number" id="budgetAllocated" class="form-input" placeholder="Enter allocated amount" min="0" step="1000">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="budgetExpenditure" class="form-label">Current Expenditure (₹)</label>
+                                        <input type="number" id="budgetExpenditure" class="form-input" placeholder="Enter current expenditure" min="0" step="1000">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="budgetCompletion" class="form-label">Completion Percentage (%)</label>
+                                        <input type="number" id="budgetCompletion" class="form-input" placeholder="Enter completion percentage" min="0" max="100">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Event-specific fields -->
+                            <div id="eventFields" class="dynamic-fields hidden">
+                                <h3 class="mb-4">Event Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="eventDate" class="form-label">Event Date</label>
+                                        <input type="date" id="eventDate" class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventTime" class="form-label">Event Time</label>
+                                        <input type="time" id="eventTime" class="form-input">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventLocation" class="form-label">Location</label>
+                                        <input type="text" id="eventLocation" class="form-input" placeholder="Enter event location">
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="eventAttendees" class="form-label">Expected Attendees</label>
+                                        <input type="number" id="eventAttendees" class="form-input" placeholder="Enter expected number of attendees" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resource-specific fields -->
+                            <div id="resourceFields" class="dynamic-fields hidden">
+                                <h3 class="mb-4">Resource Details</h3>
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <label for="resourceType" class="form-label">Resource Type</label>
+                                        <select id="resourceType" class="form-select">
+                                            <option value="Form">Form</option>
+                                            <option value="Document">Document</option>
+                                            <option value="Guidelines">Guidelines</option>
+                                            <option value="Contact Information">Contact Information</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <label for="resourceLink" class="form-label">Resource Link</label>
+                                        <input type="url" id="resourceLink" class="form-input" placeholder="Enter URL to the resource">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="form-row mt-6">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Post Content
+                                </button>
+                            </div>
                         </form>
-                        
-                        <hr class="my-4">
-                        
-                        <h3>Posted Gallery Images</h3>
-                        <div id="postedGallerysContainer">
-                            <!-- Posted gallery images will appear here -->
+                    </div>
+                    
+                    <!-- Posted Content -->
+                    <div class="posted-content">
+                        <h2 class="mb-6">Posted Budget Items</h2>
+                        <div id="postedBudgetsContainer">
+                            <!-- Posted budget items will be loaded here by authorities.js -->
                         </div>
                     </div>
                 </div>
@@ -364,19 +373,35 @@
         </div>
     </main>
     
+    <!-- Notification element -->
+    <div id="notification" class="notification hidden"></div>
+    
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
                     <h3>About RuralConnect</h3>
                     <p>Empowering rural communities through technology, transparency and participation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
                 
                 <div class="footer-links">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
                         <li><a href="authorities-dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Village Office, Main Road</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> info@ruralconnect.com</li>
                     </ul>
                 </div>
             </div>
@@ -387,38 +412,56 @@
         </div>
     </footer>
 
-    <div id="notification" class="notification hidden"></div>
-
     <script src="public/js/main.js"></script>
     <script src="authorities.js"></script>
     <script>
-        // Dashboard tabs functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Setup dashboard tabs
             const dashboardTabs = document.querySelectorAll('.dashboard-tab');
-            const tabPanes = document.querySelectorAll('.tab-pane');
             
-            // Set up click event for tabs
+            // Tab click handler
             dashboardTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    const tabName = this.getAttribute('data-tab');
-                    
                     // Update active tab
                     dashboardTabs.forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     
-                    // Update active tab pane
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
-                    document.getElementById(`${tabName}Tab`).classList.add('active');
+                    // Show content management tab for all content types except issues
+                    const tabName = this.getAttribute('data-tab');
+                    const issuesTab = document.getElementById('issuesTab');
+                    const contentManagementTab = document.getElementById('contentManagementTab');
                     
-                    // Load content for the active tab
-                    loadPostedContent(tabName);
+                    if (tabName === 'issues') {
+                        issuesTab.classList.add('active');
+                        contentManagementTab.classList.remove('active');
+                    } else {
+                        issuesTab.classList.remove('active');
+                        contentManagementTab.classList.add('active');
+                        
+                        // Update content type in form
+                        const contentTypeSelect = document.getElementById('contentType');
+                        if (contentTypeSelect) {
+                            contentTypeSelect.value = tabName;
+                            
+                            // Trigger the change event to update dynamic fields
+                            const event = new Event('change');
+                            contentTypeSelect.dispatchEvent(event);
+                        }
+                        
+                        // Update posted content heading
+                        const postedContentHeading = contentManagementTab.querySelector('h2');
+                        if (postedContentHeading) {
+                            const contentTypeCapitalized = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+                            postedContentHeading.textContent = `Posted ${contentTypeCapitalized} Items`;
+                        }
+                        
+                        // Load content for the selected tab
+                        if (window.loadPostedContent) {
+                            window.loadPostedContent(tabName);
+                        }
+                    }
                 });
             });
-            
-            // Show notification function for this page
-            window.notify = function(message, type = 'info') {
-                showNotification(message, type);
-            };
         });
     </script>
 </body>

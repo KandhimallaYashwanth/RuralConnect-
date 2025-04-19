@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Report Issue - RuralConnect</title>
-    <meta name="description" content="Report village issues for resolution by authorities." />
+    <meta name="description" content="Report issues in your village for faster resolution." />
     <link rel="stylesheet" href="public/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
@@ -42,90 +42,111 @@
       <section class="py-12 bg-gray-100">
         <div class="container">
           <div class="text-center mb-8">
-            <h1>Report Village Issue</h1>
-            <p>Submit issues affecting your area for resolution by village authorities</p>
+            <h1>Report an Issue</h1>
+            <p>Submit details about issues in your area for faster resolution by village authorities</p>
           </div>
           
           <!-- Login Required Container -->
-          <div id="loginRequiredContainer" class="auth-card hidden">
-            <div class="text-center mb-4">
-              <i class="fas fa-lock fa-3x" style="color: var(--primary);"></i>
-              <h2 class="mt-4">Login Required</h2>
-              <p>You need to login to report and track issues in the village.</p>
+          <div id="loginRequiredContainer" class="rural-card text-center p-8 hidden">
+            <div class="login-required-message">
+              <div class="login-icon">
+                <i class="fas fa-user-lock"></i>
+              </div>
+              <h2>Login Required</h2>
+              <p>Please login to report an issue. This helps authorities contact you if needed.</p>
+              
+              <button id="loginToReportBtn" class="btn btn-primary mt-4">
+                Login to Continue
+                <i class="fas fa-sign-in-alt"></i>
+              </button>
             </div>
-            <button id="loginToReportBtn" class="btn btn-primary w-full">Login to Report Issue</button>
           </div>
           
           <!-- Issue Form Container -->
-          <div id="issueFormContainer" class="auth-card">
-            <h2 class="mb-4">Submit New Issue</h2>
-            
-            <form id="issueForm" class="auth-form">
-              <div class="form-row">
-                <label for="issueType" class="form-label">Issue Type</label>
-                <select id="issueType" class="form-select" required>
-                  <option value="">Select issue type</option>
-                  <option value="Water Supply">Water Supply</option>
-                  <option value="Road Maintenance">Road Maintenance</option>
-                  <option value="Electricity">Electricity</option>
-                  <option value="Sanitation">Sanitation</option>
-                  <option value="Public Facility">Public Facility</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              
-              <div class="form-row">
-                <label for="description" class="form-label">Description</label>
-                <textarea id="description" class="form-textarea" placeholder="Describe the issue in detail..." required></textarea>
-              </div>
-              
-              <div class="form-row">
-                <label for="ward" class="form-label">Ward Number</label>
-                <input type="text" id="ward" class="form-input" placeholder="Enter your ward number" required>
-              </div>
-              
-              <div class="form-row">
-                <label for="location" class="form-label">Location</label>
-                <input type="text" id="location" class="form-input" placeholder="Specify the location of the issue" required>
-              </div>
-              
-              <div class="form-row">
-                <label for="locationCoordinates" class="form-label">
-                  Location Coordinates (Optional)
-                  <button type="button" id="getLocationBtn" class="btn btn-outline" style="padding: 0.25rem 0.5rem; margin-left: 0.5rem; font-size: 0.75rem;">
-                    <i class="fas fa-map-marker-alt"></i> Get Current Location
+          <div id="issueFormContainer" class="rural-card p-8">
+            <form id="issueForm">
+              <div class="form-grid">
+                <div class="form-row">
+                  <label for="issueType" class="form-label">Issue Type</label>
+                  <select id="issueType" class="form-select" required>
+                    <option value="">Select issue type</option>
+                    <option value="Water Supply">Water Supply</option>
+                    <option value="Electricity">Electricity</option>
+                    <option value="Road Damage">Road Damage</option>
+                    <option value="Sanitation">Sanitation</option>
+                    <option value="Streetlight">Streetlight</option>
+                    <option value="Drainage">Drainage</option>
+                    <option value="Public Property Damage">Public Property Damage</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                
+                <div class="form-row">
+                  <label for="ward" class="form-label">Ward Number</label>
+                  <select id="ward" class="form-select" required>
+                    <option value="">Select ward</option>
+                    <option value="1">Ward 1</option>
+                    <option value="2">Ward 2</option>
+                    <option value="3">Ward 3</option>
+                    <option value="4">Ward 4</option>
+                    <option value="5">Ward 5</option>
+                  </select>
+                </div>
+                
+                <div class="form-row">
+                  <label for="location" class="form-label">Location Description</label>
+                  <input type="text" id="location" class="form-input" placeholder="Describe the location" required>
+                </div>
+                
+                <div class="form-row">
+                  <label for="locationCoordinates" class="form-label">Coordinates (optional)</label>
+                  <input type="text" id="locationCoordinates" class="form-input" placeholder="Latitude, Longitude">
+                </div>
+                
+                <div class="form-row span-full">
+                  <label for="description" class="form-label">Issue Description</label>
+                  <textarea id="description" class="form-textarea" placeholder="Describe the issue in detail" required></textarea>
+                </div>
+                
+                <div class="form-row span-full">
+                  <label class="form-label">Photos (optional)</label>
+                  <div class="file-upload">
+                    <input type="file" id="issuePhotos" multiple accept="image/*">
+                    <label for="issuePhotos" class="file-upload-label">
+                      <i class="fas fa-cloud-upload-alt"></i> Choose Files
+                    </label>
+                    <div id="photoPreview" class="photo-preview"></div>
+                  </div>
+                </div>
+                
+                <div class="form-row span-full">
+                  <button type="submit" class="btn btn-primary w-full">
+                    <i class="fas fa-paper-plane"></i> Submit Issue Report
                   </button>
-                </label>
-                <input type="text" id="locationCoordinates" class="form-input" placeholder="Coordinates will be filled automatically if you use Get Current Location">
-              </div>
-              
-              <div class="form-row">
-                <label for="issuePhotos" class="form-label">Upload Photos (Optional)</label>
-                <input type="file" id="issuePhotos" class="form-input" accept="image/*" multiple>
-                <p class="auth-help-text">You can upload up to 3 photos (max 5MB each)</p>
-              </div>
-              
-              <div class="form-row">
-                <button type="submit" class="btn btn-primary w-full">Submit Issue</button>
+                </div>
               </div>
             </form>
           </div>
           
-          <!-- Success Container -->
-          <div id="issueSuccessContainer" class="auth-card hidden">
-            <div class="text-center mb-4">
-              <i class="fas fa-check-circle fa-3x" style="color: var(--success);"></i>
-              <h2 class="mt-4">Issue Reported Successfully!</h2>
-              <p>Your issue has been submitted to village authorities.</p>
+          <!-- Success Message Container -->
+          <div id="issueSuccessContainer" class="rural-card p-8 text-center hidden">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Issue Reported Successfully!</h2>
+            <p>Your issue has been submitted to village authorities. You can track its progress using the issue tracking page.</p>
+            
+            <div id="submittedIssueDetails" class="mt-6 mb-6">
+              <!-- Submitted issue details will be shown here -->
             </div>
             
-            <div id="submittedIssueDetails" class="my-4">
-              <!-- Dynamically populated issue details -->
-            </div>
-            
-            <div class="form-row">
-              <button id="trackIssueBtn" class="btn btn-primary w-full mb-2">Track This Issue</button>
-              <button id="reportAnotherBtn" class="btn btn-outline w-full">Report Another Issue</button>
+            <div class="button-group">
+              <button id="trackIssueBtn" class="btn btn-primary">
+                <i class="fas fa-tasks"></i> Track This Issue
+              </button>
+              <button id="reportAnotherBtn" class="btn btn-outline">
+                <i class="fas fa-plus"></i> Report Another Issue
+              </button>
             </div>
           </div>
         </div>
@@ -169,60 +190,6 @@
     <div id="notification" class="notification hidden"></div>
 
     <script src="public/js/main.js"></script>
-    <script>
-      // Get location button functionality
-      document.addEventListener('DOMContentLoaded', function() {
-        const getLocationBtn = document.getElementById('getLocationBtn');
-        const locationCoordinatesInput = document.getElementById('locationCoordinates');
-        
-        if (getLocationBtn && locationCoordinatesInput) {
-          getLocationBtn.addEventListener('click', function() {
-            if (navigator.geolocation) {
-              getLocationBtn.disabled = true;
-              getLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
-              
-              navigator.geolocation.getCurrentPosition(
-                function(position) {
-                  const lat = position.coords.latitude;
-                  const lng = position.coords.longitude;
-                  locationCoordinatesInput.value = `${lat},${lng}`;
-                  
-                  getLocationBtn.disabled = false;
-                  getLocationBtn.innerHTML = '<i class="fas fa-check"></i> Location Added';
-                  getLocationBtn.classList.remove('btn-outline');
-                  getLocationBtn.classList.add('btn-success');
-                  
-                  // Show notification
-                  showNotification('Location added successfully', 'success');
-                },
-                function(error) {
-                  console.error('Error getting location:', error);
-                  getLocationBtn.disabled = false;
-                  getLocationBtn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Try Again';
-                  
-                  // Show error notification
-                  let errorMessage = 'Could not get your location';
-                  switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                      errorMessage = 'Location permission denied';
-                      break;
-                    case error.POSITION_UNAVAILABLE:
-                      errorMessage = 'Location information unavailable';
-                      break;
-                    case error.TIMEOUT:
-                      errorMessage = 'Location request timed out';
-                      break;
-                  }
-                  
-                  showNotification(errorMessage, 'error');
-                }
-              );
-            } else {
-              showNotification('Geolocation is not supported by your browser', 'error');
-            }
-          });
-        }
-      });
-    </script>
+    <script src="content.js"></script>
   </body>
 </html>
