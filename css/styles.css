@@ -1,0 +1,244 @@
+
+/* ... keep existing code */
+
+/* Events Page Styles */
+.events-section {
+  padding: 4rem 0;
+  background-color: var(--gray-100);
+}
+
+.event-description {
+  margin: 1rem 0 1.5rem;
+  color: var(--gray-600);
+}
+
+/* Budget Page Styles */
+.budget-section {
+  padding: 4rem 0;
+  background-color: var(--gray-100);
+}
+
+.budget-summary {
+  margin-bottom: 3rem;
+}
+
+.budget-card {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--box-shadow);
+}
+
+.budget-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.budget-stat {
+  text-align: center;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background-color: var(--gray-100);
+}
+
+.stat-label {
+  display: block;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: 0.5rem;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+.budget-allocation {
+  margin-bottom: 3rem;
+}
+
+.allocation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.allocation-item {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  gap: 1.5rem;
+}
+
+.category-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.category-icon.infrastructure {
+  background-color: rgba(240, 192, 90, 0.2);
+  color: var(--mustard-dark);
+}
+
+.category-icon.education {
+  background-color: rgba(126, 200, 227, 0.2);
+  color: var(--sky);
+}
+
+.category-icon.health {
+  background-color: rgba(205, 93, 69, 0.2);
+  color: var(--terracotta);
+}
+
+.category-icon.agriculture {
+  background-color: rgba(77, 114, 77, 0.2);
+  color: var(--leaf);
+}
+
+.allocation-details {
+  flex-grow: 1;
+}
+
+.allocation-details h4 {
+  margin-bottom: 1rem;
+}
+
+.allocation-bar {
+  height: 0.75rem;
+  background-color: var(--gray-200);
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+.allocation-progress {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: var(--terracotta);
+}
+
+.allocation-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-bottom: 1rem;
+}
+
+.project-list {
+  list-style: disc;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--gray-700);
+}
+
+.project-list li {
+  margin-bottom: 0.375rem;
+}
+
+.budget-documents {
+  margin-bottom: 3rem;
+}
+
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.document-item {
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  gap: 1.5rem;
+}
+
+.document-icon {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgba(77, 114, 77, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--leaf);
+  flex-shrink: 0;
+}
+
+.document-info {
+  flex-grow: 1;
+}
+
+.document-info h4 {
+  margin-bottom: 0.5rem;
+}
+
+.document-meta {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-bottom: 1rem;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .allocation-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .document-item {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+/* Button outline accent style */
+.btn-outline-accent {
+  border: 1px solid var(--leaf);
+  color: var(--leaf);
+  background-color: transparent;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-outline-accent:hover {
+  background-color: var(--leaf);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(77, 114, 77, 0.2);
+}
+
+/* Fix for Authority Login button */
+@media (max-width: 992px) {
+  .nav-menu.active .btn-outline-accent {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0.75rem;
+  }
+}

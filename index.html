@@ -29,7 +29,8 @@
           <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
           <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
           <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-          <button class="btn btn-primary login-btn">Login</button>
+          <a href="login.html" class="btn btn-primary login-btn">Login</a>
+          <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
         </div>
         <div class="hamburger" id="hamburger">
           <span></span>
@@ -510,8 +511,19 @@
       </div>
     </footer>
 
+    <script>
+      // Mobile menu toggle
+      document.addEventListener('DOMContentLoaded', function() {
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+        
+        hamburger.addEventListener('click', function() {
+          navMenu.classList.toggle('active');
+        });
+      });
+    </script>
+
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

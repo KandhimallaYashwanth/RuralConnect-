@@ -3,6 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const authorityLoginForm = document.getElementById('authority-login-form');
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+    
+    // Mobile menu toggle
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', function() {
+            navMenu.classList.toggle('active');
+        });
+    }
 
     // Public User Login
     if (loginForm) {
@@ -69,4 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Login buttons in the navigation
+    const loginButtons = document.querySelectorAll('.login-btn');
+    loginButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            window.location.href = 'login.html';
+        });
+    });
 });
