@@ -1,369 +1,439 @@
 
-// Main JavaScript functionality for RuralConnect
-document.addEventListener('DOMContentLoaded', function() {
-    // Get main UI elements
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('navMenu');
-    const loginBtn = document.getElementById('loginBtn');
-    const notification = document.getElementById('notification');
+// Mobile menu toggle
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('navMenu');
+
+if (hamburger && navMenu) {
+  hamburger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
     
-    // Mobile menu toggle
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    }
-    
-    // Check login status
-    const isUserLoggedIn = localStorage.getItem('isUserLoggedIn') === 'true';
-    const isAuthorityLoggedIn = localStorage.getItem('isAuthorityLoggedIn') === 'true';
-    
-    // Update login button based on login status
-    if (loginBtn) {
-        if (isUserLoggedIn) {
-            loginBtn.textContent = 'Logout';
-            loginBtn.classList.add('logout-btn');
-        } else if (isAuthorityLoggedIn) {
-            loginBtn.textContent = 'Dashboard';
-            loginBtn.classList.add('dashboard-btn');
-        }
-        
-        loginBtn.addEventListener('click', function() {
-            if (isUserLoggedIn) {
-                // Handle user logout
-                localStorage.removeItem('isUserLoggedIn');
-                localStorage.removeItem('userName');
-                localStorage.removeItem('userPhone');
-                localStorage.removeItem('userEmail');
-                
-                // Show logout notification
-                showNotification('Logged out successfully!', 'info');
-                
-                // Redirect to home after logout
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1500);
-            } else if (isAuthorityLoggedIn) {
-                // Redirect to authority dashboard
-                window.location.href = 'authorities-dashboard.html';
-            } else {
-                // Show login modal when not logged in
-                showLoginModal();
-            }
-        });
-    }
-    
-    // Handle issue reporting page functionality
-    const issueForm = document.getElementById('issueForm');
-    if (issueForm) {
-        // Show login required message if not logged in
-        const loginRequiredContainer = document.getElementById('loginRequiredContainer');
-        const issueFormContainer = document.getElementById('issueFormContainer');
-        const issueSuccessContainer = document.getElementById('issueSuccessContainer');
-        
-        if (loginRequiredContainer && issueFormContainer) {
-            if (!isUserLoggedIn) {
-                loginRequiredContainer.classList.remove('hidden');
-                issueFormContainer.classList.add('hidden');
-                
-                // Handle login to report button
-                const loginToReportBtn = document.getElementById('loginToReportBtn');
-                if (loginToReportBtn) {
-                    loginToReportBtn.addEventListener('click', function() {
-                        showLoginModal();
-                    });
-                }
-            } else {
-                loginRequiredContainer.classList.add('hidden');
-                issueFormContainer.classList.remove('hidden');
-                
-                // Handle issue form submission
-                issueForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    // Get form values
-                    const issueType = document.getElementById('issueType').value;
-                    const description = document.getElementById('description').value;
-                    const ward = document.getElementById('ward').value;
-                    const location = document.getElementById('location').value;
-                    const locationCoordinates = document.getElementById('locationCoordinates').value || '0,0';
-                    
-                    // Create issue object
-                    const newIssue = {
-                        id: Date.now().toString(),
-                        type: issueType,
-                        description: description,
-                        ward: ward,
-                        location: location,
-                        coordinates: locationCoordinates,
-                        reportedBy: localStorage.getItem('userEmail') || 'anonymous',
-                        dateReported: new Date().toISOString(),
-                        status: 'pending',
-                        // Files would be handled with actual backend
-                        photos: []
-                    };
-                    
-                    // Get existing issues
-                    let villageIssues = JSON.parse(localStorage.getItem('villageIssues')) || [];
-                    
-                    // Add new issue
-                    villageIssues.push(newIssue);
-                    
-                    // Save to localStorage
-                    localStorage.setItem('villageIssues', JSON.stringify(villageIssues));
-                    
-                    // Show success message
-                    issueFormContainer.classList.add('hidden');
-                    if (issueSuccessContainer) {
-                        issueSuccessContainer.classList.remove('hidden');
-                        
-                        // Populate submitted issue details
-                        const submittedIssueDetails = document.getElementById('submittedIssueDetails');
-                        if (submittedIssueDetails) {
-                            submittedIssueDetails.innerHTML = `
-                                <div class="issue-details">
-                                    <h3>${issueType}</h3>
-                                    <p>${description}</p>
-                                    <div class="issue-meta">
-                                        <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
-                                        <span><i class="fas fa-sort-numeric-up"></i> Ward ${ward}</span>
-                                        <span><i class="fas fa-calendar-alt"></i> ${new Date().toLocaleDateString()}</span>
-                                        <span><i class="fas fa-tag"></i> ${newIssue.id}</span>
-                                    </div>
-                                </div>
-                            `;
-                        }
-                        
-                        // Handle track issue button
-                        const trackIssueBtn = document.getElementById('trackIssueBtn');
-                        if (trackIssueBtn) {
-                            trackIssueBtn.addEventListener('click', function() {
-                                window.location.href = `issue-tracking.html?id=${newIssue.id}`;
-                            });
-                        }
-                        
-                        // Handle report another issue button
-                        const reportAnotherBtn = document.getElementById('reportAnotherBtn');
-                        if (reportAnotherBtn) {
-                            reportAnotherBtn.addEventListener('click', function() {
-                                issueSuccessContainer.classList.add('hidden');
-                                issueFormContainer.classList.remove('hidden');
-                                issueForm.reset();
-                            });
-                        }
-                    }
-                });
-            }
-        }
-    }
-    
-    // Handle login form for user accounts
-    function showLoginModal() {
-        // Create login modal if it doesn't exist
-        let loginModal = document.getElementById('loginModal');
-        if (!loginModal) {
-            loginModal = document.createElement('div');
-            loginModal.id = 'loginModal';
-            loginModal.className = 'modal';
-            loginModal.innerHTML = `
-                <div class="modal-content">
-                    <span class="close-modal">&times;</span>
-                    <h2>Login / Register</h2>
-                    <div class="tabs">
-                        <button class="tab-btn active" data-tab="login">Login</button>
-                        <button class="tab-btn" data-tab="register">Register</button>
-                    </div>
-                    <div class="tab-content">
-                        <div id="login" class="tab-pane active">
-                            <form id="loginForm">
-                                <div class="form-group">
-                                    <label for="loginEmail">Email</label>
-                                    <input type="email" id="loginEmail" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="loginPassword">Password</label>
-                                    <input type="password" id="loginPassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Login</button>
-                            </form>
-                        </div>
-                        <div id="register" class="tab-pane">
-                            <form id="registerForm">
-                                <div class="form-group">
-                                    <label for="registerName">Full Name</label>
-                                    <input type="text" id="registerName" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="registerPhone">Phone Number</label>
-                                    <input type="tel" id="registerPhone" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="registerEmail">Email</label>
-                                    <input type="email" id="registerEmail" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="registerPassword">Password</label>
-                                    <input type="password" id="registerPassword" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="registerAddress">Address</label>
-                                    <textarea id="registerAddress" required></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label for="registerWard">Ward Number</label>
-                                    <input type="text" id="registerWard" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Register</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(loginModal);
-            
-            // Handle tabs
-            const tabBtns = loginModal.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tab = this.dataset.tab;
-                    
-                    // Update active tab button
-                    tabBtns.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    // Update active tab content
-                    const tabPanes = loginModal.querySelectorAll('.tab-pane');
-                    tabPanes.forEach(pane => pane.classList.remove('active'));
-                    loginModal.querySelector(`#${tab}`).classList.add('active');
-                });
-            });
-            
-            // Handle close modal
-            const closeModal = loginModal.querySelector('.close-modal');
-            closeModal.addEventListener('click', function() {
-                loginModal.style.display = 'none';
-            });
-            
-            // Handle login form submission
-            const loginForm = loginModal.querySelector('#loginForm');
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                
-                // In a real app, validate credentials against server
-                // For demo purposes, we'll just use localStorage
-                
-                const users = JSON.parse(localStorage.getItem('villageUsers')) || [];
-                const user = users.find(u => u.email === email && u.password === password);
-                
-                if (user) {
-                    // Store user info
-                    localStorage.setItem('isUserLoggedIn', 'true');
-                    localStorage.setItem('userName', user.name);
-                    localStorage.setItem('userEmail', user.email);
-                    localStorage.setItem('userPhone', user.phone);
-                    localStorage.setItem('userAddress', user.address);
-                    localStorage.setItem('userWard', user.ward);
-                    
-                    // Close modal
-                    loginModal.style.display = 'none';
-                    
-                    // Show success notification
-                    showNotification('Login successful!', 'success');
-                    
-                    // Refresh page after short delay
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    showNotification('Invalid email or password', 'error');
-                }
-            });
-            
-            // Handle register form submission
-            const registerForm = loginModal.querySelector('#registerForm');
-            registerForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const name = document.getElementById('registerName').value;
-                const phone = document.getElementById('registerPhone').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const address = document.getElementById('registerAddress').value;
-                const ward = document.getElementById('registerWard').value;
-                
-                // Get existing users
-                let users = JSON.parse(localStorage.getItem('villageUsers')) || [];
-                
-                // Check if email already exists
-                if (users.some(user => user.email === email)) {
-                    showNotification('Email already registered', 'error');
-                    return;
-                }
-                
-                // Create new user
-                const newUser = {
-                    name,
-                    phone,
-                    email,
-                    password,
-                    address,
-                    ward,
-                    dateRegistered: new Date().toISOString()
-                };
-                
-                // Add to users array
-                users.push(newUser);
-                
-                // Save to localStorage
-                localStorage.setItem('villageUsers', JSON.stringify(users));
-                
-                // Auto login
-                localStorage.setItem('isUserLoggedIn', 'true');
-                localStorage.setItem('userName', name);
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('userPhone', phone);
-                localStorage.setItem('userAddress', address);
-                localStorage.setItem('userWard', ward);
-                
-                // Close modal
-                loginModal.style.display = 'none';
-                
-                // Show success notification
-                showNotification('Registration successful!', 'success');
-                
-                // Refresh page after short delay
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            });
-        }
-        
-        // Show modal
-        loginModal.style.display = 'block';
-    }
+    // Animate hamburger
+    const spans = hamburger.querySelectorAll('span');
+    spans.forEach(span => span.classList.toggle('active'));
+  });
+}
+
+// Add ripple effect to buttons
+document.addEventListener('DOMContentLoaded', () => {
+  const buttons = document.querySelectorAll('.btn, button:not([disabled])');
+  
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      const x = e.clientX - e.target.getBoundingClientRect().left;
+      const y = e.clientY - e.target.getBoundingClientRect().top;
+      
+      const ripple = document.createElement('span');
+      ripple.classList.add('ripple-effect');
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      
+      this.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
 });
 
-// Show notification
-function showNotification(message, type = 'info') {
-    const notification = document.getElementById('notification');
-    if (!notification) return;
+// Language switcher
+const langButtons = document.querySelectorAll('.lang-btn');
+langButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    // Remove active class from all buttons
+    langButtons.forEach(btn => btn.classList.remove('active'));
+    // Add active class to clicked button
+    button.classList.add('active');
     
-    // Clear any existing timeouts
-    if (window.notificationTimeout) {
-        clearTimeout(window.notificationTimeout);
+    // Here you would normally handle language change logic
+    console.log('Language changed to:', button.textContent.trim());
+    notify(`Language changed to: ${button.textContent.trim()}`, 'success');
+  });
+});
+
+// Handle form submission for report issue
+document.addEventListener('DOMContentLoaded', () => {
+  const reportForm = document.getElementById('report-issue-form');
+  if (reportForm) {
+    reportForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      handleReportIssueSubmit(e);
+    });
+  }
+  
+  // Add hover effects to cards
+  const cards = document.querySelectorAll('.rural-card, .feature-card, .event-card, .resource-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.classList.add('card-hover');
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.classList.remove('card-hover');
+    });
+  });
+  
+  // Enhanced button interactivity
+  const actionButtons = document.querySelectorAll('.btn-primary, .btn-accent, .btn-secondary, .btn-outline-accent, .btn-outline');
+  actionButtons.forEach(button => {
+    if (!button.hasAttribute('data-has-handler')) {
+      button.setAttribute('data-has-handler', 'true');
+      
+      button.addEventListener('click', function() {
+        const buttonText = this.textContent.trim();
+        notify(`Action: ${buttonText}`, 'info');
+        
+        // Add temporary active state visual feedback
+        this.classList.add('btn-active');
+        setTimeout(() => {
+          this.classList.remove('btn-active');
+        }, 300);
+      });
+      
+      // Add hover animation
+      button.addEventListener('mouseenter', function() {
+        this.classList.add('btn-hover');
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        this.classList.remove('btn-hover');
+      });
     }
+  });
+  
+  // File upload handling
+  const fileUpload = document.querySelector('.file-upload');
+  const fileInput = document.getElementById('file-input');
+  const filePreview = document.querySelector('.file-preview');
+  
+  if (fileUpload && fileInput) {
+    fileUpload.addEventListener('click', () => {
+      fileInput.click();
+    });
     
-    // Set notification content
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.classList.remove('hidden');
-    
-    // Hide notification after delay
-    window.notificationTimeout = setTimeout(() => {
-        notification.classList.add('hidden');
-    }, 4000);
-}
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0 && filePreview) {
+        filePreview.innerHTML = ''; // Clear previous previews
+        
+        Array.from(fileInput.files).forEach(file => {
+          const thumbnail = document.createElement('div');
+          thumbnail.className = 'file-thumbnail';
+          
+          if (file.type.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            thumbnail.appendChild(img);
+          } else {
+            thumbnail.textContent = file.name.substring(0, 10) + '...';
+          }
+          
+          const removeBtn = document.createElement('div');
+          removeBtn.className = 'file-remove';
+          removeBtn.innerHTML = '&times;';
+          removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            thumbnail.remove();
+            // Note: We can't actually remove items from a FileList, this is just for UI
+          });
+          
+          thumbnail.appendChild(removeBtn);
+          filePreview.appendChild(thumbnail);
+        });
+        
+        notify('Files uploaded successfully', 'success');
+      }
+    });
+  }
+  
+  // Add smooth scrolling to all internal links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Enhance resource download buttons
+  const resourceButtons = document.querySelectorAll('.download-btn');
+  resourceButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
+      notify(`Downloading resource: ${resourceTitle}`, 'info');
+      
+      // Add download animation
+      this.classList.add('downloading');
+      setTimeout(() => {
+        this.classList.remove('downloading');
+        notify(`${resourceTitle} downloaded successfully!`, 'success');
+      }, 1500);
+    });
+  });
+  
+  // Enhance event detail buttons
+  const eventDetailButtons = document.querySelectorAll('.event-card .btn-outline-accent');
+  eventDetailButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const eventTitle = this.closest('.event-card').querySelector('h3').textContent;
+      notify(`Viewing details for event: ${eventTitle}`, 'info');
+      
+      // In a real app, this would navigate to the event details page
+      this.classList.add('loading');
+      setTimeout(() => {
+        this.classList.remove('loading');
+        // Simulating navigation delay
+        window.location.href = '#'; // Would go to event page in real app
+      }, 500);
+    });
+  });
+});
+
+// Create a basic popup notification system
+const notify = (message, type = 'info') => {
+  // Remove any notifications with the same message to prevent duplicates
+  const existingNotifications = document.querySelectorAll('.notification');
+  existingNotifications.forEach(notification => {
+    if (notification.textContent.includes(message)) {
+      notification.remove();
+    }
+  });
+  
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  
+  const closeBtn = document.createElement('span');
+  closeBtn.className = 'notification-close';
+  closeBtn.innerHTML = '&times;';
+  closeBtn.addEventListener('click', () => {
+    notification.classList.add('fadeOut');
+    setTimeout(() => notification.remove(), 500);
+  });
+  
+  notification.appendChild(closeBtn);
+  document.body.appendChild(notification);
+  
+  // Apply CSS if it's not already in the page
+  if (!document.querySelector('#notification-styles')) {
+    const style = document.createElement('style');
+    style.id = 'notification-styles';
+    style.textContent = `
+      .notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: var(--border-radius, 0.5rem);
+        background-color: var(--white, white);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        z-index: 1000;
+        min-width: 250px;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out forwards;
+      }
+      .notification.info { border-left: 4px solid var(--sky, #7EC8E3); }
+      .notification.success { border-left: 4px solid var(--leaf, #4D724D); }
+      .notification.warning { border-left: 4px solid var(--mustard, #F0C05A); }
+      .notification.error { border-left: 4px solid var(--terracotta, #CD5D45); }
+      .notification-close {
+        cursor: pointer;
+        margin-left: 10px;
+        font-size: 20px;
+      }
+      .notification.fadeOut {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+      
+      /* Button effects */
+      .ripple-effect {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.4);
+        border-radius: 50%;
+        pointer-events: none;
+        width: 100px;
+        height: 100px;
+        transform: translate(-50%, -50%) scale(0);
+        animation: ripple 0.6s linear;
+      }
+      
+      @keyframes ripple {
+        to {
+          transform: translate(-50%, -50%) scale(4);
+          opacity: 0;
+        }
+      }
+      
+      .btn-hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      }
+      
+      .btn-active {
+        transform: translateY(1px);
+      }
+      
+      .card-hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      
+      .downloading {
+        position: relative;
+        pointer-events: none;
+        color: transparent !important;
+      }
+      
+      .downloading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1.2em;
+        height: 1.2em;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-radius: 50%;
+        border-top-color: currentColor;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: translate(-50%, -50%) rotate(360deg); }
+      }
+      
+      .loading {
+        position: relative;
+        pointer-events: none;
+      }
+      
+      .loading::after {
+        content: '...';
+        display: inline-block;
+        animation: loading 1.5s infinite;
+      }
+      
+      @keyframes loading {
+        0% { content: '.'; }
+        33% { content: '..'; }
+        66% { content: '...'; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (document.body.contains(notification)) {
+      notification.classList.add('fadeOut');
+      setTimeout(() => notification.remove(), 500);
+    }
+  }, 5000);
+  
+  return notification;
+};
+
+// Function to handle report issue form submission
+const handleReportIssueSubmit = (event) => {
+  if (event) event.preventDefault();
+  
+  // Get form data, validate, etc.
+  const form = document.getElementById('report-issue-form') || document.getElementById('issueForm');
+  let isValid = true;
+  
+  // Basic validation
+  if (form) {
+    const requiredFields = form.querySelectorAll('[required]');
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        isValid = false;
+        field.classList.add('error');
+        
+        // Add shake animation to invalid fields
+        field.classList.add('shake-error');
+        setTimeout(() => {
+          field.classList.remove('shake-error');
+        }, 500);
+        
+        notify(`Please fill in the ${field.name || field.id || 'required'} field`, 'warning');
+      } else {
+        field.classList.remove('error');
+      }
+    });
+  }
+  
+  if (isValid) {
+    // Add loading state to submit button
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      
+      // Simulate submission delay
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        notify('Your issue has been reported successfully!', 'success');
+        
+        // Reset form after successful submission
+        if (form) form.reset();
+        
+        // Clear file previews
+        const filePreview = document.querySelector('.file-preview');
+        if (filePreview) filePreview.innerHTML = '';
+      }, 1500);
+    } else {
+      notify('Your issue has been reported successfully!', 'success');
+      
+      // Reset form after successful submission
+      if (form) form.reset();
+      
+      // Clear file previews
+      const filePreview = document.querySelector('.file-preview');
+      if (filePreview) filePreview.innerHTML = '';
+    }
+  }
+};
+
+// Make the notification system available globally
+window.notify = notify;
+
+// Optional: Add basic offline support notification
+window.addEventListener('online', () => notify('You are back online!', 'success'));
+window.addEventListener('offline', () => notify('You are offline. Some features may be unavailable.', 'warning'));
+
+// Add CSS for button animations and error states
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.getElementById('animation-styles')) {
+    const style = document.createElement('style');
+    style.id = 'animation-styles';
+    style.textContent = `
+      .shake-error {
+        animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      }
+      
+      @keyframes shake {
+        10%, 90% { transform: translateX(-1px); }
+        20%, 80% { transform: translateX(2px); }
+        30%, 50%, 70% { transform: translateX(-4px); }
+        40%, 60% { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+});

@@ -1,595 +1,517 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RuralConnect - Village Development Platform</title>
-    <link rel="stylesheet" href="public/css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div class="navbar">
-        <div class="container">
-            <div class="nav-logo">
-                <a href="index.html">
-                    <div class="logo-circle">RC</div>
-                    RuralConnect
-                </a>
-            </div>
-            <div class="nav-menu" id="navMenu">
-                <a href="index.html" class="nav-link active">
-                    <i class="fas fa-home"></i> Home
-                </a>
-                <a href="budget.html" class="nav-link">
-                    <i class="fas fa-money-bill-wave"></i> Budget
-                </a>
-                <a href="events.html" class="nav-link">
-                    <i class="fas fa-calendar-alt"></i> Events
-                </a>
-                <a href="resources.html" class="nav-link">
-                    <i class="fas fa-file-alt"></i> Resources
-                </a>
-                <a href="history.html" class="nav-link">
-                    <i class="fas fa-history"></i> History
-                </a>
-                <a href="announcements.html" class="nav-link">
-                    <i class="fas fa-bullhorn"></i> Announcements
-                </a>
-                <a href="report-issue.html" class="nav-link authenticated-only">
-                    <i class="fas fa-exclamation-circle"></i> Report Issue
-                </a>
-                <a href="issue-tracking.html" class="nav-link authenticated-only">
-                    <i class="fas fa-tasks"></i> Issue Tracking
-                </a>
-                <a href="profile.html" class="nav-link authenticated-only">
-                    <i class="fas fa-user"></i> Profile
-                </a>
-            </div>
-            
-            <button class="btn login-btn">
-                <i class="fas fa-user"></i> Login
-            </button>
-            
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RuralConnect - Empowering Rural India Digitally</title>
+    <meta name="description" content="A platform designed to bridge the gap between rural communities and authorities, empowering villages with digital tools for better governance and communication." />
+    <meta name="author" content="RuralConnect" />
+    <meta property="og:image" content="/og-image.png" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </head>
 
-    <div class="hero">
+  <body>
+    <nav class="navbar">
+      <div class="container">
+        <div class="nav-logo">
+          <a href="index.html">
+            <div class="logo-circle">RC</div>
+            <span>RuralConnect</span>
+          </a>
+        </div>
+        <div class="nav-menu" id="navMenu">
+          <a href="index.html" class="nav-link active"><i class="fas fa-home"></i> Home</a>
+          <a href="report-issue.html" class="nav-link"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
+          <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+          <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
+          <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
+          <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
+          <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
+          <button class="btn btn-primary login-btn">Login</button>
+        </div>
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
         <div class="background-pattern"></div>
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1>Building <span class="highlight">Stronger</span> Rural Communities Together</h1>
-                    <p>RuralConnect is a digital platform bridging the gap between village authorities and residents, empowering communities through transparency, accountability, and participation.</p>
-                    
-                    <div class="hero-buttons">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-user"></i> Community Login
-                        </button>
-                        <a href="authorities-login.html" class="btn btn-outline">
-                            <i class="fas fa-user-tie"></i> Authorities Login
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="hero-image">
-                    <img src="public/images/rural-hero.svg" alt="Rural Connect Illustration" width="450">
-                </div>
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>Connecting Rural <span class="highlight">India</span> Digitally</h1>
+              <p>A platform designed to bridge the gap between rural communities and authorities, empowering villages with digital tools for better governance and communication.</p>
+              <div class="hero-buttons">
+                <a href="report-issue.html" class="btn btn-primary">Report an Issue <i class="fas fa-arrow-right"></i></a>
+                <a href="resources.html" class="btn btn-outline">Explore Resources</a>
+              </div>
             </div>
-            
-            <div class="feature-cards">
-                <div class="feature-card">
-                    <div class="icon-circle red-bg">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <h3>Issue Reporting</h3>
-                    <p>Report village issues directly to authorities and track their resolution progress</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon-circle yellow-bg">
-                        <i class="fas fa-hand-holding-usd"></i>
-                    </div>
-                    <h3>Budget Transparency</h3>
-                    <p>View how village funds are allocated and spent on community development</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="icon-circle green-bg">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <h3>Community Events</h3>
-                    <p>Stay updated on upcoming village events, meetings, and celebrations</p>
-                </div>
+            <div class="hero-image">
+              <img src="/images/rural-hero.svg" alt="Rural India Illustration">
             </div>
-        </div>
-    </div>
+          </div>
 
-    <section class="features" id="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>How RuralConnect Empowers Villages</h2>
-                <p>Our platform brings together community members and local governance to create more transparent, efficient and participatory village administration.</p>
+          <div class="feature-cards">
+            <div class="feature-card">
+              <div class="icon-circle red-bg">
+                <i class="fas fa-exclamation-circle"></i>
+              </div>
+              <h3>Report Issues</h3>
+              <p>Report local problems and track their resolution status in real-time.</p>
             </div>
             
-            <div class="feature-grid">
-                <div class="feature-box">
-                    <div class="feature-heading">
-                        <i class="fas fa-users"></i>
-                        <h3>For Community Members</h3>
-                    </div>
-                    
-                    <ul class="feature-list">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Report local issues like water supply, roads, sanitation</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Track progress of reported issues through resolution</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Access village budget information and expenditure details</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Stay updated on village events and announcements</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Access important documents and resources</div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="feature-box">
-                    <div class="feature-heading">
-                        <i class="fas fa-user-tie"></i>
-                        <h3>For Village Authorities</h3>
-                    </div>
-                    
-                    <ul class="feature-list">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Manage and respond to community reported issues</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Publish budget allocations and expenditures transparently</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Post announcements and upcoming village events</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Share important documents and resources</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Document village history and development projects</div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="feature-box">
-                    <div class="feature-heading">
-                        <i class="fas fa-chart-pie"></i>
-                        <h3>Budget Transparency</h3>
-                    </div>
-                    
-                    <ul class="feature-list">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>View detailed breakdown of village funds allocation</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Track progress of development projects and their costs</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>See completion status of budgeted projects</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Access historical budget data and expenditure reports</div>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="feature-box">
-                    <div class="feature-heading">
-                        <i class="fas fa-tasks"></i>
-                        <h3>Issue Resolution Workflow</h3>
-                    </div>
-                    
-                    <ul class="feature-list">
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Issues first reviewed by Ward Members for validity</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Valid issues forwarded to Sarpanch and Upa-Sarpanch</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Authorities provide updates as issues are addressed</div>
-                        </li>
-                        <li>
-                            <i class="fas fa-check-circle"></i>
-                            <div>Transparent tracking from submission to resolution</div>
-                        </li>
-                    </ul>
-                </div>
+            <div class="feature-card">
+              <div class="icon-circle yellow-bg">
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <h3>Community Events</h3>
+              <p>Stay updated with upcoming village events and important gatherings.</p>
             </div>
+            
+            <div class="feature-card">
+              <div class="icon-circle green-bg">
+                <i class="fas fa-money-bill-wave"></i>
+              </div>
+              <h3>Budget Transparency</h3>
+              <p>View how public funds are allocated and utilized for village development.</p>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <section class="issue-tracking">
+      <!-- Features Section -->
+      <section class="features">
         <div class="container">
-            <div class="section-header">
-                <h2>Streamlined Issue Resolution</h2>
-                <p>RuralConnect provides a transparent system for reporting and tracking village issues, ensuring nothing falls through the cracks.</p>
+          <div class="section-header">
+            <h2>Empowering Rural Communities</h2>
+            <p>Our platform provides a comprehensive suite of tools designed specifically for rural communities to enhance governance, transparency, and citizen participation.</p>
+          </div>
+          
+          <div class="feature-grid">
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>Issue Reporting</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Report local issues with pictures and location</li>
+                <li><i class="fas fa-check"></i> Track status from submission to resolution</li>
+                <li><i class="fas fa-check"></i> Transparent workflow through village authorities</li>
+                <li><i class="fas fa-check"></i> Provide feedback on issue resolution</li>
+              </ul>
             </div>
             
-            <div class="issue-card">
-                <div class="issue-header">
-                    <h3>Water Supply Disruption in Ward 3</h3>
-                    <div class="issue-status in-progress">In Progress</div>
-                </div>
-                
-                <p>Residents in Ward 3 have reported irregular water supply for the past week, affecting approximately 25 households.</p>
-                
-                <div class="issue-timeline">
-                    <div class="timeline-item completed">
-                        <div class="timeline-icon">
-                            <i class="fas fa-flag"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Issue Reported</h4>
-                                <span>June 15, 2023 • 9:30 AM</span>
-                            </div>
-                            <p>Issue submitted by Mohan Singh with details and location.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item completed">
-                        <div class="timeline-icon">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Reviewed by Ward Member</h4>
-                                <span>June 15, 2023 • 2:45 PM</span>
-                            </div>
-                            <p>Issue verified and forwarded to village authorities for resolution.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item active">
-                        <div class="timeline-icon">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Work in Progress</h4>
-                                <span>June 16, 2023 • 10:15 AM</span>
-                            </div>
-                            <p>Repair team dispatched to fix water supply line. Expected completion by tomorrow.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item pending">
-                        <div class="timeline-icon">
-                            <i class="fas fa-check-double"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <div class="timeline-header">
-                                <h4>Resolution</h4>
-                                <span>Pending</span>
-                            </div>
-                            <p>Issue will be marked as resolved once water supply is restored.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="issue-actions">
-                    <button class="btn btn-outline">
-                        <i class="fas fa-comment"></i> Add Comment
-                    </button>
-                    <button class="btn btn-primary report-issue-btn">
-                        <i class="fas fa-exclamation-circle"></i> Report an Issue
-                    </button>
-                </div>
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-calendar-alt"></i>
+                <h3>Community Events</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Upcoming village meetings and gatherings</li>
+                <li><i class="fas fa-check"></i> Government program announcements</li>
+                <li><i class="fas fa-check"></i> Local festivals and cultural celebrations</li>
+                <li><i class="fas fa-check"></i> Historical archive of past events</li>
+              </ul>
             </div>
+            
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-money-bill-wave"></i>
+                <h3>Budget Transparency</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> View allocation of public funds</li>
+                <li><i class="fas fa-check"></i> Track expenditure on development projects</li>
+                <li><i class="fas fa-check"></i> Financial reports and documentation</li>
+                <li><i class="fas fa-check"></i> Promote accountability in fund utilization</li>
+              </ul>
+            </div>
+            
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-book"></i>
+                <h3>Village History</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Explore the cultural heritage of the village</li>
+                <li><i class="fas fa-check"></i> Historical timeline of important events</li>
+                <li><i class="fas fa-check"></i> Notable personalities and achievements</li>
+                <li><i class="fas fa-check"></i> Preservation of local traditions and knowledge</li>
+              </ul>
+            </div>
+            
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-folder-open"></i>
+                <h3>Resource Repository</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Access government scheme information</li>
+                <li><i class="fas fa-check"></i> Download important documents and forms</li>
+                <li><i class="fas fa-check"></i> Educational materials and guidelines</li>
+                <li><i class="fas fa-check"></i> Helpful links to government services</li>
+              </ul>
+            </div>
+            
+            <div class="feature-box">
+              <div class="feature-heading">
+                <i class="fas fa-bullhorn"></i>
+                <h3>Announcements</h3>
+              </div>
+              <ul class="feature-list">
+                <li><i class="fas fa-check"></i> Local business advertisements</li>
+                <li><i class="fas fa-check"></i> Government initiative announcements</li>
+                <li><i class="fas fa-check"></i> Community program notifications</li>
+                <li><i class="fas fa-check"></i> Job opportunities and skill development</li>
+              </ul>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <section class="events-preview" id="events-section">
+      <!-- Issue Tracking Demo -->
+      <section class="issue-tracking">
         <div class="container">
-            <div class="section-header-with-action">
-                <div>
-                    <h2>Upcoming Village Events</h2>
-                    <p>Stay informed about community gatherings, celebrations, and important meetings.</p>
-                </div>
-                <a href="events.html" class="btn btn-outline-accent">
-                    <i class="fas fa-calendar-alt"></i> View All Events
-                </a>
-            </div>
-            
-            <div class="events-grid">
-                <div class="event-card">
-                    <div class="event-header">
-                        <span>Community</span>
-                        <h3>Village Cleanliness Drive</h3>
-                    </div>
-                    
-                    <div class="event-details">
-                        <div class="event-detail">
-                            <i class="fas fa-calendar-day"></i>
-                            <span>June 25, 2023</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-clock"></i>
-                            <span>8:00 AM - 12:00 PM</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Village Square</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-users"></i>
-                            <span>Expected: 50+ volunteers</span>
-                        </div>
-                    </div>
-                    
-                    <p>Join our monthly cleanliness drive to keep our village clean and beautiful. Tools and refreshments will be provided.</p>
-                    
-                    <button class="btn btn-outline-accent w-full mt-4">
-                        <i class="fas fa-info-circle"></i> Event Details
-                    </button>
-                </div>
-                
-                <div class="event-card">
-                    <div class="event-header">
-                        <span>Meeting</span>
-                        <h3>Gram Sabha - Budget Discussion</h3>
-                    </div>
-                    
-                    <div class="event-details">
-                        <div class="event-detail">
-                            <i class="fas fa-calendar-day"></i>
-                            <span>July 1, 2023</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-clock"></i>
-                            <span>4:00 PM - 6:00 PM</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Village Panchayat Hall</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-users"></i>
-                            <span>Open to all residents</span>
-                        </div>
-                    </div>
-                    
-                    <p>Special gram sabha meeting to discuss and approve village development budget for the upcoming financial year.</p>
-                    
-                    <button class="btn btn-outline-accent w-full mt-4">
-                        <i class="fas fa-info-circle"></i> Event Details
-                    </button>
-                </div>
-                
-                <div class="event-card">
-                    <div class="event-header">
-                        <span>Celebration</span>
-                        <h3>Annual Village Festival</h3>
-                    </div>
-                    
-                    <div class="event-details">
-                        <div class="event-detail">
-                            <i class="fas fa-calendar-day"></i>
-                            <span>July 15-17, 2023</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-clock"></i>
-                            <span>All Day</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Village Festival Grounds</span>
-                        </div>
-                        <div class="event-detail">
-                            <i class="fas fa-users"></i>
-                            <span>Expected: 500+ attendees</span>
-                        </div>
-                    </div>
-                    
-                    <p>Three days of cultural performances, games, competitions, and celebration of our village's traditions and heritage.</p>
-                    
-                    <button class="btn btn-outline-accent w-full mt-4">
-                        <i class="fas fa-info-circle"></i> Event Details
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
+          <div class="section-header">
+            <h2>Track Your Issues in Real-Time</h2>
+            <p>Our transparent tracking system keeps you informed at every stage of the resolution process, from initial reporting to final resolution.</p>
+          </div>
 
-    <section class="budget-preview">
-        <div class="container">
-            <div class="section-header-with-action">
-                <div>
-                    <h2>Village Budget Transparency</h2>
-                    <p>See how public funds are being allocated and utilized for community development projects.</p>
-                </div>
-                <a href="budget.html" class="btn btn-outline-accent">
-                    <i class="fas fa-money-bill-wave"></i> View All Budgets
-                </a>
+          <div class="issue-card">
+            <div class="issue-header">
+              <div>
+                <h3>Road Condition Issue</h3>
+                <p>Reference ID: #RCI-2023-06-15</p>
+              </div>
+              <div class="issue-status in-progress">In Progress</div>
             </div>
-            
-            <div id="budgetPreviewContainer">
-                <!-- Budget preview content will be loaded here by content.js -->
-                <div class="empty-state">
-                    <p>Budget information will be available soon.</p>
-                    <a href="budget.html" class="btn btn-outline-accent mt-4">View All Budgets</a>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="resources-preview" id="resources-preview">
-        <div class="container">
-            <div class="section-header-with-action">
-                <div>
-                    <h2>Useful Resources</h2>
-                    <p>Access important forms, documents, and information relevant to village residents.</p>
+            <div class="issue-timeline">
+              <div class="timeline-item completed">
+                <div class="timeline-icon">
+                  <i class="fas fa-check"></i>
                 </div>
-                <a href="resources.html" class="btn btn-outline-accent">
-                    <i class="fas fa-file-alt"></i> View All Resources
-                </a>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <h4>Issue Reported</h4>
+                    <span>15 Jun 2023</span>
+                  </div>
+                  <p>You've reported an issue with road condition in Ward 5</p>
+                </div>
+              </div>
+
+              <div class="timeline-item active">
+                <div class="timeline-icon">
+                  <i class="fas fa-clock"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <h4>Ward Member Review</h4>
+                    <span>16 Jun 2023</span>
+                  </div>
+                  <p>Your issue is being reviewed by the Ward Member</p>
+                </div>
+              </div>
+
+              <div class="timeline-item pending">
+                <div class="timeline-icon">
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <h4>Uppasarpanch Review</h4>
+                    <span>Pending</span>
+                  </div>
+                  <p>Issue will be forwarded to Uppasarpanch</p>
+                </div>
+              </div>
+
+              <div class="timeline-item pending">
+                <div class="timeline-icon">
+                  <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="timeline-content">
+                  <div class="timeline-header">
+                    <h4>Sarpanch Action</h4>
+                    <span>Pending</span>
+                  </div>
+                  <p>Final approval and action by Sarpanch</p>
+                </div>
+              </div>
             </div>
-            
-            <div class="resources-grid">
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div class="resource-details">
-                        <h3>Ration Card Application Form</h3>
-                        <p>Form for applying for new ration card or updating existing one</p>
-                        <div class="resource-meta">
-                            <span>PDF • 500KB</span>
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="resource-details">
-                        <h3>Water Connection Guidelines</h3>
-                        <p>Official guidelines for applying for water connection</p>
-                        <div class="resource-meta">
-                            <span>DOC • 350KB</span>
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-address-card"></i>
-                    </div>
-                    <div class="resource-details">
-                        <h3>Important Contact Information</h3>
-                        <p>Contact details for various village officials and departments</p>
-                        <div class="resource-meta">
-                            <span>Updated: May 15, 2023</span>
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-file-pdf"></i>
-                    </div>
-                    <div class="resource-details">
-                        <h3>Land Records Request Form</h3>
-                        <p>Form for requesting copies of land records and documents</p>
-                        <div class="resource-meta">
-                            <span>PDF • 420KB</span>
-                            <button class="download-btn">
-                                <i class="fas fa-download"></i> Download
-                            </button>
-                        </div>
-                    </div>
-                </div>
+
+            <div class="issue-actions">
+              <button class="btn btn-secondary">View Details</button>
+              <button class="btn btn-primary">Track Updates <i class="fas fa-chevron-right"></i></button>
             </div>
-            
-            <div class="text-center mt-8">
-                <a href="resources.html" class="btn btn-primary">
-                    <i class="fas fa-file-alt"></i> Explore All Resources
-                </a>
-            </div>
+          </div>
         </div>
-    </section>
+      </section>
+
+      <!-- Events Preview -->
+      <section class="events-preview">
+        <div class="container">
+          <div class="section-header-with-action">
+            <div>
+              <h2>Upcoming Village Events</h2>
+              <p>Stay informed about important community gatherings, government programs, and local festivals.</p>
+            </div>
+            <a href="events.html" class="btn btn-accent">View All Events</a>
+          </div>
+
+          <div class="events-grid">
+            <div class="event-card">
+              <div class="event-header">
+                <span>Upcoming Event</span>
+                <h3>Village Council Meeting</h3>
+              </div>
+              
+              <div class="event-details">
+                <div class="event-detail">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>24 June 2023</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-clock"></i>
+                  <span>10:00 AM</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>Panchayat Bhavan, Ward 3</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-users"></i>
+                  <span>45 Attendees</span>
+                </div>
+              </div>
+              
+              <button class="btn btn-outline-accent">Event Details</button>
+            </div>
+
+            <div class="event-card">
+              <div class="event-header">
+                <span>Upcoming Event</span>
+                <h3>Health Camp & Vaccination Drive</h3>
+              </div>
+              
+              <div class="event-details">
+                <div class="event-detail">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>30 June 2023</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-clock"></i>
+                  <span>9:00 AM - 4:00 PM</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>Primary Health Center</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-users"></i>
+                  <span>120 Attendees</span>
+                </div>
+              </div>
+              
+              <button class="btn btn-outline-accent">Event Details</button>
+            </div>
+
+            <div class="event-card">
+              <div class="event-header">
+                <span>Upcoming Event</span>
+                <h3>Agricultural Workshop</h3>
+              </div>
+              
+              <div class="event-details">
+                <div class="event-detail">
+                  <i class="fas fa-calendar-alt"></i>
+                  <span>5 July 2023</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-clock"></i>
+                  <span>11:00 AM</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>Community Hall</span>
+                </div>
+                <div class="event-detail">
+                  <i class="fas fa-users"></i>
+                  <span>75 Attendees</span>
+                </div>
+              </div>
+              
+              <button class="btn btn-outline-accent">Event Details</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Resources Preview -->
+      <section class="resources-preview">
+        <div class="container">
+          <div class="section-header">
+            <h2>Useful Resources</h2>
+            <p>Access important documents, government schemes, and helpful resources for rural development and welfare.</p>
+          </div>
+
+          <div class="resources-grid">
+            <div class="resource-card">
+              <div class="resource-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              
+              <div class="resource-details">
+                <h3>MGNREGA Job Card Application</h3>
+                <p>Employment Scheme</p>
+                
+                <div class="resource-meta">
+                  <span>Downloaded 125 times • PDF</span>
+                  <button class="download-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="resource-card">
+              <div class="resource-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              
+              <div class="resource-details">
+                <h3>PM Kisan Yojana Guidelines</h3>
+                <p>Agricultural Support</p>
+                
+                <div class="resource-meta">
+                  <span>Downloaded 93 times • PDF</span>
+                  <button class="download-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="resource-card">
+              <div class="resource-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              
+              <div class="resource-details">
+                <h3>Drinking Water Supply Scheme</h3>
+                <p>Infrastructure</p>
+                
+                <div class="resource-meta">
+                  <span>Downloaded 78 times • DOC</span>
+                  <button class="download-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="resource-card">
+              <div class="resource-icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              
+              <div class="resource-details">
+                <h3>Village Development Fund Application</h3>
+                <p>Development</p>
+                
+                <div class="resource-meta">
+                  <span>Downloaded 56 times • PDF</span>
+                  <button class="download-btn">
+                    <i class="fas fa-download"></i>
+                    <span>Download</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <a href="resources.html" class="btn btn-primary">Browse All Resources <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </section>
+    </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h3>About RuralConnect</h3>
-                    <p>Empowering rural communities through technology, transparency and participation.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="budget.html">Budget</a></li>
-                        <li><a href="#events-section">Events</a></li>
-                        <li><a href="#resources-preview">Resources</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-contact">
-                    <h3>Contact Us</h3>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Village Office, Main Road</li>
-                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
-                        <li><i class="fas fa-envelope"></i> info@ruralconnect.com</li>
-                    </ul>
-                </div>
-                
-                <div class="footer-newsletter">
-                    <h3>Language Preference</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">Hindi</button>
-                        <button class="lang-btn">Telugu</button>
-                        <button class="lang-btn">Tamil</button>
-                    </div>
-                    
-                    <h3 class="mt-4">Get Mobile App</h3>
-                    <div class="app-buttons">
-                        <button class="app-btn"><i class="fab fa-google-play"></i> Play Store</button>
-                        <button class="app-btn"><i class="fab fa-apple"></i> App Store</button>
-                    </div>
-                </div>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <h3>RuralConnect</h3>
+            <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+            <div class="social-links">
+              <a href="#"><i class="fab fa-facebook-f"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+            </div>
+          </div>
+          
+          <div class="footer-links">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="report-issue.html">Report Issue</a></li>
+              <li><a href="events.html">Events</a></li>
+              <li><a href="budget.html">Budget</a></li>
+              <li><a href="history.html">History</a></li>
+              <li><a href="resources.html">Resources</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-contact">
+            <h3>Contact</h3>
+            <ul>
+              <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+              <li><i class="fas fa-phone"></i> +91 9876543210</li>
+              <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+            </ul>
+          </div>
+          
+          <div class="footer-language">
+            <h3>Language</h3>
+            <div class="language-buttons">
+              <button class="lang-btn active">English</button>
+              <button class="lang-btn">हिंदी</button>
+              <button class="lang-btn">தமிழ்</button>
+              <button class="lang-btn">తెలుగు</button>
             </div>
             
-            <div class="footer-bottom">
-                <p>&copy; 2023 RuralConnect. All rights reserved.</p>
+            <h3>Download App</h3>
+            <div class="app-buttons">
+              <button class="app-btn">
+                <i class="fab fa-google-play"></i>
+                <span>Play Store</span>
+              </button>
+              <button class="app-btn">
+                <i class="fab fa-apple"></i>
+                <span>App Store</span>
+              </button>
             </div>
+          </div>
         </div>
+        
+        <div class="footer-bottom">
+          <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+        </div>
+      </div>
     </footer>
 
-    <script src="public/js/main.js"></script>
-    <script src="content.js"></script>
-</body>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script src="/js/main.js"></script>
+  </body>
 </html>
