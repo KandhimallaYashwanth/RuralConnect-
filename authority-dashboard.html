@@ -1,0 +1,743 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authority Dashboard - RuralConnect</title>
+    <meta name="description" content="Authority dashboard for RuralConnect platform." />
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <div class="logo-circle">RC</div>
+                    <span>RuralConnect</span>
+                </a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="authority-dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="#reported-issues" class="nav-link"><i class="fas fa-exclamation-circle"></i> Reported Issues</a>
+                <a href="#manage-events" class="nav-link"><i class="fas fa-calendar-alt"></i> Manage Events</a>
+                <a href="#manage-budgets" class="nav-link"><i class="fas fa-money-bill-wave"></i> Manage Budgets</a>
+                <a href="#manage-history" class="nav-link"><i class="fas fa-book"></i> Manage History</a>
+                <a href="#manage-resources" class="nav-link"><i class="fas fa-folder-open"></i> Manage Resources</a>
+                <a href="#manage-announcements" class="nav-link"><i class="fas fa-bullhorn"></i> Manage Announcements</a>
+                <button id="logout-btn" class="btn btn-outline-accent">Logout</button>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="container py-5">
+            <div class="section-header">
+                <h1>Authority Dashboard</h1>
+                <p>Manage village affairs, handle reported issues, and update content for public users.</p>
+                <div id="authority-info" class="mt-4 p-4 bg-gray-100 rounded-lg">
+                    <h3>Welcome, <span id="role-display">Authority</span>!</h3>
+                    <p>You can manage all aspects of the village's digital presence from this dashboard.</p>
+                </div>
+            </div>
+
+            <!-- Reported Issues Section -->
+            <section id="reported-issues" class="py-5">
+                <div class="section-header">
+                    <h2><i class="fas fa-exclamation-circle"></i> Reported Issues</h2>
+                </div>
+                <div class="issue-filters mb-4">
+                    <div class="btn-group">
+                        <button class="btn btn-outline filter-btn active" data-filter="all">All Issues</button>
+                        <button class="btn btn-outline filter-btn" data-filter="pending">Pending Review</button>
+                        <button class="btn btn-outline filter-btn" data-filter="in-progress">In Progress</button>
+                        <button class="btn btn-outline filter-btn" data-filter="resolved">Resolved</button>
+                    </div>
+                </div>
+                <div class="issue-list">
+                    <!-- Sample issue cards -->
+                    <div class="issue-card" data-status="pending">
+                        <div class="issue-header">
+                            <div>
+                                <h3>Water Supply Problem</h3>
+                                <p>Reference ID: #WSP-2023-06-18 • Ward 2</p>
+                                <p><strong>Category:</strong> Water • <strong>Reported by:</strong> Rahul Sharma</p>
+                            </div>
+                            <div class="issue-status reported">Pending Review</div>
+                        </div>
+                        <p class="issue-description">
+                            Insufficient water pressure in the main supply line. No water reaching the elevated areas of the locality.
+                        </p>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary view-details-btn">View Details</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-accent approve-btn"><i class="fas fa-check"></i> Approve</button>
+                                <button class="btn btn-outline-accent reject-btn"><i class="fas fa-times"></i> Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-card" data-status="in-progress">
+                        <div class="issue-header">
+                            <div>
+                                <h3>Road Condition Issue</h3>
+                                <p>Reference ID: #RCI-2023-06-15 • Ward 5</p>
+                                <p><strong>Category:</strong> Infrastructure • <strong>Reported by:</strong> Priya Patel</p>
+                            </div>
+                            <div class="issue-status in-progress">In Progress</div>
+                        </div>
+                        <p class="issue-description">
+                            The road in Ward 5 near the community hall has several potholes making transportation difficult.
+                        </p>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary view-details-btn">View Details</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-card" data-status="resolved">
+                        <div class="issue-header">
+                            <div>
+                                <h3>Streetlight Malfunction</h3>
+                                <p>Reference ID: #SLM-2023-06-10 • Ward 3</p>
+                                <p><strong>Category:</strong> Electricity • <strong>Reported by:</strong> Amit Kumar</p>
+                            </div>
+                            <div class="issue-status resolved">Resolved</div>
+                        </div>
+                        <p class="issue-description">
+                            Three streetlights near the market area are not working, causing safety concerns at night.
+                        </p>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary view-details-btn">View Details</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-outline-accent reopen-btn"><i class="fas fa-redo"></i> Reopen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Events Section -->
+            <section id="manage-events" class="py-5">
+                <div class="section-header-with-action">
+                    <h2><i class="fas fa-calendar-alt"></i> Manage Events</h2>
+                    <button id="add-event-btn" class="btn btn-primary">Add New Event</button>
+                </div>
+                
+                <div class="event-form-container" style="display: none;">
+                    <form id="event-form" class="report-form">
+                        <div class="form-row">
+                            <label for="event-title" class="form-label">Event Title</label>
+                            <input type="text" id="event-title" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="event-date" class="form-label">Date</label>
+                            <input type="date" id="event-date" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="event-time" class="form-label">Time</label>
+                            <input type="time" id="event-time" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="event-location" class="form-label">Location</label>
+                            <input type="text" id="event-location" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="event-description" class="form-label">Description</label>
+                            <textarea id="event-description" class="form-textarea" rows="4" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancel-event" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Event</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="events-grid">
+                    <div class="event-card">
+                        <div class="event-header">
+                            <span>Upcoming Event</span>
+                            <h3>Village Council Meeting</h3>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>24 June 2023</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>10:00 AM</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Panchayat Bhavan, Ward 3</span>
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn btn-secondary">Edit</button>
+                            <button class="btn btn-outline-accent">Delete</button>
+                        </div>
+                    </div>
+                    <div class="event-card">
+                        <div class="event-header">
+                            <span>Upcoming Event</span>
+                            <h3>Health Camp & Vaccination Drive</h3>
+                        </div>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>30 June 2023</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>9:00 AM - 4:00 PM</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Primary Health Center</span>
+                            </div>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn btn-secondary">Edit</button>
+                            <button class="btn btn-outline-accent">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Budgets Section -->
+            <section id="manage-budgets" class="py-5">
+                <div class="section-header-with-action">
+                    <h2><i class="fas fa-money-bill-wave"></i> Manage Budget</h2>
+                    <button id="add-budget-btn" class="btn btn-primary">Add Budget Item</button>
+                </div>
+                
+                <div class="budget-form-container" style="display: none;">
+                    <form id="budget-form" class="report-form">
+                        <div class="form-row">
+                            <label for="budget-year" class="form-label">Budget Year</label>
+                            <input type="text" id="budget-year" class="form-input" placeholder="e.g., 2023-24" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="budget-category" class="form-label">Category</label>
+                            <select id="budget-category" class="form-select" required>
+                                <option value="">Select category</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="education">Education</option>
+                                <option value="health">Health</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="sanitation">Sanitation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label for="budget-allocation" class="form-label">Allocation Amount (₹)</label>
+                            <input type="number" id="budget-allocation" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="budget-projects" class="form-label">Projects (one per line)</label>
+                            <textarea id="budget-projects" class="form-textarea" rows="4" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancel-budget" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Budget</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="budget-card">
+                    <div class="budget-summary">
+                        <h3>Budget Summary 2023-24</h3>
+                        <div class="budget-stats">
+                            <div class="budget-stat">
+                                <span class="stat-label">Total Budget</span>
+                                <span class="stat-value">₹75,00,000</span>
+                            </div>
+                            <div class="budget-stat">
+                                <span class="stat-label">Allocated</span>
+                                <span class="stat-value">₹65,25,000</span>
+                            </div>
+                            <div class="budget-stat">
+                                <span class="stat-label">Spent</span>
+                                <span class="stat-value">₹32,45,000</span>
+                            </div>
+                            <div class="budget-stat">
+                                <span class="stat-label">Remaining</span>
+                                <span class="stat-value">₹42,55,000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="budget-allocation">
+                        <h3>Budget Allocation</h3>
+                        <div class="allocation-grid">
+                            <div class="allocation-item">
+                                <div class="category-icon infrastructure">
+                                    <i class="fas fa-road"></i>
+                                </div>
+                                <div class="allocation-details">
+                                    <h4>Infrastructure <button class="btn-sm btn-outline-accent float-right">Edit</button></h4>
+                                    <div class="allocation-bar">
+                                        <div class="allocation-progress" style="width: 40%"></div>
+                                    </div>
+                                    <div class="allocation-info">
+                                        <span>₹30,00,000 (40%)</span>
+                                        <span>₹12,50,000 spent</span>
+                                    </div>
+                                    <ul class="project-list">
+                                        <li>Road maintenance in Ward 2</li>
+                                        <li>Community hall renovation</li>
+                                        <li>Drainage system improvement</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="allocation-item">
+                                <div class="category-icon education">
+                                    <i class="fas fa-school"></i>
+                                </div>
+                                <div class="allocation-details">
+                                    <h4>Education <button class="btn-sm btn-outline-accent float-right">Edit</button></h4>
+                                    <div class="allocation-bar">
+                                        <div class="allocation-progress" style="width: 25%"></div>
+                                    </div>
+                                    <div class="allocation-info">
+                                        <span>₹18,75,000 (25%)</span>
+                                        <span>₹8,25,000 spent</span>
+                                    </div>
+                                    <ul class="project-list">
+                                        <li>Primary school repairs</li>
+                                        <li>Educational equipment</li>
+                                        <li>Scholarship program</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional management sections would go here -->
+            <!-- Manage Announcements Section -->
+            <section id="manage-announcements" class="py-5">
+                <div class="section-header-with-action">
+                    <h2><i class="fas fa-bullhorn"></i> Manage Announcements</h2>
+                    <button id="add-announcement-btn" class="btn btn-primary">Add Announcement</button>
+                </div>
+                
+                <div class="announcement-form-container" style="display: none;">
+                    <form id="announcement-form" class="report-form">
+                        <div class="form-row">
+                            <label for="announcement-title" class="form-label">Announcement Title</label>
+                            <input type="text" id="announcement-title" class="form-input" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="announcement-content" class="form-label">Content</label>
+                            <textarea id="announcement-content" class="form-textarea" rows="4" required></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" id="cancel-announcement" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Announcement</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="resource-grid">
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="resource-details">
+                            <h3>Water Supply Interruption</h3>
+                            <p>Due to maintenance work, water supply will be interrupted in Wards 2 and 3 on June 20 from 9 AM to 2 PM.</p>
+                            <div class="resource-meta">
+                                <span>Posted: 15 Jun 2023</span>
+                                <div>
+                                    <button class="btn-sm btn-secondary">Edit</button>
+                                    <button class="btn-sm btn-outline-accent">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage History Section -->
+            <section id="manage-history" class="py-5">
+                <div class="section-header-with-action">
+                    <h2><i class="fas fa-book"></i> Manage History</h2>
+                    <button id="add-history-btn" class="btn btn-primary">Add Historical Record</button>
+                </div>
+                
+                <div class="resource-grid">
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-landmark"></i>
+                        </div>
+                        <div class="resource-details">
+                            <h3>Village Foundation</h3>
+                            <p>Learn about the founding of our village in 1865 and the key historical events that shaped our community.</p>
+                            <div class="resource-meta">
+                                <span>Historical Records</span>
+                                <div>
+                                    <button class="btn-sm btn-secondary">Edit</button>
+                                    <button class="btn-sm btn-outline-accent">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Manage Resources Section -->
+            <section id="manage-resources" class="py-5">
+                <div class="section-header-with-action">
+                    <h2><i class="fas fa-folder-open"></i> Manage Resources</h2>
+                    <button id="add-resource-btn" class="btn btn-primary">Add Resource</button>
+                </div>
+                
+                <div class="resource-grid">
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="resource-details">
+                            <h3>MGNREGA Job Card Application</h3>
+                            <p>Employment Scheme</p>
+                            <div class="resource-meta">
+                                <span>Downloaded 125 times • PDF</span>
+                                <div>
+                                    <button class="btn-sm btn-secondary">Replace</button>
+                                    <button class="btn-sm btn-outline-accent">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>RuralConnect</h3>
+                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#reported-issues">Reported Issues</a></li>
+                        <li><a href="#manage-events">Manage Events</a></li>
+                        <li><a href="#manage-budgets">Manage Budgets</a></li>
+                        <li><a href="#manage-history">Manage History</a></li>
+                        <li><a href="#manage-resources">Manage Resources</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/public/js/main.js"></script>
+    <script>
+        // Authority Dashboard specific functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set role from localStorage (set during login)
+            const role = localStorage.getItem('authority-role') || 'Authority';
+            const roleDisplay = document.getElementById('role-display');
+            if (roleDisplay) roleDisplay.textContent = role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ');
+            
+            // Handle logout
+            const logoutBtn = document.getElementById('logout-btn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem('authority-role');
+                    alert('You have been logged out.');
+                    window.location.href = 'index.html';
+                });
+            }
+            
+            // Issue filter functionality
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const issueCards = document.querySelectorAll('.issue-card');
+            
+            if (filterBtns.length > 0 && issueCards.length > 0) {
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const filter = btn.getAttribute('data-filter');
+                        
+                        // Update active button
+                        filterBtns.forEach(button => button.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        // Filter cards
+                        issueCards.forEach(card => {
+                            if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+            
+            // Events form handling
+            const addEventBtn = document.getElementById('add-event-btn');
+            const eventFormContainer = document.querySelector('.event-form-container');
+            const cancelEventBtn = document.getElementById('cancel-event');
+            
+            if (addEventBtn && eventFormContainer) {
+                addEventBtn.addEventListener('click', () => {
+                    eventFormContainer.style.display = 'block';
+                    addEventBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelEventBtn && eventFormContainer && addEventBtn) {
+                cancelEventBtn.addEventListener('click', () => {
+                    eventFormContainer.style.display = 'none';
+                    addEventBtn.style.display = 'inline-flex';
+                });
+            }
+            
+            // Budget form handling
+            const addBudgetBtn = document.getElementById('add-budget-btn');
+            const budgetFormContainer = document.querySelector('.budget-form-container');
+            const cancelBudgetBtn = document.getElementById('cancel-budget');
+            
+            if (addBudgetBtn && budgetFormContainer) {
+                addBudgetBtn.addEventListener('click', () => {
+                    budgetFormContainer.style.display = 'block';
+                    addBudgetBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelBudgetBtn && budgetFormContainer && addBudgetBtn) {
+                cancelBudgetBtn.addEventListener('click', () => {
+                    budgetFormContainer.style.display = 'none';
+                    addBudgetBtn.style.display = 'inline-flex';
+                });
+            }
+            
+            // Announcement form handling
+            const addAnnouncementBtn = document.getElementById('add-announcement-btn');
+            const announcementFormContainer = document.querySelector('.announcement-form-container');
+            const cancelAnnouncementBtn = document.getElementById('cancel-announcement');
+            
+            if (addAnnouncementBtn && announcementFormContainer) {
+                addAnnouncementBtn.addEventListener('click', () => {
+                    announcementFormContainer.style.display = 'block';
+                    addAnnouncementBtn.style.display = 'none';
+                });
+            }
+            
+            if (cancelAnnouncementBtn && announcementFormContainer && addAnnouncementBtn) {
+                cancelAnnouncementBtn.addEventListener('click', () => {
+                    announcementFormContainer.style.display = 'none';
+                    addAnnouncementBtn.style.display = 'inline-flex';
+                });
+            }
+            
+            // Handle issue actions
+            const approveButtons = document.querySelectorAll('.approve-btn');
+            const rejectButtons = document.querySelectorAll('.reject-btn');
+            const resolveButtons = document.querySelectorAll('.resolve-btn');
+            const reopenButtons = document.querySelectorAll('.reopen-btn');
+            
+            approveButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueCard = this.closest('.issue-card');
+                    const statusElement = issueCard.querySelector('.issue-status');
+                    
+                    statusElement.textContent = 'In Progress';
+                    statusElement.className = 'issue-status in-progress';
+                    issueCard.setAttribute('data-status', 'in-progress');
+                    
+                    // Replace buttons
+                    const actionButtons = issueCard.querySelector('.action-buttons');
+                    actionButtons.innerHTML = `
+                        <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
+                    `;
+                    
+                    // Add event listener to new button
+                    const newResolveBtn = actionButtons.querySelector('.resolve-btn');
+                    newResolveBtn.addEventListener('click', function() {
+                        statusElement.textContent = 'Resolved';
+                        statusElement.className = 'issue-status resolved';
+                        issueCard.setAttribute('data-status', 'resolved');
+                        
+                        actionButtons.innerHTML = `
+                            <button class="btn btn-outline-accent reopen-btn"><i class="fas fa-redo"></i> Reopen</button>
+                        `;
+                        
+                        // Add event listener to new button
+                        const newReopenBtn = actionButtons.querySelector('.reopen-btn');
+                        newReopenBtn.addEventListener('click', function() {
+                            statusElement.textContent = 'In Progress';
+                            statusElement.className = 'issue-status in-progress';
+                            issueCard.setAttribute('data-status', 'in-progress');
+                            
+                            actionButtons.innerHTML = `
+                                <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
+                            `;
+                            
+                            const finalResolveBtn = actionButtons.querySelector('.resolve-btn');
+                            finalResolveBtn.addEventListener('click', handleResolveClick);
+                        });
+                    });
+                    
+                    notify('Issue has been approved and is now in progress.', 'success');
+                });
+            });
+            
+            rejectButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueCard = this.closest('.issue-card');
+                    if (confirm('Are you sure you want to reject this issue?')) {
+                        issueCard.remove();
+                        notify('Issue has been rejected.', 'warning');
+                    }
+                });
+            });
+            
+            resolveButtons.forEach(button => {
+                button.addEventListener('click', handleResolveClick);
+            });
+            
+            function handleResolveClick() {
+                const issueCard = this.closest('.issue-card');
+                const statusElement = issueCard.querySelector('.issue-status');
+                
+                statusElement.textContent = 'Resolved';
+                statusElement.className = 'issue-status resolved';
+                issueCard.setAttribute('data-status', 'resolved');
+                
+                const actionButtons = issueCard.querySelector('.action-buttons');
+                actionButtons.innerHTML = `
+                    <button class="btn btn-outline-accent reopen-btn"><i class="fas fa-redo"></i> Reopen</button>
+                `;
+                
+                const newReopenBtn = actionButtons.querySelector('.reopen-btn');
+                newReopenBtn.addEventListener('click', function() {
+                    statusElement.textContent = 'In Progress';
+                    statusElement.className = 'issue-status in-progress';
+                    issueCard.setAttribute('data-status', 'in-progress');
+                    
+                    actionButtons.innerHTML = `
+                        <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
+                    `;
+                    
+                    const finalResolveBtn = actionButtons.querySelector('.resolve-btn');
+                    finalResolveBtn.addEventListener('click', handleResolveClick);
+                });
+                
+                notify('Issue has been marked as resolved.', 'success');
+            }
+            
+            reopenButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const issueCard = this.closest('.issue-card');
+                    const statusElement = issueCard.querySelector('.issue-status');
+                    
+                    statusElement.textContent = 'In Progress';
+                    statusElement.className = 'issue-status in-progress';
+                    issueCard.setAttribute('data-status', 'in-progress');
+                    
+                    const actionButtons = issueCard.querySelector('.action-buttons');
+                    actionButtons.innerHTML = `
+                        <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
+                    `;
+                    
+                    const newResolveBtn = actionButtons.querySelector('.resolve-btn');
+                    newResolveBtn.addEventListener('click', handleResolveClick);
+                    
+                    notify('Issue has been reopened.', 'info');
+                });
+            });
+            
+            // Create notification function if not already defined
+            if (typeof window.notify !== 'function') {
+                window.notify = function(message, type = 'info') {
+                    const notification = document.createElement('div');
+                    notification.className = `notification ${type}`;
+                    notification.textContent = message;
+                    
+                    const closeBtn = document.createElement('span');
+                    closeBtn.className = 'notification-close';
+                    closeBtn.innerHTML = '&times;';
+                    closeBtn.addEventListener('click', () => {
+                        notification.classList.add('fadeOut');
+                        setTimeout(() => notification.remove(), 500);
+                    });
+                    
+                    notification.appendChild(closeBtn);
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            notification.classList.add('fadeOut');
+                            setTimeout(() => notification.remove(), 500);
+                        }
+                    }, 5000);
+                };
+            }
+            
+            // Form submissions
+            const eventForm = document.getElementById('event-form');
+            if (eventForm) {
+                eventForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    notify('Event has been saved and published.', 'success');
+                    eventFormContainer.style.display = 'none';
+                    addEventBtn.style.display = 'inline-flex';
+                    this.reset();
+                });
+            }
+            
+            const budgetForm = document.getElementById('budget-form');
+            if (budgetForm) {
+                budgetForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    notify('Budget information has been saved and published.', 'success');
+                    budgetFormContainer.style.display = 'none';
+                    addBudgetBtn.style.display = 'inline-flex';
+                    this.reset();
+                });
+            }
+            
+            const announcementForm = document.getElementById('announcement-form');
+            if (announcementForm) {
+                announcementForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    notify('Announcement has been published.', 'success');
+                    announcementFormContainer.style.display = 'none';
+                    addAnnouncementBtn.style.display = 'inline-flex';
+                    this.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

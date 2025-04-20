@@ -22,8 +22,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Simple validation
             if (phoneNumber && password) {
+                // In a real app, you would verify this against a database
+                // For demo, just redirect to public dashboard
                 alert('Login successful for public user!');
-                // In a real app, you would send this to a backend
+                window.location.href = 'public-dashboard.html';
             } else {
                 alert('Please fill in all fields');
             }
@@ -41,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Simple validation
             if (name && phoneNumber && password) {
                 alert('Registration successful!');
-                // In a real app, you would send this to a backend
+                // In a real app, you would store this in a database
                 window.location.href = 'login.html';
             } else {
                 alert('Please fill in all fields');
@@ -68,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (role && credentials[role]) {
                 if (email === credentials[role].email && password === credentials[role].password) {
                     alert(`Login successful for ${role}!`);
-                    // Redirect to authority dashboard (you'd need to create this page)
-                    // window.location.href = 'authority-dashboard.html';
+                    // Redirect to authority dashboard
+                    window.location.href = 'authority-dashboard.html';
                 } else {
                     alert('Invalid email or password');
                 }
