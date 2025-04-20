@@ -1,9 +1,9 @@
 
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { notify } from "@/lib/notification";
 
-const AuthoritiesDashboard = () => {
+const AuthorityDashboard = () => {
   const navigate = useNavigate();
   
   return (
@@ -11,7 +11,7 @@ const AuthoritiesDashboard = () => {
       <header className="bg-white shadow">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-[#CD5D45] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-rural-terracotta flex items-center justify-center">
               <span className="text-white font-bold">RC</span>
             </div>
             <h1 className="text-xl font-semibold">Authorities Dashboard</h1>
@@ -34,12 +34,7 @@ const AuthoritiesDashboard = () => {
       <main className="py-6">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-[#CD5D45] flex items-center justify-center">
-                <span className="text-white text-xl">!</span>
-              </div>
-              <h2 className="text-xl font-semibold text-[#CD5D45]">Pending Issues</h2>
-            </div>
+            <h2 className="text-xl font-semibold mb-4">Pending Issues</h2>
             <p className="text-gray-600">Review and respond to newly submitted issues from citizens.</p>
             <div className="mt-4 text-gray-500">No pending issues at this time.</div>
           </div>
@@ -49,4 +44,4 @@ const AuthoritiesDashboard = () => {
   );
 };
 
-export default AuthoritiesDashboard;
+export default AuthorityDashboard;

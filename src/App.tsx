@@ -7,7 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AuthorityLogin from "./pages/AuthorityLogin";
-import AuthoritiesDashboard from "./pages/AuthoritiesDashboard";
+import AuthorityDashboard from "./pages/AuthorityDashboard";
 import ReportIssue from "./pages/ReportIssue";
 import NotFound from "./pages/NotFound";
 
@@ -23,7 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/authority-login" element={<AuthorityLogin />} />
-          <Route path="/authorities-dashboard" element={<AuthoritiesDashboard />} />
+          <Route path="/authority-dashboard" element={<AuthorityDashboard />} />
           <Route path="/report-issue" element={<ReportIssue />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
