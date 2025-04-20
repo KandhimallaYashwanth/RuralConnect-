@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Home, FileText, Calendar, DollarSign, BookOpen, FolderOpen, MessageSquare } from "lucide-react";
@@ -28,6 +29,10 @@ const NavBar = () => {
     navigate("/authority-login");
   };
 
+  const handleAuthorities = () => {
+    navigate("/authorities-dashboard");
+  };
+
   const handleNavItemClick = (item) => {
     setActiveItem(item.name);
     navigate(item.href);
@@ -40,10 +45,10 @@ const NavBar = () => {
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
             <Link to="/" className="flex items-center gap-2" onClick={() => setActiveItem("Home")}>
-              <div className="w-10 h-10 rounded-full bg-rural-terracotta flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-[#CD5D45] flex items-center justify-center">
                 <span className="text-white font-bold">RC</span>
               </div>
-              <span className="text-xl font-bold text-rural-terracotta">RuralConnect</span>
+              <span className="text-xl font-bold text-[#CD5D45]">RuralConnect</span>
             </Link>
           </div>
 
@@ -54,7 +59,7 @@ const NavBar = () => {
                 pressed={activeItem === item.name}
                 onPressedChange={() => handleNavItemClick(item)}
                 className={`flex items-center gap-1 px-3 py-2 rounded-md hover:bg-muted text-sm font-medium animated-border ${
-                  activeItem === item.name ? "text-rural-terracotta after:w-full" : ""
+                  activeItem === item.name ? "text-[#CD5D45] after:w-full" : ""
                 }`}
               >
                 <item.icon className="h-4 w-4" />
@@ -64,13 +69,20 @@ const NavBar = () => {
             <div className="flex items-center gap-2">
               <Button 
                 variant="outline"
-                className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white transition-all duration-300"
+                className="bg-[#CD5D45] hover:bg-[#CD5D45]/90 text-white"
+                onClick={handleAuthorities}
+              >
+                Authorities
+              </Button>
+              <Button 
+                variant="outline"
+                className="bg-[#CD5D45] hover:bg-[#CD5D45]/90 text-white"
                 onClick={handleAuthorityLogin}
               >
                 Authority Login
               </Button>
               <Button 
-                className="bg-rural-terracotta hover:bg-rural-terracotta/90 transition-all duration-300"
+                className="bg-[#CD5D45] hover:bg-[#CD5D45]/90"
                 onClick={handleLogin}
               >
                 Login
@@ -85,9 +97,9 @@ const NavBar = () => {
               aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? (
-                <X className="h-6 w-6 text-rural-terracotta" />
+                <X className="h-6 w-6 text-[#CD5D45]" />
               ) : (
-                <Menu className="h-6 w-6 text-rural-terracotta" />
+                <Menu className="h-6 w-6 text-[#CD5D45]" />
               )}
             </button>
           </div>
@@ -100,24 +112,31 @@ const NavBar = () => {
                 <button
                   key={item.name}
                   className={`flex items-center gap-2 px-4 py-2 rounded-md hover:bg-muted text-left ${
-                    activeItem === item.name ? "bg-muted text-rural-terracotta" : ""
+                    activeItem === item.name ? "bg-muted text-[#CD5D45]" : ""
                   }`}
                   onClick={() => handleNavItemClick(item)}
                 >
-                  <item.icon className="h-5 w-5 text-rural-terracotta" />
+                  <item.icon className="h-5 w-5 text-[#CD5D45]" />
                   <span>{item.name}</span>
                 </button>
               ))}
               <div className="flex flex-col gap-2 mt-4">
                 <Button 
                   variant="outline"
-                  className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white w-full transition-all duration-300"
+                  className="bg-[#CD5D45] hover:bg-[#CD5D45]/90 text-white w-full"
+                  onClick={handleAuthorities}
+                >
+                  Authorities
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="bg-[#CD5D45] hover:bg-[#CD5D45]/90 text-white w-full"
                   onClick={handleAuthorityLogin}
                 >
                   Authority Login
                 </Button>
                 <Button 
-                  className="bg-rural-terracotta hover:bg-rural-terracotta/90 w-full transition-all duration-300"
+                  className="bg-[#CD5D45] hover:bg-[#CD5D45]/90 w-full"
                   onClick={handleLogin}
                 >
                   Login
