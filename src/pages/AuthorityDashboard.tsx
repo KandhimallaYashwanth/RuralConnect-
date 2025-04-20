@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { notify } from "@/lib/notification";
 
 const AuthorityDashboard = () => {
   const navigate = useNavigate();
