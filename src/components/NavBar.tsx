@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, Home, FileText, Calendar, DollarSign, BookOpen, FolderOpen, MessageSquare } from "lucide-react";
@@ -22,11 +21,11 @@ const NavBar = () => {
   ];
 
   const handleLogin = () => {
-    notify("Login functionality initiated!", "info");
-    // Simulating login modal or redirect
-    setTimeout(() => {
-      notify("Login successful! Welcome back.", "success");
-    }, 2000);
+    navigate("/login");
+  };
+
+  const handleAuthorityLogin = () => {
+    navigate("/authority-login");
   };
 
   const handleNavItemClick = (item) => {
@@ -48,7 +47,6 @@ const NavBar = () => {
             </Link>
           </div>
 
-          {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => (
               <Toggle 
@@ -63,15 +61,23 @@ const NavBar = () => {
                 <span>{item.name}</span>
               </Toggle>
             ))}
-            <Button 
-              className="bg-rural-terracotta hover:bg-rural-terracotta/90 transition-all duration-300 transform hover:scale-105"
-              onClick={handleLogin}
-            >
-              Login
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline"
+                className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white transition-all duration-300"
+                onClick={handleAuthorityLogin}
+              >
+                Authority Login
+              </Button>
+              <Button 
+                className="bg-rural-terracotta hover:bg-rural-terracotta/90 transition-all duration-300"
+                onClick={handleLogin}
+              >
+                Login
+              </Button>
+            </div>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button 
               onClick={() => setIsOpen(!isOpen)}
@@ -87,7 +93,6 @@ const NavBar = () => {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {isOpen && (
           <div className="md:hidden py-4 animate-fade-in">
             <div className="flex flex-col space-y-2">
@@ -103,12 +108,21 @@ const NavBar = () => {
                   <span>{item.name}</span>
                 </button>
               ))}
-              <Button 
-                className="bg-rural-terracotta hover:bg-rural-terracotta/90 mt-4 w-full transition-all duration-300"
-                onClick={handleLogin}
-              >
-                Login
-              </Button>
+              <div className="flex flex-col gap-2 mt-4">
+                <Button 
+                  variant="outline"
+                  className="bg-rural-terracotta hover:bg-rural-terracotta/90 text-white w-full transition-all duration-300"
+                  onClick={handleAuthorityLogin}
+                >
+                  Authority Login
+                </Button>
+                <Button 
+                  className="bg-rural-terracotta hover:bg-rural-terracotta/90 w-full transition-all duration-300"
+                  onClick={handleLogin}
+                >
+                  Login
+                </Button>
+              </div>
             </div>
           </div>
         )}
