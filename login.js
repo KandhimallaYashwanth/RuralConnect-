@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
@@ -98,11 +97,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Login buttons in the navigation
+    // Login buttons in the navigation - update to handle both login and logout
     const loginButtons = document.querySelectorAll('.login-btn');
     loginButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            window.location.href = 'login.html';
-        });
+        // Check login status
+        if (localStorage.getItem('isLoggedIn') === 'true') {
+            // User is logged in, show logout button
+            button.textContent = 'Logout';
+            button.classList.remove('login-btn');
+            button.classList.add('logout-btn');
+            
+            button.addEventListener('click', () => {
+                // Handle logout
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('authorityRole');
+                alert('You have been logged out.');
+                window.location.reload();
+            });
+        } else {
+            // User is not logged in, show login button
+            button.addEventListener('click', () => {
+                window.location.href = 'login.html';
+            });
+        }
     });
+
+    // Update the report issue link behavior based on login status
+    const updateReportIssueAccess = () => {
+        const reportIssueLinks = document.querySelectorAll('.report-issue-link');
+        const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        
+        reportIssueLinks.forEach(link => {
+            if (isLoggedIn) {
+                link.classList.remove('disabled-link');
+                // Remove any existing event listeners by cloning
+                const newLink = link.cloneNode(true);
+                if (link.parentNode) {
+                    link.parentNode.replaceChild(newLink, link);
+                }
+            } else {
+                link.classList.add('disabled-link');
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    alert('Please login to report an issue');
+                    sessionStorage.setItem('redirectFrom', window.location.href);
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+    };
+
+    // Call on page load
+    updateReportIssueAccess();
 });

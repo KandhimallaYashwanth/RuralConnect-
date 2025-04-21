@@ -1221,3 +1221,34 @@ p {
 .animated-border:hover::after {
   width: 100%;
 }
+
+/* Login/Logout Button Styling */
+.login-btn {
+    background-color: var(--terracotta);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.login-btn:hover {
+    background-color: var(--terracotta-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(205, 93, 69, 0.3);
+}
+
+.logout-btn {
+    background-color: var(--leaf);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background-color: var(--leaf-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(77, 114, 77, 0.3);
+}

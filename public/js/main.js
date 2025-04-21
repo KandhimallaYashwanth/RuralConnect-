@@ -205,15 +205,21 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to update login status UI
 function updateLoginStatusUI() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const loginStatusBtn = document.getElementById('login-status-btn');
+  const loginStatusBtns = document.querySelectorAll('.login-btn, .logout-btn');
   
-  if (loginStatusBtn) {
+  loginStatusBtns.forEach(btn => {
     if (isLoggedIn) {
-      loginStatusBtn.textContent = 'Logout';
-      loginStatusBtn.classList.remove('login-btn');
-      loginStatusBtn.classList.add('logout-btn');
+      btn.textContent = 'Logout';
+      btn.classList.remove('login-btn');
+      btn.classList.add('logout-btn');
       
-      loginStatusBtn.addEventListener('click', () => {
+      // Remove any existing event listeners
+      const newBtn = btn.cloneNode(true);
+      if (btn.parentNode) {
+        btn.parentNode.replaceChild(newBtn, btn);
+      }
+      
+      newBtn.addEventListener('click', () => {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userType');
         localStorage.removeItem('authorityRole');
@@ -221,16 +227,22 @@ function updateLoginStatusUI() {
         window.location.reload();
       });
     } else {
-      loginStatusBtn.textContent = 'Login';
-      loginStatusBtn.classList.add('login-btn');
-      loginStatusBtn.classList.remove('logout-btn');
+      btn.textContent = 'Login';
+      btn.classList.add('login-btn');
+      btn.classList.remove('logout-btn');
       
-      loginStatusBtn.addEventListener('click', () => {
+      // Remove any existing event listeners
+      const newBtn = btn.cloneNode(true);
+      if (btn.parentNode) {
+        btn.parentNode.replaceChild(newBtn, btn);
+      }
+      
+      newBtn.addEventListener('click', () => {
         sessionStorage.setItem('redirectFrom', window.location.href);
         window.location.href = 'login.html';
       });
     }
-  }
+  });
 }
 
 // Function to update report issue link behavior based on login status
@@ -244,13 +256,17 @@ function updateReportIssueLinkBehavior() {
       
       // Remove any existing click listeners
       const newLink = link.cloneNode(true);
-      link.parentNode.replaceChild(newLink, link);
+      if (link.parentNode) {
+        link.parentNode.replaceChild(newLink, link);
+      }
     } else {
       link.classList.add('disabled-link');
       
       // Remove any existing click listeners and add new one
       const newLink = link.cloneNode(true);
-      link.parentNode.replaceChild(newLink, link);
+      if (link.parentNode) {
+        link.parentNode.replaceChild(newLink, link);
+      }
       
       newLink.addEventListener('click', (e) => {
         e.preventDefault();
