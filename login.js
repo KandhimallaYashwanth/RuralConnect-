@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('navMenu');
     
+    // Store the current page URL before login
+    const currentPage = sessionStorage.getItem('currentPage') || window.location.href;
+    
     // Mobile menu toggle
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', function() {
@@ -23,9 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Simple validation
             if (phoneNumber && password) {
                 // In a real app, you would verify this against a database
-                // For demo, just redirect to public dashboard
-                alert('Login successful for public user!');
-                window.location.href = 'public-dashboard.html';
+                // For demo, set login status and redirect back to original page
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userType', 'public');
+                localStorage.setItem('userPhone', phoneNumber);
+                
+                alert('Login successful!');
+                
+                // Redirect back to the page they were on or to index if none stored
+                const redirectTo = sessionStorage.getItem('redirectFrom') || 'index.html';
+                sessionStorage.removeItem('redirectFrom'); // Clear the stored page
+                window.location.href = redirectTo;
             } else {
                 alert('Please fill in all fields');
             }
@@ -44,6 +55,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (name && phoneNumber && password) {
                 alert('Registration successful!');
                 // In a real app, you would store this in a database
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userPhone', phoneNumber);
                 window.location.href = 'login.html';
             } else {
                 alert('Please fill in all fields');
@@ -69,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check credentials
             if (role && credentials[role]) {
                 if (email === credentials[role].email && password === credentials[role].password) {
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userType', 'authority');
+                    localStorage.setItem('authorityRole', role);
+                    
                     alert(`Login successful for ${role}!`);
                     // Redirect to authority dashboard
                     window.location.href = 'authority-dashboard.html';

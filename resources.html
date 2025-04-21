@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resources - RuralConnect</title>
+    <meta name="description" content="Village resources and documents - RuralConnect" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <div class="logo-circle">RC</div>
+                    <span>RuralConnect</span>
+                </a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="report-issue.html" class="nav-link report-issue-link"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
+                <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+                <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
+                <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
+                <a href="resources.html" class="nav-link active"><i class="fas fa-folder-open"></i> Resources</a>
+                <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
+                <div class="auth-buttons">
+                    <button id="login-status-btn" class="btn-outline-accent login-btn">Login</button>
+                </div>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="container py-5">
+            <div class="section-header">
+                <h1>Resources</h1>
+                <p>Access important documents and resources for the village community.</p>
+            </div>
+
+            <div class="resource-grid" id="resources-grid">
+                <!-- Default resource items -->
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="resource-details">
+                        <h3>MGNREGA Job Card Application</h3>
+                        <p>Employment Scheme</p>
+                        <div class="resource-meta">
+                            <span>Downloaded 125 times • PDF</span>
+                            <button class="download-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Download</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="resource-details">
+                        <h3>PM Kisan Yojana Guidelines</h3>
+                        <p>Agricultural Support</p>
+                        <div class="resource-meta">
+                            <span>Downloaded 93 times • PDF</span>
+                            <button class="download-btn">
+                                <i class="fas fa-download"></i>
+                                <span>Download</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dynamic resource items will be added here -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>RuralConnect</h3>
+                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="report-issue.html">Report Issue</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="budget.html">Budget</a></li>
+                        <li><a href="history.html">History</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-language">
+                    <h3>Language</h3>
+                    <div class="language-buttons">
+                        <button class="lang-btn active">English</button>
+                        <button class="lang-btn">हिंदी</button>
+                        <button class="lang-btn">தமிழ்</button>
+                        <button class="lang-btn">తెలుగు</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/public/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const loginStatusBtn = document.getElementById('login-status-btn');
+            const reportIssueLink = document.querySelector('.report-issue-link');
+            
+            // Update login button text based on login status
+            if (isLoggedIn) {
+                loginStatusBtn.textContent = 'Logout';
+                loginStatusBtn.classList.remove('login-btn');
+                loginStatusBtn.classList.add('logout-btn');
+                
+                // Enable report issue link
+                if (reportIssueLink) {
+                    reportIssueLink.classList.remove('disabled-link');
+                    reportIssueLink.addEventListener('click', (e) => {
+                        // Proceed normally as user is logged in
+                    });
+                }
+            } else {
+                // Disable report issue link for non-logged in users
+                if (reportIssueLink) {
+                    reportIssueLink.classList.add('disabled-link');
+                    reportIssueLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        alert('Please login to report an issue');
+                        // Store current page before redirecting to login
+                        sessionStorage.setItem('redirectFrom', window.location.href);
+                        window.location.href = 'login.html';
+                    });
+                }
+            }
+            
+            // Handle login/logout button click
+            if (loginStatusBtn) {
+                loginStatusBtn.addEventListener('click', () => {
+                    if (isLoggedIn) {
+                        // Logout logic
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userType');
+                        localStorage.removeItem('authorityRole');
+                        alert('You have been logged out.');
+                        window.location.reload();
+                    } else {
+                        // Login logic - redirect to login page
+                        sessionStorage.setItem('redirectFrom', window.location.href);
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+
+            // Add download functionality to download buttons
+            document.querySelectorAll('.download-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
+                    notify(`Downloading resource: ${resourceTitle}`, 'info');
+                    
+                    // Add download animation
+                    this.classList.add('downloading');
+                    setTimeout(() => {
+                        this.classList.remove('downloading');
+                        notify(`${resourceTitle} downloaded successfully!`, 'success');
+                    }, 1500);
+                });
+            });
+
+            // Load resource items from localStorage
+            function loadResourceItems() {
+                const resourcesGrid = document.getElementById('resources-grid');
+                const resourceItems = JSON.parse(localStorage.getItem('resourceItems') || '[]');
+                
+                if (resourcesGrid && resourceItems.length > 0) {
+                    resourceItems.forEach(item => {
+                        let icon = 'fa-file-alt';
+                        if (item.type === 'guide') icon = 'fa-book';
+                        if (item.type === 'link') icon = 'fa-link';
+                        
+                        const resourceCard = document.createElement('div');
+                        resourceCard.className = 'resource-card';
+                        resourceCard.innerHTML = `
+                            <div class="resource-icon">
+                                <i class="fas ${icon}"></i>
+                            </div>
+                            <div class="resource-details">
+                                <h3>${item.title}</h3>
+                                <p>${item.description}</p>
+                                <div class="resource-meta">
+                                    <span>${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</span>
+                                    <button class="download-btn">
+                                        <i class="fas fa-download"></i>
+                                        <span>Download</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        resourcesGrid.appendChild(resourceCard);
+                        
+                        // Add event listener to the new download button
+                        const downloadBtn = resourceCard.querySelector('.download-btn');
+                        downloadBtn.addEventListener('click', function() {
+                            const resourceTitle = this.closest('.resource-card').querySelector('h3').textContent;
+                            notify(`Downloading resource: ${resourceTitle}`, 'info');
+                            
+                            // Add download animation
+                            this.classList.add('downloading');
+                            setTimeout(() => {
+                                this.classList.remove('downloading');
+                                notify(`${resourceTitle} downloaded successfully!`, 'success');
+                            }, 1500);
+                        });
+                    });
+                }
+            }
+            
+            // Load resource items when page loads
+            loadResourceItems();
+            
+            // Listen for storage events to update content in real-time
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'resourceItems') {
+                    // Refresh resource items when they change
+                    const resourcesGrid = document.getElementById('resources-grid');
+                    const existingItems = resourcesGrid.querySelectorAll('.resource-card');
+                    
+                    // Keep only the first two default items
+                    if (existingItems.length > 2) {
+                        for (let i = 2; i < existingItems.length; i++) {
+                            resourcesGrid.removeChild(existingItems[i]);
+                        }
+                    }
+                    
+                    loadResourceItems();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

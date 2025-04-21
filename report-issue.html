@@ -1,400 +1,559 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Issue - RuralConnect</title>
-    <meta name="description" content="Report local issues in your area to bring them to the attention of the authorities." />
-    <meta name="author" content="RuralConnect" />
+    <meta name="description" content="Report issues in your village through RuralConnect platform." />
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-      /* Additional styles for the report issue page */
-      .notification {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: var(--border-radius);
-        background-color: var(--white);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        z-index: 1000;
-        min-width: 250px;
-        max-width: 400px;
-        animation: slideIn 0.3s ease-out forwards;
-      }
-      .notification.info { border-left: 4px solid var(--sky); }
-      .notification.success { border-left: 4px solid var(--leaf); }
-      .notification.warning { border-left: 4px solid var(--mustard); }
-      .notification.error { border-left: 4px solid var(--terracotta); }
-      .notification-close {
-        cursor: pointer;
-        margin-left: 10px;
-        font-size: 20px;
-      }
-      .notification.fadeOut {
-        animation: fadeOut 0.5s ease-out forwards;
-      }
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-      }
+        .disabled-link {
+            pointer-events: none;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .my-issues {
+            margin-top: 3rem;
+        }
     </style>
-  </head>
-
-  <body>
+</head>
+<body>
     <nav class="navbar">
-      <div class="container">
-        <div class="nav-logo">
-          <a href="index.html">
-            <div class="logo-circle">RC</div>
-            <span>RuralConnect</span>
-          </a>
+        <div class="container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <div class="logo-circle">RC</div>
+                    <span>RuralConnect</span>
+                </a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+                <a href="report-issue.html" class="nav-link report-issue-link active"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
+                <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
+                <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
+                <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
+                <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
+                <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
+                <div class="auth-buttons">
+                    <button id="login-status-btn" class="btn-outline-accent login-btn">Login</button>
+                </div>
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
-        <div class="nav-menu" id="navMenu">
-          <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
-          <a href="report-issue.html" class="nav-link active"><i class="fas fa-exclamation-circle"></i> Report Issue</a>
-          <a href="events.html" class="nav-link"><i class="fas fa-calendar-alt"></i> Events</a>
-          <a href="budget.html" class="nav-link"><i class="fas fa-money-bill-wave"></i> Budget</a>
-          <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
-          <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
-          <a href="announcements.html" class="nav-link"><i class="fas fa-bullhorn"></i> Announcements</a>
-          <button class="btn btn-primary login-btn">Login</button>
-        </div>
-        <div class="hamburger" id="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
     </nav>
 
     <main>
-      <section class="py-12 bg-gray-100">
-        <div class="container">
-          <div class="text-center mb-8">
-            <h1>Report an Issue</h1>
-            <p>Report local issues in your area to bring them to the attention of the authorities. Track the status of your reported issues in real-time.</p>
-          </div>
-          
-          <div class="report-form">
-            <form id="issueForm" onsubmit="handleReportIssueSubmit(event)">
-              <div class="form-row">
-                <label class="form-label" for="issueType">Issue Type</label>
-                <select id="issueType" class="form-select" required>
-                  <option value="">Select Issue Type</option>
-                  <option value="Road Condition">Road Condition</option>
-                  <option value="Water Supply">Water Supply</option>
-                  <option value="Electricity">Electricity</option>
-                  <option value="Sanitation">Sanitation</option>
-                  <option value="Public Property Damage">Public Property Damage</option>
-                  <option value="Agriculture Related">Agriculture Related</option>
-                  <option value="Healthcare">Healthcare</option>
-                  <option value="Education">Education</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              
-              <div class="form-row">
-                <label class="form-label" for="description">Description</label>
-                <div class="flex items-start gap-2">
-                  <textarea id="description" class="form-textarea" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+        <section class="container py-5">
+            <div id="login-required" style="display: none;">
+                <div class="section-header">
+                    <h1>Report an Issue</h1>
+                    <p>You need to be logged in to report an issue.</p>
                 </div>
-              </div>
-              
-              <div class="form-row">
-                <div class="grid-2">
-                  <div>
-                    <label class="form-label" for="ward">Ward Number</label>
-                    <input type="text" id="ward" class="form-input" placeholder="Enter your ward number" required>
-                  </div>
-                  
-                  <div>
-                    <label class="form-label" for="location">Location</label>
-                    <div class="input-icon">
-                      <input type="text" id="location" class="form-input" placeholder="Enter location or use current location" required>
-                      <i class="fas fa-map-marker-alt"></i>
+                <div class="text-center">
+                    <p>Please login to access this feature and report issues in your village.</p>
+                    <button id="login-redirect" class="btn btn-primary mt-4">Login Now</button>
+                </div>
+            </div>
+            
+            <div id="issue-reporting" style="display: none;">
+                <div class="section-header">
+                    <h1>Report an Issue</h1>
+                    <p>Help us improve our village by reporting issues you've observed</p>
+                </div>
+                
+                <form id="issue-report-form" class="report-form">
+                    <div class="form-row">
+                        <label for="issue-title" class="form-label">Issue Title</label>
+                        <input type="text" id="issue-title" class="form-input" placeholder="Briefly describe the issue" required>
                     </div>
-                  </div>
+                    
+                    <div class="form-row">
+                        <label for="issue-category" class="form-label">Category</label>
+                        <select id="issue-category" class="form-select" required>
+                            <option value="">Select a category</option>
+                            <option value="infrastructure">Infrastructure</option>
+                            <option value="water">Water Supply</option>
+                            <option value="sanitation">Sanitation</option>
+                            <option value="electricity">Electricity</option>
+                            <option value="health">Health Services</option>
+                            <option value="education">Education</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="issue-location" class="form-label">Location</label>
+                        <input type="text" id="issue-location" class="form-input" placeholder="Where is this issue located?" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="issue-description" class="form-label">Detailed Description</label>
+                        <textarea id="issue-description" class="form-textarea" rows="4" placeholder="Provide details about the issue" required></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label class="form-label">Attachments (Optional)</label>
+                        <div class="file-upload">
+                            <input type="file" id="file-input" multiple style="display: none;">
+                            <div class="file-upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="file-upload-text">
+                                Drag & drop files here or click to browse
+                            </div>
+                            <div class="file-preview"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Submit Issue</button>
+                    </div>
+                </form>
+                
+                <div id="my-issues" class="my-issues">
+                    <h2>My Reported Issues</h2>
+                    <div class="issue-list" id="user-issues-list">
+                        <!-- User issues will be listed here -->
+                    </div>
                 </div>
-              </div>
-              
-              <div class="form-row">
-                <label class="form-label">Upload Images/Videos</label>
-                <div class="file-upload">
-                  <div class="file-upload-icon">
-                    <i class="fas fa-camera"></i>
-                  </div>
-                  <p class="file-upload-text">Drag & drop files here or click to browse</p>
-                  <input type="file" id="file-input" multiple accept="image/*,video/*" style="display: none;">
-                  <button type="button" class="btn btn-primary">
-                    <i class="fas fa-upload"></i>
-                    <span>Upload Files</span>
-                  </button>
-                  <div class="file-preview"></div>
-                </div>
-              </div>
-              
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                  <span>Submit Issue</span>
-                  <i class="fas fa-chevron-right"></i>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </section>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-about">
-            <h3>RuralConnect</h3>
-            <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
-            <div class="social-links">
-              <a href="#"><i class="fab fa-facebook-f"></i></a>
-              <a href="#"><i class="fab fa-twitter"></i></a>
-              <a href="#"><i class="fab fa-instagram"></i></a>
-            </div>
-          </div>
-          
-          <div class="footer-links">
-            <h3>Quick Links</h3>
-            <ul>
-              <li><a href="index.html">Home</a></li>
-              <li><a href="report-issue.html">Report Issue</a></li>
-              <li><a href="events.html">Events</a></li>
-              <li><a href="budget.html">Budget</a></li>
-              <li><a href="history.html">History</a></li>
-              <li><a href="resources.html">Resources</a></li>
-            </ul>
-          </div>
-          
-          <div class="footer-contact">
-            <h3>Contact</h3>
-            <ul>
-              <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
-              <li><i class="fas fa-phone"></i> +91 9876543210</li>
-              <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
-            </ul>
-          </div>
-          
-          <div class="footer-language">
-            <h3>Language</h3>
-            <div class="language-buttons">
-              <button class="lang-btn active">English</button>
-              <button class="lang-btn">हिंदी</button>
-              <button class="lang-btn">தமிழ்</button>
-              <button class="lang-btn">తెలుగు</button>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>RuralConnect</h3>
+                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="report-issue.html">Report Issue</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="budget.html">Budget</a></li>
+                        <li><a href="history.html">History</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-language">
+                    <h3>Language</h3>
+                    <div class="language-buttons">
+                        <button class="lang-btn active">English</button>
+                        <button class="lang-btn">हिंदी</button>
+                        <button class="lang-btn">தமிழ்</button>
+                        <button class="lang-btn">తెలుగు</button>
+                    </div>
+                </div>
             </div>
             
-            <h3>Download App</h3>
-            <div class="app-buttons">
-              <button class="app-btn">
-                <i class="fab fa-google-play"></i>
-                <span>Play Store</span>
-              </button>
-              <button class="app-btn">
-                <i class="fab fa-apple"></i>
-                <span>App Store</span>
-              </button>
+            <div class="footer-bottom">
+                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
             </div>
-          </div>
         </div>
-        
-        <div class="footer-bottom">
-          <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
-        </div>
-      </div>
     </footer>
 
-    <!-- Add GPT Engineer script -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script src="/js/main.js"></script>
+    <script src="/public/js/main.js"></script>
     <script>
-      // Specific JavaScript for the report issue page
-      const handleReportIssueSubmit = (event) => {
-        event.preventDefault();
-        
-        // Get form values
-        const issueType = document.getElementById('issueType').value;
-        const description = document.getElementById('description').value;
-        const ward = document.getElementById('ward').value;
-        const location = document.getElementById('location').value;
-        const fileInput = document.getElementById('file-input');
-        const files = fileInput ? fileInput.files : [];
-        
-        // Validate form (basic validation)
-        if (!issueType || !description || !ward || !location) {
-          notify('Please fill all required fields.', 'warning');
-          return;
-        }
-        
-        // In a real application, you would send this data to a server
-        console.log({
-          issueType,
-          description,
-          ward,
-          location,
-          filesCount: files.length
-        });
-        
-        // Show success message
-        notify('Your issue has been reported successfully! You can track its status in the dashboard.', 'success');
-        
-        // Reset form
-        document.getElementById('issueForm').reset();
-        const filePreview = document.querySelector('.file-preview');
-        if (filePreview) filePreview.innerHTML = '';
-      };
-      
-      // Function to show notifications
-      const notify = (message, type = 'info') => {
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        
-        const closeBtn = document.createElement('span');
-        closeBtn.className = 'notification-close';
-        closeBtn.innerHTML = '&times;';
-        closeBtn.addEventListener('click', () => {
-          notification.remove();
-        });
-        
-        notification.appendChild(closeBtn);
-        document.body.appendChild(notification);
-        
-        // Auto remove after 5 seconds
-        setTimeout(() => {
-          notification.classList.add('fadeOut');
-          setTimeout(() => notification.remove(), 500);
-        }, 5000);
-        
-        return notification;
-      };
-      
-      // Handle file upload interface
-      document.addEventListener('DOMContentLoaded', () => {
-        const fileUpload = document.querySelector('.file-upload');
-        const fileInput = document.getElementById('file-input');
-        const filePreview = document.querySelector('.file-preview');
-        const uploadButton = document.querySelector('.file-upload .btn');
-        
-        if (fileUpload && fileInput && uploadButton) {
-          uploadButton.addEventListener('click', () => {
-            fileInput.click();
-          });
-          
-          fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0 && filePreview) {
-              filePreview.innerHTML = ''; // Clear previous previews
-              
-              Array.from(fileInput.files).forEach(file => {
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'file-thumbnail';
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const userType = localStorage.getItem('userType');
+            const loginStatusBtn = document.getElementById('login-status-btn');
+            const loginRequiredDiv = document.getElementById('login-required');
+            const issueReportingDiv = document.getElementById('issue-reporting');
+            const loginRedirectBtn = document.getElementById('login-redirect');
+            const userIssuesList = document.getElementById('user-issues-list');
+            
+            // Display appropriate content based on login status
+            if (isLoggedIn && userType === 'public') {
+                loginStatusBtn.textContent = 'Logout';
+                loginStatusBtn.classList.remove('login-btn');
+                loginStatusBtn.classList.add('logout-btn');
                 
-                if (file.type.startsWith('image/')) {
-                  const img = document.createElement('img');
-                  img.src = URL.createObjectURL(file);
-                  thumbnail.appendChild(img);
-                } else {
-                  thumbnail.textContent = file.name.substring(0, 10) + '...';
+                loginRequiredDiv.style.display = 'none';
+                issueReportingDiv.style.display = 'block';
+                
+                // Load user's reported issues
+                displayUserIssues();
+            } else {
+                loginRequiredDiv.style.display = 'block';
+                issueReportingDiv.style.display = 'none';
+            }
+            
+            // Handle login/logout button click
+            if (loginStatusBtn) {
+                loginStatusBtn.addEventListener('click', () => {
+                    if (isLoggedIn) {
+                        // Logout logic
+                        localStorage.removeItem('isLoggedIn');
+                        localStorage.removeItem('userType');
+                        localStorage.removeItem('authorityRole');
+                        alert('You have been logged out.');
+                        window.location.reload();
+                    } else {
+                        // Login logic - redirect to login page
+                        sessionStorage.setItem('redirectFrom', window.location.href);
+                        window.location.href = 'login.html';
+                    }
+                });
+            }
+            
+            // Login redirect button
+            if (loginRedirectBtn) {
+                loginRedirectBtn.addEventListener('click', () => {
+                    sessionStorage.setItem('redirectFrom', window.location.href);
+                    window.location.href = 'login.html';
+                });
+            }
+            
+            // Handle issue form submission
+            const issueForm = document.getElementById('issue-report-form');
+            if (issueForm) {
+                issueForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Get form data
+                    const issueTitle = document.getElementById('issue-title').value;
+                    const issueCategory = document.getElementById('issue-category').value;
+                    const issueLocation = document.getElementById('issue-location').value;
+                    const issueDescription = document.getElementById('issue-description').value;
+                    const userPhone = localStorage.getItem('userPhone') || 'Anonymous';
+                    const userName = localStorage.getItem('userName') || 'User';
+                    
+                    // Create new issue object
+                    const issue = {
+                        id: `#${issueCategory.substring(0, 3).toUpperCase()}-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`,
+                        title: issueTitle,
+                        category: issueCategory,
+                        location: issueLocation,
+                        description: issueDescription,
+                        status: 'reported', // Initial status is always 'reported'
+                        reporter: {
+                            name: userName,
+                            phone: userPhone
+                        },
+                        timeline: [
+                            {
+                                status: 'reported',
+                                date: new Date().toISOString(),
+                                message: 'Issue reported successfully'
+                            }
+                        ],
+                        currentStep: 'ward-member', // Always sent to Ward Member first
+                        created: new Date().toISOString()
+                    };
+                    
+                    // Save to localStorage
+                    const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+                    userIssues.push(issue);
+                    localStorage.setItem('userIssues', JSON.stringify(userIssues));
+                    
+                    // Also add to pending issues for authorities
+                    const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
+                    pendingIssues.push(issue);
+                    localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
+                    
+                    notify('Your issue has been reported successfully!', 'success');
+                    issueForm.reset();
+                    
+                    // Clear file previews
+                    const filePreview = document.querySelector('.file-preview');
+                    if (filePreview) filePreview.innerHTML = '';
+                    
+                    // Update user issues display
+                    displayUserIssues();
+                });
+            }
+            
+            // Display user's reported issues
+            function displayUserIssues() {
+                if (!userIssuesList) return;
+                
+                const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+                
+                if (userIssues.length === 0) {
+                    userIssuesList.innerHTML = '<p>You have not reported any issues yet.</p>';
+                    return;
                 }
                 
-                const removeBtn = document.createElement('div');
-                removeBtn.className = 'file-remove';
-                removeBtn.innerHTML = '&times;';
-                removeBtn.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                  thumbnail.remove();
-                  // Note: We can't actually remove items from a FileList, this is just for UI
+                userIssuesList.innerHTML = '';
+                
+                userIssues.forEach(issue => {
+                    const issueStatusClass = getStatusClass(issue.status);
+                    const issueStatusText = getStatusText(issue.status);
+                    
+                    const issueCard = document.createElement('div');
+                    issueCard.className = 'issue-card';
+                    
+                    // Create issue timeline based on current status
+                    let timelineHTML = `
+                        <div class="issue-timeline">
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Issue Reported</h4>
+                                        <span>${formatDate(issue.created)}</span>
+                                    </div>
+                                    <p>You've reported an issue with ${issue.category} in ${issue.location}</p>
+                                </div>
+                            </div>
+                    `;
+                    
+                    if (issue.status === 'reported') {
+                        timelineHTML += `
+                            <div class="timeline-item active">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Ward Member Review</h4>
+                                        <span>Pending</span>
+                                    </div>
+                                    <p>Your issue is being reviewed by the Ward Member</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item pending">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Wise Sarpanch Review</h4>
+                                        <span>Pending</span>
+                                    </div>
+                                    <p>Issue will be forwarded to Wise Sarpanch if approved</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item pending">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Sarpanch Review</h4>
+                                        <span>Pending</span>
+                                    </div>
+                                    <p>Issue will be forwarded to Sarpanch for final resolution</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (issue.status === 'in-progress' && issue.currentStep === 'wise-sarpanch') {
+                        timelineHTML += `
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Ward Member Review</h4>
+                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Ward Member has approved your issue</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item active">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Wise Sarpanch Review</h4>
+                                        <span>In Progress</span>
+                                    </div>
+                                    <p>Your issue is being reviewed by the Wise Sarpanch</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item pending">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Sarpanch Review</h4>
+                                        <span>Pending</span>
+                                    </div>
+                                    <p>Issue will be forwarded to Sarpanch for final resolution</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (issue.status === 'in-progress' && issue.currentStep === 'sarpanch') {
+                        timelineHTML += `
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Ward Member Review</h4>
+                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Ward Member has approved your issue</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Wise Sarpanch Review</h4>
+                                        <span>${issue.timeline[2] ? formatDate(issue.timeline[2].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Wise Sarpanch has approved your issue</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item active">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Sarpanch Review</h4>
+                                        <span>In Progress</span>
+                                    </div>
+                                    <p>Your issue is being reviewed by the Sarpanch for final resolution</p>
+                                </div>
+                            </div>
+                        `;
+                    } else if (issue.status === 'resolved') {
+                        timelineHTML += `
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Ward Member Review</h4>
+                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Ward Member has approved your issue</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Wise Sarpanch Review</h4>
+                                        <span>${issue.timeline[2] ? formatDate(issue.timeline[2].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Wise Sarpanch has approved your issue</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-header">
+                                        <h4>Resolved by Sarpanch</h4>
+                                        <span>${issue.timeline[3] ? formatDate(issue.timeline[3].date) : 'Completed'}</span>
+                                    </div>
+                                    <p>Your issue has been successfully resolved</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    timelineHTML += `</div>`;
+                    
+                    issueCard.innerHTML = `
+                        <div class="issue-header">
+                            <div>
+                                <h3>${issue.title}</h3>
+                                <p>Reference ID: ${issue.id}</p>
+                            </div>
+                            <div class="issue-status ${issueStatusClass}">${issueStatusText}</div>
+                        </div>
+                        <p class="issue-description">
+                            ${issue.description}
+                        </p>
+                        ${timelineHTML}
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary view-details-btn" data-id="${issue.id}">View Details</button>
+                        </div>
+                    `;
+                    
+                    userIssuesList.appendChild(issueCard);
                 });
                 
-                thumbnail.appendChild(removeBtn);
-                filePreview.appendChild(thumbnail);
-              });
+                // Add event listeners to view details buttons
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const issueId = this.getAttribute('data-id');
+                        const issue = userIssues.find(i => i.id === issueId);
+                        
+                        if (issue) {
+                            alert(`Issue Details:\n\nTitle: ${issue.title}\nCategory: ${issue.category}\nLocation: ${issue.location}\nStatus: ${getStatusText(issue.status)}\nReported on: ${formatDate(issue.created)}`);
+                        }
+                    });
+                });
             }
-          });
-        }
-      });
+            
+            // Helper functions
+            function getStatusClass(status) {
+                switch (status) {
+                    case 'reported': return 'reported';
+                    case 'in-progress': return 'in-progress';
+                    case 'resolved': return 'resolved';
+                    default: return 'reported';
+                }
+            }
+            
+            function getStatusText(status) {
+                switch (status) {
+                    case 'reported': return 'Reported';
+                    case 'in-progress': return 'In Progress';
+                    case 'resolved': return 'Resolved';
+                    default: return 'Reported';
+                }
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            
+            // Listen for storage events to update content in real-time
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'userIssues' || e.key === 'pendingIssues') {
+                    // Refresh user issues when they change
+                    displayUserIssues();
+                }
+            });
+        });
     </script>
-    <style>
-      /* Responsive grid for the form */
-      .grid-2 {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      @media (min-width: 768px) {
-        .grid-2 {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-      
-      .input-icon {
-        position: relative;
-      }
-      
-      .input-icon i {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translateY(-50%);
-        color: var(--terracotta);
-      }
-      
-      /* File upload styles */
-      .file-preview {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1rem;
-      }
-      
-      .file-thumbnail {
-        width: 4rem;
-        height: 4rem;
-        background-color: var(--gray-200);
-        border-radius: 0.25rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        overflow: hidden;
-        position: relative;
-      }
-      
-      .file-thumbnail img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-      
-      .file-remove {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 1.25rem;
-        height: 1.25rem;
-        background-color: rgba(0, 0, 0, 0.5);
-        color: var(--white);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        cursor: pointer;
-      }
-    </style>
-  </body>
+</body>
 </html>

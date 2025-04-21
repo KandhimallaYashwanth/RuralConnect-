@@ -15,6 +15,12 @@ if (hamburger && navMenu) {
 
 // Add ripple effect to buttons
 document.addEventListener('DOMContentLoaded', () => {
+  // Check login status and update UI accordingly
+  updateLoginStatusUI();
+  
+  // Update report issue links
+  updateReportIssueLinkBehavior();
+  
   const buttons = document.querySelectorAll('.btn, button:not([disabled])');
   
   buttons.forEach(button => {
@@ -191,7 +197,70 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 500);
     });
   });
+  
+  // Real-time content synchronization between authority dashboard and public pages
+  setupStorageListener();
 });
+
+// Function to update login status UI
+function updateLoginStatusUI() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const loginStatusBtn = document.getElementById('login-status-btn');
+  
+  if (loginStatusBtn) {
+    if (isLoggedIn) {
+      loginStatusBtn.textContent = 'Logout';
+      loginStatusBtn.classList.remove('login-btn');
+      loginStatusBtn.classList.add('logout-btn');
+      
+      loginStatusBtn.addEventListener('click', () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('authorityRole');
+        alert('You have been logged out.');
+        window.location.reload();
+      });
+    } else {
+      loginStatusBtn.textContent = 'Login';
+      loginStatusBtn.classList.add('login-btn');
+      loginStatusBtn.classList.remove('logout-btn');
+      
+      loginStatusBtn.addEventListener('click', () => {
+        sessionStorage.setItem('redirectFrom', window.location.href);
+        window.location.href = 'login.html';
+      });
+    }
+  }
+}
+
+// Function to update report issue link behavior based on login status
+function updateReportIssueLinkBehavior() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const reportIssueLinks = document.querySelectorAll('.report-issue-link');
+  
+  reportIssueLinks.forEach(link => {
+    if (isLoggedIn) {
+      link.classList.remove('disabled-link');
+      
+      // Remove any existing click listeners
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
+    } else {
+      link.classList.add('disabled-link');
+      
+      // Remove any existing click listeners and add new one
+      const newLink = link.cloneNode(true);
+      link.parentNode.replaceChild(newLink, link);
+      
+      newLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Please login to report an issue');
+        sessionStorage.setItem('redirectFrom', window.location.href);
+        window.location.href = 'login.html';
+      });
+    }
+  });
+}
 
 // Create a basic popup notification system
 const notify = (message, type = 'info') => {
@@ -333,6 +402,13 @@ const notify = (message, type = 'info') => {
         33% { content: '..'; }
         66% { content: '...'; }
       }
+      
+      /* Disabled link styling */
+      .disabled-link {
+        pointer-events: none;
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -377,12 +453,53 @@ const handleReportIssueSubmit = (event) => {
     });
   }
   
-  if (isValid) {
+  if (isValid && form) {
     // Add loading state to submit button
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.classList.add('loading');
+      
+      // Get form data
+      const issueTitle = document.getElementById('issue-title')?.value || '';
+      const issueCategory = document.getElementById('issue-category')?.value || 'general';
+      const issueLocation = document.getElementById('issue-location')?.value || '';
+      const issueDescription = document.getElementById('issue-description')?.value || '';
+      const userPhone = localStorage.getItem('userPhone') || 'Anonymous';
+      const userName = localStorage.getItem('userName') || 'User';
+      
+      // Create new issue object
+      const issue = {
+        id: `#${issueCategory.substring(0, 3).toUpperCase()}-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`,
+        title: issueTitle,
+        category: issueCategory,
+        location: issueLocation,
+        description: issueDescription,
+        status: 'reported', // Initial status is always 'reported'
+        reporter: {
+          name: userName,
+          phone: userPhone
+        },
+        timeline: [
+          {
+            status: 'reported',
+            date: new Date().toISOString(),
+            message: 'Issue reported successfully'
+          }
+        ],
+        currentStep: 'ward-member', // Always sent to Ward Member first
+        created: new Date().toISOString()
+      };
+      
+      // Save to localStorage
+      const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+      userIssues.push(issue);
+      localStorage.setItem('userIssues', JSON.stringify(userIssues));
+      
+      // Also add to pending issues for authorities
+      const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
+      pendingIssues.push(issue);
+      localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
       
       // Simulate submission delay
       setTimeout(() => {
@@ -391,17 +508,22 @@ const handleReportIssueSubmit = (event) => {
         notify('Your issue has been reported successfully!', 'success');
         
         // Reset form after successful submission
-        if (form) form.reset();
+        form.reset();
         
         // Clear file previews
         const filePreview = document.querySelector('.file-preview');
         if (filePreview) filePreview.innerHTML = '';
+        
+        // If we're on the report-issue page, refresh the list
+        if (window.location.href.includes('report-issue.html')) {
+          displayUserIssues();
+        }
       }, 1500);
     } else {
       notify('Your issue has been reported successfully!', 'success');
       
       // Reset form after successful submission
-      if (form) form.reset();
+      form.reset();
       
       // Clear file previews
       const filePreview = document.querySelector('.file-preview');
@@ -409,6 +531,89 @@ const handleReportIssueSubmit = (event) => {
     }
   }
 };
+
+// Setup storage event listener for real-time content sync
+function setupStorageListener() {
+  window.addEventListener('storage', function(e) {
+    // Handle different types of content updates
+    switch (e.key) {
+      case 'eventItems':
+        if (window.location.href.includes('events.html')) {
+          refreshEventsDisplay();
+        }
+        break;
+      case 'budgetItems':
+        if (window.location.href.includes('budget.html')) {
+          refreshBudgetDisplay();
+        }
+        break;
+      case 'resourceItems':
+        if (window.location.href.includes('resources.html')) {
+          refreshResourcesDisplay();
+        }
+        break;
+      case 'historyItems':
+        if (window.location.href.includes('history.html')) {
+          refreshHistoryDisplay();
+        }
+        break;
+      case 'galleryItems':
+        if (window.location.href.includes('gallery.html')) {
+          refreshGalleryDisplay();
+        }
+        break;
+      case 'userIssues':
+      case 'pendingIssues':
+        if (window.location.href.includes('report-issue.html') ||
+            window.location.href.includes('public-dashboard.html')) {
+          refreshUserIssuesDisplay();
+        }
+        break;
+      case 'isLoggedIn':
+        // Update login UI and report issue functionality
+        updateLoginStatusUI();
+        updateReportIssueLinkBehavior();
+        break;
+    }
+  });
+}
+
+// Helper functions for refreshing content displays
+function refreshEventsDisplay() {
+  // Implementation would depend on page structure
+  notify('Events have been updated', 'info');
+  // Specific implementation would reload events from localStorage
+}
+
+function refreshBudgetDisplay() {
+  // Implementation would depend on page structure
+  notify('Budget information has been updated', 'info');
+  // Specific implementation would reload budget data from localStorage
+}
+
+function refreshResourcesDisplay() {
+  // Implementation would depend on page structure
+  notify('Resources have been updated', 'info');
+  // Specific implementation would reload resources from localStorage
+}
+
+function refreshHistoryDisplay() {
+  // Implementation would depend on page structure
+  notify('Historical records have been updated', 'info');
+  // Specific implementation would reload history from localStorage
+}
+
+function refreshGalleryDisplay() {
+  // Implementation would depend on page structure
+  notify('Gallery has been updated', 'info');
+  // Specific implementation would reload gallery from localStorage
+}
+
+function refreshUserIssuesDisplay() {
+  // Implementation would depend on page structure
+  notify('Issue status has been updated', 'info');
+  // Specific implementation would reload user issues from localStorage
+}
 
 // Make the notification system available globally
 window.notify = notify;
