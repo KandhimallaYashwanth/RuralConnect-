@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +18,7 @@
         <h1 class="dashboard-title">Authorities Dashboard</h1>
         <div class="auth-info">
             <span id="authority-role">Sarpanch</span>
-            <button id="logout-btn" class="btn logout-btn">
+            <button id="logout-btn" class="logout-btn">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </div>
@@ -36,12 +37,17 @@
                     <li data-section="in-progress-issues">
                         <i class="fas fa-spinner"></i>
                         <span>In Progress</span>
-                        <span class="item-count" id="progress-count">1</span>
+                        <span class="item-count" id="progress-count">0</span>
                     </li>
                     <li data-section="resolved-issues">
                         <i class="fas fa-check-circle"></i>
                         <span>Resolved</span>
-                        <span class="item-count" id="resolved-count">4</span>
+                        <span class="item-count" id="resolved-count">0</span>
+                    </li>
+                    <li data-section="rejected-issues">
+                        <i class="fas fa-times-circle"></i>
+                        <span>Rejected</span>
+                        <span class="item-count" id="rejected-count">0</span>
                     </li>
                 </ul>
             </div>
@@ -118,21 +124,6 @@
                 
                 <div class="issues-container" id="in-progress-issues-list">
                     <!-- In progress issues would be loaded here -->
-                    <div class="issue-card">
-                        <h3>Road Condition Issue</h3>
-                        <div class="issue-meta">
-                            <span>#ROA-20230615</span>
-                            <span>Reported: 15 Jun 2023</span>
-                        </div>
-                        <span class="issue-category road">Road & Transportation</span>
-                        <p class="issue-description">The main road in Ward 5 has several large potholes making it difficult for vehicles to pass.</p>
-                        <div class="issue-detail"><strong>Location:</strong> Main Road, Ward 5</div>
-                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
-                        <div class="issue-actions">
-                            <button class="btn btn-secondary">View Details</button>
-                            <button class="btn btn-primary">Mark Resolved</button>
-                        </div>
-                    </div>
                 </div>
             </section>
             
@@ -150,35 +141,23 @@
                 
                 <div class="issues-container" id="resolved-issues-list">
                     <!-- Resolved issues would be loaded here -->
-                    <div class="issue-card">
-                        <h3>Street Light Repair</h3>
-                        <div class="issue-meta">
-                            <span>#ELE-20230605</span>
-                            <span>Resolved: 12 Jun 2023</span>
-                        </div>
-                        <span class="issue-category electricity">Electricity</span>
-                        <p class="issue-description">Street lights in Ward 3 not functioning for the past week.</p>
-                        <div class="issue-detail"><strong>Location:</strong> Ward 3, Market Area</div>
-                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
-                        <div class="issue-actions">
-                            <button class="btn btn-secondary">View Details</button>
-                        </div>
+                </div>
+            </section>
+            
+            <!-- Rejected Issues Section -->
+            <section id="rejected-issues" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-times-circle"></i>
                     </div>
-                    
-                    <div class="issue-card">
-                        <h3>Water Supply Disruption</h3>
-                        <div class="issue-meta">
-                            <span>#WAT-20230601</span>
-                            <span>Resolved: 10 Jun 2023</span>
-                        </div>
-                        <span class="issue-category water">Water Supply</span>
-                        <p class="issue-description">No water supply in Ward 2 for the last 3 days.</p>
-                        <div class="issue-detail"><strong>Location:</strong> Ward 2, Residential Area</div>
-                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543211</div>
-                        <div class="issue-actions">
-                            <button class="btn btn-secondary">View Details</button>
-                        </div>
+                    <div>
+                        <h2>Rejected Issues</h2>
+                        <p>Issues that have been rejected.</p>
                     </div>
+                </div>
+                
+                <div class="issues-container" id="rejected-issues-list">
+                    <!-- Rejected issues would be loaded here -->
                 </div>
             </section>
 
@@ -224,12 +203,12 @@
                             <input type="number" id="budget-spent" required placeholder="Enter amount in rupees">
                         </div>
                         
-                        <div class="form-row">
+                        <div class="form-row full-width">
                             <label for="budget-description">Description</label>
                             <textarea id="budget-description" rows="4" required placeholder="Provide details about this budget allocation"></textarea>
                         </div>
                         
-                        <div class="form-row">
+                        <div class="form-row full-width">
                             <label for="budget-projects">Related Projects (comma separated)</label>
                             <input type="text" id="budget-projects" placeholder="E.g., Main Road Repair, Bridge Construction">
                         </div>
@@ -244,6 +223,106 @@
                     <h3>Existing Budget Items</h3>
                     <div id="budget-items-list" class="preview-grid">
                         <!-- Budget items will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- History Management Section -->
+            <section id="history-management" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div>
+                        <h2>Historical Information</h2>
+                        <p>Add important historical events and information about the village.</p>
+                    </div>
+                </div>
+                
+                <div class="content-form-container">
+                    <form id="history-form" class="content-form">
+                        <div class="form-row">
+                            <label for="history-title">Event Title</label>
+                            <input type="text" id="history-title" required placeholder="E.g., Village Foundation Day">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="history-date">Date</label>
+                            <input type="date" id="history-date" required>
+                        </div>
+                        
+                        <div class="form-row full-width">
+                            <label for="history-description">Description</label>
+                            <textarea id="history-description" rows="4" required placeholder="Provide details about this historical event"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Historical Event</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="content-preview">
+                    <h3>Existing Historical Information</h3>
+                    <div id="history-items-list" class="preview-grid">
+                        <!-- History items will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Resources Management Section -->
+            <section id="resources-management" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h2>Resources Management</h2>
+                        <p>Upload and manage useful documents and resources for citizens.</p>
+                    </div>
+                </div>
+                
+                <div class="content-form-container">
+                    <form id="resources-form" class="content-form">
+                        <div class="form-row">
+                            <label for="resource-title">Resource Title</label>
+                            <input type="text" id="resource-title" required placeholder="E.g., Farming Subsidy Guidelines">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="resource-category">Category</label>
+                            <select id="resource-category" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="education">Education</option>
+                                <option value="health">Health</option>
+                                <option value="government">Government Schemes</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row full-width">
+                            <label for="resource-description">Description</label>
+                            <textarea id="resource-description" rows="4" required placeholder="Provide details about this resource"></textarea>
+                        </div>
+                        
+                        <div class="form-row full-width">
+                            <label for="resource-file-link">File Link</label>
+                            <input type="url" id="resource-file-link" required placeholder="Enter link to file (Google Drive, Dropbox, etc.)">
+                            <small>For demo purposes, please provide a link to the document</small>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Resource</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="content-preview">
+                    <h3>Existing Resources</h3>
+                    <div id="resource-items-list" class="preview-grid">
+                        <!-- Resource items will be dynamically loaded here -->
                     </div>
                 </div>
             </section>
@@ -267,12 +346,12 @@
                             <input type="text" id="image-title" required placeholder="Enter a title for this image">
                         </div>
                         
-                        <div class="form-row">
+                        <div class="form-row full-width">
                             <label for="image-description">Description</label>
                             <textarea id="image-description" rows="3" required placeholder="Provide a short description for the image"></textarea>
                         </div>
                         
-                        <div class="form-row">
+                        <div class="form-row full-width">
                             <label>Upload Image</label>
                             <div class="file-upload">
                                 <div class="file-upload-icon">
@@ -282,9 +361,10 @@
                                     <p>Drag & drop or click to browse</p>
                                     <span>JPG, PNG files up to 5MB</span>
                                 </div>
-                                <input type="file" id="gallery-file-input" accept="image/*" style="display:none" required>
+                                <input type="file" id="gallery-file-input" accept="image/*" style="display:none">
                             </div>
                             <div id="gallery-file-preview" class="file-preview"></div>
+                            <small>For demo purposes, placeholder images will be used</small>
                         </div>
                         
                         <div class="form-row">
@@ -348,7 +428,7 @@
                             <input type="text" id="event-location" required placeholder="Enter event venue">
                         </div>
                         
-                        <div class="form-row">
+                        <div class="form-row full-width">
                             <label for="event-description">Description</label>
                             <textarea id="event-description" rows="4" required placeholder="Provide details about the event"></textarea>
                         </div>
@@ -367,7 +447,51 @@
                 </div>
             </section>
             
-            <!-- Other management sections would follow the same pattern -->
+            <!-- Profile Settings Section -->
+            <section id="profile-settings" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <div>
+                        <h2>Profile Settings</h2>
+                        <p>Update your profile information and account settings.</p>
+                    </div>
+                </div>
+                
+                <div class="content-form-container">
+                    <form id="profile-form" class="content-form">
+                        <div class="form-row">
+                            <label for="profile-name">Full Name</label>
+                            <input type="text" id="profile-name" required placeholder="Enter your full name">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="profile-email">Email</label>
+                            <input type="email" id="profile-email" required placeholder="Enter your email">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="profile-phone">Phone Number</label>
+                            <input type="tel" id="profile-phone" required placeholder="Enter your phone number">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="profile-password">New Password</label>
+                            <input type="password" id="profile-password" placeholder="Enter new password (leave blank to keep current)">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="profile-confirm-password">Confirm Password</label>
+                            <input type="password" id="profile-confirm-password" placeholder="Confirm new password">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </main>
     </div>
 

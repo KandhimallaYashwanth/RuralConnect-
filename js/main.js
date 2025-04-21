@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Function to check login status and update UI
 function updateLoginStatus() {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  const loginButtons = document.querySelectorAll('.login-btn');
+  const loginButtons = document.querySelectorAll('.login-btn, .logout-btn');
   
   loginButtons.forEach(button => {
     if (isLoggedIn) {
@@ -43,6 +43,12 @@ function updateLoginStatus() {
       button.classList.remove('logout-btn');
       
       // Keep the default href behavior to navigate to login page
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Store the current page URL to redirect back after login
+        sessionStorage.setItem('redirectFrom', window.location.href);
+        window.location.href = 'login.html';
+      });
     }
   });
 }
@@ -161,5 +167,39 @@ window.addEventListener('storage', function(e) {
     if (document.getElementById('events-container')) {
       loadEvents();
     }
+  } else if (e.key === 'historyItems') {
+    // Update history if on history page
+    if (document.getElementById('history-container')) {
+      loadHistoryItems();
+    }
+  } else if (e.key === 'resourceItems') {
+    // Update resources if on resources page
+    if (document.getElementById('resources-container')) {
+      loadResourceItems();
+    }
+  } else if (e.key === 'userIssues' || e.key === 'pendingIssues') {
+    // Update issue tracking if on issue tracking page
+    if (document.getElementById('issue-tracking-container')) {
+      loadUserIssues();
+    }
+    
+    // Update authority dashboard if on authority dashboard page
+    if (document.getElementById('pending-issues-list')) {
+      loadPendingIssues();
+    }
+    if (document.getElementById('in-progress-issues-list')) {
+      loadInProgressIssues();
+    }
+    if (document.getElementById('resolved-issues-list')) {
+      loadResolvedIssues();
+    }
   }
 });
+
+// Common function to create elements
+function createElement(tag, className, textContent = '') {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (textContent) element.textContent = textContent;
+  return element;
+}
