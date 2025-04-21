@@ -6,16 +6,34 @@ import { Button } from "@/components/ui/button";
 import { notify } from "@/lib/notification";
 
 const NavBar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    typeof window !== "undefined"
+      ? localStorage.getItem("isLoggedIn") === "true"
+      : false
+  );
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check login status on mount and when location changes
+  // Listen for changes in localStorage to update login/logout button
   useEffect(() => {
-    // In a real app, you'd check for authentication tokens
-    const loggedInStatus = localStorage.getItem("isLoggedIn") === "true";
-    setIsLoggedIn(loggedInStatus);
+    function syncLoginStatus() {
+      const loggedInStatus = localStorage.getItem("isLoggedIn") === "true";
+      setIsLoggedIn(loggedInStatus);
+    }
+
+    // Sync on mount and on route
+    syncLoginStatus();
+
+    // Listen for "storage" events (another tab or login page)
+    function handleStorage(e: StorageEvent) {
+      if (e.key === "isLoggedIn") {
+        syncLoginStatus();
+      }
+    }
+    window.addEventListener("storage", handleStorage);
+
+    return () => window.removeEventListener("storage", handleStorage);
   }, [location]);
 
   const handleLogin = () => {
@@ -32,25 +50,17 @@ const NavBar = () => {
     navigate("/");
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(prev => !prev);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link to="/" className="flex items-center" onClick={closeMobileMenu}>
             <img src="/images/rural-pattern.svg" alt="Logo" className="h-8 w-8 mr-2" />
             <span className="text-xl font-bold text-rural-terracotta">GramSeva</span>
           </Link>
-
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-6 items-center">
             <Link to="/" className="text-gray-700 hover:text-rural-terracotta transition-colors">
               Home
@@ -88,8 +98,6 @@ const NavBar = () => {
               </Button>
             )}
           </nav>
-
-          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button 
               onClick={toggleMobileMenu}
@@ -105,67 +113,64 @@ const NavBar = () => {
           </div>
         </div>
       </div>
-
-      {/* Mobile Navigation */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Home
             </Link>
-            <Link 
-              to="/report-issue" 
+            <Link
+              to="/report-issue"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Report Issue
             </Link>
-            <Link 
-              to="/events" 
+            <Link
+              to="/events"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Events
             </Link>
-            <Link 
-              to="/resources" 
+            <Link
+              to="/resources"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Resources
             </Link>
-            <Link 
-              to="/budget" 
+            <Link
+              to="/budget"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Budget
             </Link>
-            <Link 
-              to="/gallery" 
+            <Link
+              to="/gallery"
               className="block py-2 text-gray-700 hover:text-rural-terracotta transition-colors"
               onClick={closeMobileMenu}
             >
               Gallery
             </Link>
-            
             {isLoggedIn ? (
-              <Button 
+              <Button
                 onClick={() => {
                   handleLogout();
                   closeMobileMenu();
                 }}
-                variant="outline" 
+                variant="outline"
                 className="border-rural-terracotta text-rural-terracotta hover:bg-rural-terracotta/10 w-full"
               >
                 Logout
               </Button>
             ) : (
-              <Button 
+              <Button
                 onClick={() => {
                   handleLogin();
                   closeMobileMenu();
