@@ -1,55 +1,24 @@
 
 // Authority Dashboard functionality
 document.addEventListener('DOMContentLoaded', () => {
-  // Check if user is logged in as authority
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  // Check if user is authority
   const userType = localStorage.getItem('userType');
+  const authorityRole = localStorage.getItem('authorityRole');
   
-  if (!isLoggedIn || userType !== 'authority') {
-    // Redirect non-authority users to login
-    alert('Please login as an authority to access the dashboard');
-    window.location.href = 'authority-login.html';
+  if (userType !== 'authority') {
+    // Redirect non-authority users
+    notify('Access denied. Authority access only.', 'error');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 2000);
     return;
   }
   
   // Display authority role
-  const authorityRole = localStorage.getItem('authorityRole');
   const roleDisplay = document.getElementById('authority-role');
   if (roleDisplay && authorityRole) {
     roleDisplay.textContent = authorityRole.charAt(0).toUpperCase() + authorityRole.slice(1);
   }
-  
-  // Handle sidebar navigation
-  const sidebarItems = document.querySelectorAll('.sidebar-menu li');
-  const dashboardSections = document.querySelectorAll('.dashboard-section');
-  
-  sidebarItems.forEach(item => {
-    item.addEventListener('click', () => {
-      // Get the target section ID
-      const sectionId = item.getAttribute('data-section');
-      
-      // Remove active class from all items and sections
-      sidebarItems.forEach(i => i.classList.remove('active'));
-      dashboardSections.forEach(s => s.classList.remove('active'));
-      
-      // Add active class to clicked item and corresponding section
-      item.classList.add('active');
-      document.getElementById(sectionId)?.classList.add('active');
-    });
-  });
-  
-  // Initialize issue counters
-  updateIssueCounts();
-  
-  // Load issues
-  loadPendingIssues();
-  loadInProgressIssues();
-  loadResolvedIssues();
-  
-  // Load content management data
-  loadBudgetItemsForDashboard();
-  loadGalleryItemsForDashboard();
-  loadEventsForDashboard();
   
   // Handle logout
   const logoutBtn = document.getElementById('logout-btn');
@@ -59,27 +28,300 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('userType');
       localStorage.removeItem('authorityRole');
       
-      // Redirect to home page
-      window.location.href = 'index.html';
+      notify('Logged out successfully', 'success');
+      
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
     });
   }
   
-  // Set up form submissions
-  setupBudgetForm();
-  setupGalleryForm();
-  setupEventForm();
-});
-
-// Function to update issue counts
-function updateIssueCounts() {
-  const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
-  const inProgressIssues = JSON.parse(localStorage.getItem('inProgressIssues') || '[]');
-  const resolvedIssues = JSON.parse(localStorage.getItem('resolvedIssues') || '[]');
+  // Handle sidebar navigation
+  const sidebarItems = document.querySelectorAll('.sidebar-menu li');
+  const dashboardSections = document.querySelectorAll('.dashboard-section');
   
-  document.getElementById('pending-count').textContent = pendingIssues.length;
-  document.getElementById('progress-count').textContent = inProgressIssues.length;
-  document.getElementById('resolved-count').textContent = resolvedIssues.length;
-}
+  sidebarItems.forEach(item => {
+    item.addEventListener('click', () => {
+      // Hide all sections
+      dashboardSections.forEach(section => {
+        section.classList.remove('active');
+      });
+      
+      // Remove active class from all sidebar items
+      sidebarItems.forEach(menuItem => {
+        menuItem.classList.remove('active');
+      });
+      
+      // Add active class to clicked item
+      item.classList.add('active');
+      
+      // Show corresponding section
+      const sectionId = item.dataset.section;
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.classList.add('active');
+      }
+    });
+  });
+  
+  // Load initial data
+  loadPendingIssues();
+  loadInProgressIssues();
+  loadResolvedIssues();
+  loadRejectedIssues();
+  loadBudgetItemsForDashboard();
+  loadHistoryItemsForDashboard();
+  loadResourceItemsForDashboard();
+  loadGalleryItemsForDashboard();
+  loadEventItemsForDashboard();
+  
+  // Update issue counts
+  updateIssueCounts();
+  
+  // Handle budget form submission
+  const budgetForm = document.getElementById('budget-form');
+  if (budgetForm) {
+    budgetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get form data
+      const title = document.getElementById('budget-title').value;
+      const category = document.getElementById('budget-category').value;
+      const allocation = parseFloat(document.getElementById('budget-allocation').value);
+      const spent = parseFloat(document.getElementById('budget-spent').value);
+      const description = document.getElementById('budget-description').value;
+      const projectsInput = document.getElementById('budget-projects').value;
+      
+      // Validate form
+      if (!title || !category || isNaN(allocation) || isNaN(spent) || !description) {
+        notify('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Process projects input
+      const projects = projectsInput ? projectsInput.split(',').map(p => p.trim()) : [];
+      
+      // Create new budget item
+      const newBudgetItem = {
+        id: Date.now(),
+        title: title,
+        category: category,
+        allocation: allocation,
+        spent: spent,
+        description: description,
+        projects: projects,
+        createdAt: new Date().toISOString(),
+        createdBy: authorityRole
+      };
+      
+      // Save to localStorage
+      const budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
+      budgetItems.push(newBudgetItem);
+      localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+      
+      // Show success message
+      notify('Budget item added successfully!', 'success');
+      
+      // Reset form
+      budgetForm.reset();
+      
+      // Reload budget items
+      loadBudgetItemsForDashboard();
+    });
+  }
+  
+  // Handle history form submission
+  const historyForm = document.getElementById('history-form');
+  if (historyForm) {
+    historyForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get form data
+      const title = document.getElementById('history-title').value;
+      const date = document.getElementById('history-date').value;
+      const description = document.getElementById('history-description').value;
+      
+      // Validate form
+      if (!title || !date || !description) {
+        notify('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Create new history item
+      const newHistoryItem = {
+        id: Date.now(),
+        title: title,
+        date: date,
+        description: description,
+        createdAt: new Date().toISOString(),
+        createdBy: authorityRole
+      };
+      
+      // Save to localStorage
+      const historyItems = JSON.parse(localStorage.getItem('historyItems') || '[]');
+      historyItems.push(newHistoryItem);
+      localStorage.setItem('historyItems', JSON.stringify(historyItems));
+      
+      // Show success message
+      notify('History item added successfully!', 'success');
+      
+      // Reset form
+      historyForm.reset();
+      
+      // Reload history items
+      loadHistoryItemsForDashboard();
+    });
+  }
+  
+  // Handle resources form submission
+  const resourceForm = document.getElementById('resources-form');
+  if (resourceForm) {
+    resourceForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get form data
+      const title = document.getElementById('resource-title').value;
+      const category = document.getElementById('resource-category').value;
+      const description = document.getElementById('resource-description').value;
+      const fileLink = document.getElementById('resource-file-link').value;
+      
+      // Validate form
+      if (!title || !category || !description || !fileLink) {
+        notify('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Create new resource item
+      const newResourceItem = {
+        id: Date.now(),
+        title: title,
+        category: category,
+        description: description,
+        fileLink: fileLink,
+        fileSize: '2.4 MB', // Placeholder, in real app would get actual file size
+        fileType: 'PDF', // Placeholder, in real app would get actual file type
+        createdAt: new Date().toISOString(),
+        createdBy: authorityRole
+      };
+      
+      // Save to localStorage
+      const resourceItems = JSON.parse(localStorage.getItem('resourceItems') || '[]');
+      resourceItems.push(newResourceItem);
+      localStorage.setItem('resourceItems', JSON.stringify(resourceItems));
+      
+      // Show success message
+      notify('Resource added successfully!', 'success');
+      
+      // Reset form
+      resourceForm.reset();
+      
+      // Reload resource items
+      loadResourceItemsForDashboard();
+    });
+  }
+  
+  // Handle gallery form submission
+  const galleryForm = document.getElementById('gallery-form');
+  if (galleryForm) {
+    galleryForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get form data
+      const title = document.getElementById('image-title').value;
+      const description = document.getElementById('image-description').value;
+      const category = document.getElementById('image-category').value;
+      
+      // Validate form
+      if (!title || !description || !category) {
+        notify('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // For demo, we'll use placeholder images
+      const placeholderImages = [
+        'https://images.unsplash.com/photo-1472396961693-142e6e269027',
+        'https://images.unsplash.com/photo-1466721591366-2d5fba72006d',
+        'https://images.unsplash.com/photo-1493962853295-0fd70327578a',
+        'https://images.unsplash.com/photo-1517022812141-23620dba5c23',
+        'https://images.unsplash.com/photo-1465379944081-7f47de8d74ac'
+      ];
+      
+      const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+      
+      // Create new gallery item
+      const newGalleryItem = {
+        id: Date.now(),
+        title: title,
+        description: description,
+        category: category,
+        imageUrl: randomImage,
+        createdAt: new Date().toISOString(),
+        createdBy: authorityRole
+      };
+      
+      // Save to localStorage
+      const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
+      galleryItems.push(newGalleryItem);
+      localStorage.setItem('galleryItems', JSON.stringify(galleryItems));
+      
+      // Show success message
+      notify('Gallery item added successfully!', 'success');
+      
+      // Reset form
+      galleryForm.reset();
+      
+      // Reload gallery items
+      loadGalleryItemsForDashboard();
+    });
+  }
+  
+  // Handle event form submission
+  const eventForm = document.getElementById('event-form');
+  if (eventForm) {
+    eventForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Get form data
+      const title = document.getElementById('event-title').value;
+      const date = document.getElementById('event-date').value;
+      const time = document.getElementById('event-time').value;
+      const location = document.getElementById('event-location').value;
+      const description = document.getElementById('event-description').value;
+      
+      // Validate form
+      if (!title || !date || !time || !location || !description) {
+        notify('Please fill in all required fields', 'error');
+        return;
+      }
+      
+      // Create new event item
+      const newEventItem = {
+        id: Date.now(),
+        title: title,
+        date: date,
+        time: time,
+        location: location,
+        description: description,
+        createdAt: new Date().toISOString(),
+        createdBy: authorityRole
+      };
+      
+      // Save to localStorage
+      const eventItems = JSON.parse(localStorage.getItem('eventItems') || '[]');
+      eventItems.push(newEventItem);
+      localStorage.setItem('eventItems', JSON.stringify(eventItems));
+      
+      // Show success message
+      notify('Event added successfully!', 'success');
+      
+      // Reset form
+      eventForm.reset();
+      
+      // Reload event items
+      loadEventItemsForDashboard();
+    });
+  }
+});
 
 // Function to load pending issues
 function loadPendingIssues() {
@@ -88,7 +330,6 @@ function loadPendingIssues() {
   
   const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
   
-  // Clear the container
   pendingIssuesList.innerHTML = '';
   
   if (pendingIssues.length === 0) {
@@ -100,254 +341,388 @@ function loadPendingIssues() {
     return;
   }
   
-  // Create cards for each pending issue
   pendingIssues.forEach(issue => {
     const issueCard = document.createElement('div');
     issueCard.className = 'issue-card';
+    
+    // Get the current authority role
+    const authorityRole = localStorage.getItem('authorityRole');
+    
+    // Create different actions based on role
+    let actionButtons = '';
+    
+    if (authorityRole === 'ward-member') {
+      actionButtons = `
+        <button class="btn btn-secondary issue-action" data-action="forward" data-id="${issue.id}">Forward</button>
+        <button class="btn btn-primary issue-action" data-action="validate" data-id="${issue.id}">Validate</button>
+      `;
+    } else if (authorityRole === 'sarpanch' || authorityRole === 'vice-sarpanch') {
+      actionButtons = `
+        <button class="btn btn-secondary issue-action" data-action="view-details" data-id="${issue.id}">View Details</button>
+        <button class="btn btn-accent issue-action" data-action="reject" data-id="${issue.id}">Reject</button>
+        <button class="btn btn-primary issue-action" data-action="resolve" data-id="${issue.id}">Resolve</button>
+      `;
+    }
+    
     issueCard.innerHTML = `
       <h3>${issue.title}</h3>
       <div class="issue-meta">
         <span>${issue.id}</span>
         <span>Reported: ${formatDate(issue.reportedAt)}</span>
       </div>
-      <span class="issue-category ${issue.category}">${getCategoryName(issue.category)}</span>
+      <span class="issue-category ${issue.category}">${issue.category}</span>
       <p class="issue-description">${issue.description}</p>
       <div class="issue-detail"><strong>Location:</strong> ${issue.location}</div>
       <div class="issue-detail"><strong>Reported By:</strong> ${issue.reportedBy}</div>
       <div class="issue-actions">
-        <button class="btn btn-secondary reject-issue" data-id="${issue.id}">Reject</button>
-        <button class="btn btn-primary approve-issue" data-id="${issue.id}">Approve</button>
+        ${actionButtons}
       </div>
     `;
     
     pendingIssuesList.appendChild(issueCard);
   });
   
-  // Add event listeners to buttons
-  pendingIssuesList.querySelectorAll('.approve-issue').forEach(button => {
-    button.addEventListener('click', function() {
-      const issueId = this.getAttribute('data-id');
-      approveIssue(issueId);
-    });
+  // Add event listeners to action buttons
+  const actionButtons = pendingIssuesList.querySelectorAll('.issue-action');
+  actionButtons.forEach(button => {
+    button.addEventListener('click', handleIssueAction);
   });
-  
-  pendingIssuesList.querySelectorAll('.reject-issue').forEach(button => {
-    button.addEventListener('click', function() {
-      const issueId = this.getAttribute('data-id');
-      rejectIssue(issueId);
-    });
-  });
-}
-
-// Function to approve an issue
-function approveIssue(issueId) {
-  const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
-  const inProgressIssues = JSON.parse(localStorage.getItem('inProgressIssues') || '[]');
-  
-  // Find the issue to approve
-  const issueIndex = pendingIssues.findIndex(issue => issue.id === issueId);
-  if (issueIndex === -1) return;
-  
-  const issue = pendingIssues[issueIndex];
-  
-  // Update issue status
-  issue.status = 'in-progress';
-  issue.timeline.push({
-    status: 'in-progress',
-    date: new Date().toISOString(),
-    message: 'Issue approved and moved to in-progress'
-  });
-  
-  // Remove from pending and add to in-progress
-  pendingIssues.splice(issueIndex, 1);
-  inProgressIssues.push(issue);
-  
-  // Update localStorage
-  localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
-  localStorage.setItem('inProgressIssues', JSON.stringify(inProgressIssues));
-  
-  // Update UI
-  loadPendingIssues();
-  loadInProgressIssues();
-  updateIssueCounts();
-  
-  // Show notification
-  alert('Issue approved and moved to in-progress');
-}
-
-// Function to reject an issue
-function rejectIssue(issueId) {
-  const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
-  const resolvedIssues = JSON.parse(localStorage.getItem('resolvedIssues') || '[]');
-  
-  // Find the issue to reject
-  const issueIndex = pendingIssues.findIndex(issue => issue.id === issueId);
-  if (issueIndex === -1) return;
-  
-  const issue = pendingIssues[issueIndex];
-  
-  // Update issue status
-  issue.status = 'rejected';
-  issue.timeline.push({
-    status: 'rejected',
-    date: new Date().toISOString(),
-    message: 'Issue rejected'
-  });
-  
-  // Remove from pending and add to resolved (as rejected)
-  pendingIssues.splice(issueIndex, 1);
-  resolvedIssues.push(issue);
-  
-  // Update localStorage
-  localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
-  localStorage.setItem('resolvedIssues', JSON.stringify(resolvedIssues));
-  
-  // Update UI
-  loadPendingIssues();
-  loadResolvedIssues();
-  updateIssueCounts();
-  
-  // Show notification
-  alert('Issue rejected');
 }
 
 // Function to load in-progress issues
 function loadInProgressIssues() {
-  const inProgressSection = document.getElementById('in-progress-issues');
-  if (!inProgressSection) return;
+  const inProgressIssuesList = document.getElementById('in-progress-issues-list');
+  if (!inProgressIssuesList) return;
   
-  // For this example, I'll just add a placeholder
-  inProgressSection.innerHTML = `
-    <div class="section-header">
-      <div class="section-icon">
-        <i class="fas fa-spinner"></i>
+  const allIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const inProgressIssues = allIssues.filter(issue => 
+    issue.status === 'forwarded' || 
+    issue.status === 'validated' || 
+    issue.status === 'in-progress'
+  );
+  
+  inProgressIssuesList.innerHTML = '';
+  
+  if (inProgressIssues.length === 0) {
+    inProgressIssuesList.innerHTML = `
+      <div class="empty-state">
+        <p>No in-progress issues at this time.</p>
       </div>
-      <div>
-        <h2>In Progress Issues</h2>
-        <p>Issues that are currently being addressed.</p>
-      </div>
-    </div>
+    `;
+    return;
+  }
+  
+  inProgressIssues.forEach(issue => {
+    const issueCard = document.createElement('div');
+    issueCard.className = 'issue-card';
     
-    <div class="issues-container" id="in-progress-issues-list">
-      <!-- In progress issues would be loaded here -->
-      <div class="issue-card">
-        <h3>Road Condition Issue</h3>
-        <div class="issue-meta">
-          <span>#ROA-20230615</span>
-          <span>Reported: 15 Jun 2023</span>
-        </div>
-        <span class="issue-category road">Road & Transportation</span>
-        <p class="issue-description">The main road in Ward 5 has several large potholes making it difficult for vehicles to pass.</p>
-        <div class="issue-detail"><strong>Location:</strong> Main Road, Ward 5</div>
-        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
-        <div class="issue-actions">
-          <button class="btn btn-secondary">View Details</button>
-          <button class="btn btn-primary">Mark Resolved</button>
-        </div>
+    // Get the current authority role
+    const authorityRole = localStorage.getItem('authorityRole');
+    
+    // Create different actions based on role
+    let actionButtons = '';
+    
+    if (authorityRole === 'ward-member') {
+      actionButtons = `
+        <button class="btn btn-secondary issue-action" data-action="view-details" data-id="${issue.id}">View Details</button>
+      `;
+    } else if (authorityRole === 'sarpanch' || authorityRole === 'vice-sarpanch') {
+      actionButtons = `
+        <button class="btn btn-secondary issue-action" data-action="view-details" data-id="${issue.id}">View Details</button>
+        <button class="btn btn-primary issue-action" data-action="resolve" data-id="${issue.id}">Mark Resolved</button>
+      `;
+    }
+    
+    issueCard.innerHTML = `
+      <h3>${issue.title}</h3>
+      <div class="issue-meta">
+        <span>${issue.id}</span>
+        <span>Reported: ${formatDate(issue.reportedAt)}</span>
       </div>
-    </div>
-  `;
+      <span class="issue-category ${issue.category}">${issue.category}</span>
+      <p class="issue-description">${issue.description}</p>
+      <div class="issue-detail"><strong>Location:</strong> ${issue.location}</div>
+      <div class="issue-detail"><strong>Reported By:</strong> ${issue.reportedBy}</div>
+      <div class="issue-detail"><strong>Status:</strong> ${issue.status.charAt(0).toUpperCase() + issue.status.slice(1)}</div>
+      <div class="issue-actions">
+        ${actionButtons}
+      </div>
+    `;
+    
+    inProgressIssuesList.appendChild(issueCard);
+  });
+  
+  // Add event listeners to action buttons
+  const actionButtons = inProgressIssuesList.querySelectorAll('.issue-action');
+  actionButtons.forEach(button => {
+    button.addEventListener('click', handleIssueAction);
+  });
 }
 
 // Function to load resolved issues
 function loadResolvedIssues() {
-  const resolvedSection = document.getElementById('resolved-issues');
-  if (!resolvedSection) return;
+  const resolvedIssuesList = document.getElementById('resolved-issues-list');
+  if (!resolvedIssuesList) return;
   
-  // For this example, I'll just add placeholders
-  resolvedSection.innerHTML = `
-    <div class="section-header">
-      <div class="section-icon">
-        <i class="fas fa-check-circle"></i>
+  const allIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const resolvedIssues = allIssues.filter(issue => issue.status === 'resolved');
+  
+  resolvedIssuesList.innerHTML = '';
+  
+  if (resolvedIssues.length === 0) {
+    resolvedIssuesList.innerHTML = `
+      <div class="empty-state">
+        <p>No resolved issues at this time.</p>
       </div>
-      <div>
-        <h2>Resolved Issues</h2>
-        <p>Issues that have been successfully addressed and completed.</p>
-      </div>
-    </div>
+    `;
+    return;
+  }
+  
+  resolvedIssues.forEach(issue => {
+    const issueCard = document.createElement('div');
+    issueCard.className = 'issue-card';
     
-    <div class="issues-container" id="resolved-issues-list">
-      <!-- Resolved issues would be loaded here -->
-      <div class="issue-card">
-        <h3>Street Light Repair</h3>
-        <div class="issue-meta">
-          <span>#ELE-20230605</span>
-          <span>Resolved: 12 Jun 2023</span>
-        </div>
-        <span class="issue-category electricity">Electricity</span>
-        <p class="issue-description">Street lights in Ward 3 not functioning for the past week.</p>
-        <div class="issue-detail"><strong>Location:</strong> Ward 3, Market Area</div>
-        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
-        <div class="issue-actions">
-          <button class="btn btn-secondary">View Details</button>
-        </div>
+    // Find the resolved timeline entry
+    const resolvedEntry = issue.timeline.find(entry => entry.status === 'resolved');
+    const resolvedDate = resolvedEntry ? formatDate(resolvedEntry.date) : 'Unknown';
+    
+    issueCard.innerHTML = `
+      <h3>${issue.title}</h3>
+      <div class="issue-meta">
+        <span>${issue.id}</span>
+        <span>Resolved: ${resolvedDate}</span>
       </div>
-      
-      <div class="issue-card">
-        <h3>Water Supply Disruption</h3>
-        <div class="issue-meta">
-          <span>#WAT-20230601</span>
-          <span>Resolved: 10 Jun 2023</span>
-        </div>
-        <span class="issue-category water">Water Supply</span>
-        <p class="issue-description">No water supply in Ward 2 for the last 3 days.</p>
-        <div class="issue-detail"><strong>Location:</strong> Ward 2, Residential Area</div>
-        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543211</div>
-        <div class="issue-actions">
-          <button class="btn btn-secondary">View Details</button>
-        </div>
+      <span class="issue-category ${issue.category}">${issue.category}</span>
+      <p class="issue-description">${issue.description}</p>
+      <div class="issue-detail"><strong>Location:</strong> ${issue.location}</div>
+      <div class="issue-detail"><strong>Reported By:</strong> ${issue.reportedBy}</div>
+      <div class="issue-actions">
+        <button class="btn btn-secondary issue-action" data-action="view-details" data-id="${issue.id}">View Details</button>
       </div>
-    </div>
-  `;
+    `;
+    
+    resolvedIssuesList.appendChild(issueCard);
+  });
+  
+  // Add event listeners to action buttons
+  const actionButtons = resolvedIssuesList.querySelectorAll('.issue-action');
+  actionButtons.forEach(button => {
+    button.addEventListener('click', handleIssueAction);
+  });
 }
 
-// Function to set up budget form submission
-function setupBudgetForm() {
-  const budgetForm = document.getElementById('budget-form');
-  if (!budgetForm) return;
+// Function to load rejected issues
+function loadRejectedIssues() {
+  const rejectedIssuesList = document.getElementById('rejected-issues-list');
+  if (!rejectedIssuesList) return;
   
-  budgetForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const allIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const rejectedIssues = allIssues.filter(issue => issue.status === 'rejected');
+  
+  rejectedIssuesList.innerHTML = '';
+  
+  if (rejectedIssues.length === 0) {
+    rejectedIssuesList.innerHTML = `
+      <div class="empty-state">
+        <p>No rejected issues at this time.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  rejectedIssues.forEach(issue => {
+    const issueCard = document.createElement('div');
+    issueCard.className = 'issue-card';
     
-    // Get form values
-    const title = document.getElementById('budget-title').value;
-    const category = document.getElementById('budget-category').value;
-    const allocation = Number(document.getElementById('budget-allocation').value);
-    const spent = Number(document.getElementById('budget-spent').value);
-    const description = document.getElementById('budget-description').value;
-    const projectsInput = document.getElementById('budget-projects').value;
+    // Find the rejected timeline entry
+    const rejectedEntry = issue.timeline.find(entry => entry.status === 'rejected');
+    const rejectedDate = rejectedEntry ? formatDate(rejectedEntry.date) : 'Unknown';
     
-    // Parse projects (comma separated)
-    const projects = projectsInput ? projectsInput.split(',').map(p => p.trim()) : [];
+    issueCard.innerHTML = `
+      <h3>${issue.title}</h3>
+      <div class="issue-meta">
+        <span>${issue.id}</span>
+        <span>Rejected: ${rejectedDate}</span>
+      </div>
+      <span class="issue-category ${issue.category}">${issue.category}</span>
+      <p class="issue-description">${issue.description}</p>
+      <div class="issue-detail"><strong>Location:</strong> ${issue.location}</div>
+      <div class="issue-detail"><strong>Reported By:</strong> ${issue.reportedBy}</div>
+      <div class="issue-actions">
+        <button class="btn btn-secondary issue-action" data-action="view-details" data-id="${issue.id}">View Details</button>
+      </div>
+    `;
     
-    // Create budget object
-    const newBudget = {
-      id: Date.now().toString(),
-      title,
-      category,
-      allocation,
-      spent,
-      description,
-      projects,
-      createdAt: new Date().toISOString()
-    };
-    
-    // Get existing budgets and add new one
-    const budgets = JSON.parse(localStorage.getItem('budgetItems') || '[]');
-    budgets.push(newBudget);
-    
-    // Save to localStorage
-    localStorage.setItem('budgetItems', JSON.stringify(budgets));
-    
-    // Update UI
-    loadBudgetItemsForDashboard();
-    
-    // Reset form
-    budgetForm.reset();
-    
-    // Show success message
-    alert('Budget item added successfully');
+    rejectedIssuesList.appendChild(issueCard);
   });
+  
+  // Add event listeners to action buttons
+  const actionButtons = rejectedIssuesList.querySelectorAll('.issue-action');
+  actionButtons.forEach(button => {
+    button.addEventListener('click', handleIssueAction);
+  });
+}
+
+// Function to handle issue actions
+function handleIssueAction(e) {
+  const action = e.target.dataset.action;
+  const issueId = e.target.dataset.id;
+  const authorityRole = localStorage.getItem('authorityRole');
+  
+  if (!action || !issueId) return;
+  
+  // Find the issue in storage
+  const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
+  
+  const issueIndex = userIssues.findIndex(issue => issue.id === issueId);
+  const pendingIndex = pendingIssues.findIndex(issue => issue.id === issueId);
+  
+  if (issueIndex === -1) {
+    notify('Issue not found!', 'error');
+    return;
+  }
+  
+  const issue = userIssues[issueIndex];
+  
+  switch (action) {
+    case 'forward':
+      if (authorityRole !== 'ward-member') {
+        notify('Only Ward Members can forward issues.', 'error');
+        return;
+      }
+      
+      // Update issue status
+      issue.status = 'forwarded';
+      
+      // Add to timeline
+      issue.timeline.push({
+        status: 'forwarded',
+        date: new Date().toISOString(),
+        message: `Issue forwarded by ${authorityRole} for further action.`
+      });
+      
+      // Remove from pending issues
+      if (pendingIndex !== -1) {
+        pendingIssues.splice(pendingIndex, 1);
+      }
+      
+      notify('Issue forwarded successfully!', 'success');
+      break;
+      
+    case 'validate':
+      if (authorityRole !== 'ward-member') {
+        notify('Only Ward Members can validate issues.', 'error');
+        return;
+      }
+      
+      // Update issue status
+      issue.status = 'validated';
+      
+      // Add to timeline
+      issue.timeline.push({
+        status: 'validated',
+        date: new Date().toISOString(),
+        message: `Issue validated by ${authorityRole}.`
+      });
+      
+      // Remove from pending issues
+      if (pendingIndex !== -1) {
+        pendingIssues.splice(pendingIndex, 1);
+      }
+      
+      notify('Issue validated successfully!', 'success');
+      break;
+      
+    case 'reject':
+      if (authorityRole !== 'sarpanch' && authorityRole !== 'vice-sarpanch') {
+        notify('Only Sarpanch or Vice Sarpanch can reject issues.', 'error');
+        return;
+      }
+      
+      // Update issue status
+      issue.status = 'rejected';
+      
+      // Add to timeline
+      issue.timeline.push({
+        status: 'rejected',
+        date: new Date().toISOString(),
+        message: `Issue rejected by ${authorityRole}.`
+      });
+      
+      // Remove from pending issues
+      if (pendingIndex !== -1) {
+        pendingIssues.splice(pendingIndex, 1);
+      }
+      
+      notify('Issue rejected successfully!', 'success');
+      break;
+      
+    case 'resolve':
+      if (authorityRole !== 'sarpanch' && authorityRole !== 'vice-sarpanch') {
+        notify('Only Sarpanch or Vice Sarpanch can resolve issues.', 'error');
+        return;
+      }
+      
+      // Update issue status
+      issue.status = 'resolved';
+      
+      // Add to timeline
+      issue.timeline.push({
+        status: 'resolved',
+        date: new Date().toISOString(),
+        message: `Issue resolved by ${authorityRole}.`
+      });
+      
+      // Remove from pending issues
+      if (pendingIndex !== -1) {
+        pendingIssues.splice(pendingIndex, 1);
+      }
+      
+      notify('Issue resolved successfully!', 'success');
+      break;
+      
+    case 'view-details':
+      // In a real app, this would navigate to a detail page
+      alert(`Issue Details:\n\nID: ${issue.id}\nTitle: ${issue.title}\nStatus: ${issue.status}\nCategory: ${issue.category}\nLocation: ${issue.location}\nDescription: ${issue.description}\nReported By: ${issue.reportedBy}\nReported At: ${formatDate(issue.reportedAt)}`);
+      return;
+  }
+  
+  // Update storage
+  userIssues[issueIndex] = issue;
+  localStorage.setItem('userIssues', JSON.stringify(userIssues));
+  localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
+  
+  // Reload issue lists
+  loadPendingIssues();
+  loadInProgressIssues();
+  loadResolvedIssues();
+  loadRejectedIssues();
+  
+  // Update counts
+  updateIssueCounts();
+}
+
+// Function to update issue counts
+function updateIssueCounts() {
+  const pendingCount = document.getElementById('pending-count');
+  const progressCount = document.getElementById('progress-count');
+  const resolvedCount = document.getElementById('resolved-count');
+  
+  const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
+  
+  const inProgressIssues = userIssues.filter(issue => 
+    issue.status === 'forwarded' || 
+    issue.status === 'validated' || 
+    issue.status === 'in-progress'
+  );
+  
+  const resolvedIssues = userIssues.filter(issue => issue.status === 'resolved');
+  
+  if (pendingCount) pendingCount.textContent = pendingIssues.length;
+  if (progressCount) progressCount.textContent = inProgressIssues.length;
+  if (resolvedCount) resolvedCount.textContent = resolvedIssues.length;
 }
 
 // Function to load budget items for dashboard
@@ -355,347 +730,264 @@ function loadBudgetItemsForDashboard() {
   const budgetItemsList = document.getElementById('budget-items-list');
   if (!budgetItemsList) return;
   
-  // Get budget items
   const budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
   
-  // Clear container
   budgetItemsList.innerHTML = '';
   
   if (budgetItems.length === 0) {
     budgetItemsList.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-        <p>No budget items available. Use the form to add some.</p>
+      <div class="empty-state">
+        <p>No budget items added yet.</p>
       </div>
     `;
     return;
   }
   
-  // Add each budget item
   budgetItems.forEach(item => {
     const progress = (item.spent / item.allocation) * 100;
     
-    const previewCard = document.createElement('div');
-    previewCard.className = 'preview-card';
-    previewCard.innerHTML = `
+    const budgetCard = document.createElement('div');
+    budgetCard.className = 'preview-card';
+    
+    budgetCard.innerHTML = `
       <div class="preview-actions">
         <button class="edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
         <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
       </div>
-      <h3>${item.title}</h3>
+      <h4>${item.title}</h4>
+      <p><strong>Category:</strong> ${item.category}</p>
       <div class="allocation-bar">
         <div class="allocation-progress" style="width: ${progress}%"></div>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
-        <span>₹${item.allocation.toLocaleString()}</span>
-        <span>${Math.round(progress)}% spent</span>
+      <div class="allocation-info">
+        <span>Budget: ₹${item.allocation.toLocaleString()}</span>
+        <span>Spent: ₹${item.spent.toLocaleString()} (${Math.round(progress)}%)</span>
       </div>
-      <p style="margin-top: 1rem;">${item.description}</p>
+      <p>${item.description}</p>
+      ${item.projects && item.projects.length > 0 ? `
+        <div class="projects-list">
+          <strong>Projects:</strong>
+          <ul>
+            ${item.projects.map(project => `<li>${project}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
     `;
     
-    budgetItemsList.appendChild(previewCard);
+    budgetItemsList.appendChild(budgetCard);
   });
   
-  // Add event listeners to delete buttons
-  budgetItemsList.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const itemId = this.getAttribute('data-id');
-      if (confirm('Are you sure you want to delete this budget item?')) {
-        deleteBudgetItem(itemId);
-      }
+  // Add event listeners to action buttons
+  const editButtons = budgetItemsList.querySelectorAll('.edit-btn');
+  const deleteButtons = budgetItemsList.querySelectorAll('.delete-btn');
+  
+  editButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const itemId = parseInt(button.dataset.id);
+      editBudgetItem(itemId);
     });
   });
+  
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const itemId = parseInt(button.dataset.id);
+      deleteBudgetItem(itemId);
+    });
+  });
+}
+
+// Function to edit budget item
+function editBudgetItem(itemId) {
+  const budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
+  const itemIndex = budgetItems.findIndex(item => item.id === itemId);
+  
+  if (itemIndex === -1) {
+    notify('Budget item not found!', 'error');
+    return;
+  }
+  
+  const item = budgetItems[itemIndex];
+  
+  // Populate form with item data
+  document.getElementById('budget-title').value = item.title;
+  document.getElementById('budget-category').value = item.category;
+  document.getElementById('budget-allocation').value = item.allocation;
+  document.getElementById('budget-spent').value = item.spent;
+  document.getElementById('budget-description').value = item.description;
+  document.getElementById('budget-projects').value = item.projects ? item.projects.join(', ') : '';
+  
+  // Change form submit button text
+  const submitButton = document.querySelector('#budget-form .btn-primary');
+  submitButton.textContent = 'Update Budget Item';
+  
+  // Add itemId to form for later use
+  document.getElementById('budget-form').dataset.editId = itemId;
+  
+  // Scroll to form
+  document.getElementById('budget-form').scrollIntoView();
+  
+  notify('Please update the budget item and submit the form.', 'info');
 }
 
 // Function to delete budget item
 function deleteBudgetItem(itemId) {
-  let budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
-  budgetItems = budgetItems.filter(item => item.id !== itemId);
-  localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+  if (!confirm('Are you sure you want to delete this budget item?')) return;
   
-  // Update UI
+  const budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
+  const updatedItems = budgetItems.filter(item => item.id !== itemId);
+  
+  localStorage.setItem('budgetItems', JSON.stringify(updatedItems));
+  
   loadBudgetItemsForDashboard();
-  
-  // Show success message
-  alert('Budget item deleted successfully');
+  notify('Budget item deleted successfully!', 'success');
 }
 
-// Function to set up gallery form submission
-function setupGalleryForm() {
-  const galleryForm = document.getElementById('gallery-form');
-  const fileInput = document.getElementById('gallery-file-input');
-  const filePreview = document.getElementById('gallery-file-preview');
+// Functions for History Items
+function loadHistoryItemsForDashboard() {
+  const historyItemsList = document.getElementById('history-items-list');
+  if (!historyItemsList) return;
   
-  if (!galleryForm || !fileInput || !filePreview) return;
+  const historyItems = JSON.parse(localStorage.getItem('historyItems') || '[]');
   
-  // Set up file upload preview
-  const fileUpload = document.querySelector('#gallery-management .file-upload');
-  if (fileUpload) {
-    fileUpload.addEventListener('click', () => {
-      fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length > 0) {
-        filePreview.innerHTML = '';
-        
-        const file = fileInput.files[0];
-        if (file.type.startsWith('image/')) {
-          const thumbnail = document.createElement('div');
-          thumbnail.className = 'file-thumbnail';
-          
-          const img = document.createElement('img');
-          img.src = URL.createObjectURL(file);
-          thumbnail.appendChild(img);
-          
-          filePreview.appendChild(thumbnail);
-        }
-      }
-    });
-  }
+  historyItemsList.innerHTML = '';
   
-  // Set up form submission
-  galleryForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Check if file is selected
-    if (fileInput.files.length === 0) {
-      alert('Please select an image to upload');
-      return;
-    }
-    
-    // Get form values
-    const title = document.getElementById('image-title').value;
-    const description = document.getElementById('image-description').value;
-    const category = document.getElementById('image-category').value;
-    const file = fileInput.files[0];
-    
-    // Create a placeholder URL (in a real app, you would upload the file to a server)
-    // Here we're just using a placeholder URL for demo purposes
-    const imageUrl = URL.createObjectURL(file);
-    
-    // Create gallery item object
-    const newGalleryItem = {
-      id: Date.now().toString(),
-      title,
-      description,
-      category,
-      image: imageUrl,  // In a real app, this would be the server URL
-      uploadedAt: new Date().toISOString()
-    };
-    
-    // Get existing gallery items and add new one
-    const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-    galleryItems.push(newGalleryItem);
-    
-    // Save to localStorage
-    localStorage.setItem('galleryItems', JSON.stringify(galleryItems));
-    
-    // Update UI
-    loadGalleryItemsForDashboard();
-    
-    // Reset form
-    galleryForm.reset();
-    filePreview.innerHTML = '';
-    
-    // Show success message
-    alert('Image added to gallery successfully');
-  });
-}
-
-// Function to load gallery items for dashboard
-function loadGalleryItemsForDashboard() {
-  const galleryPreviewList = document.getElementById('gallery-preview-list');
-  if (!galleryPreviewList) return;
-  
-  // Get gallery items
-  const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-  
-  // Clear container
-  galleryPreviewList.innerHTML = '';
-  
-  if (galleryItems.length === 0) {
-    galleryPreviewList.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-        <p>No gallery images available. Use the form to add some.</p>
+  if (historyItems.length === 0) {
+    historyItemsList.innerHTML = `
+      <div class="empty-state">
+        <p>No historical information added yet.</p>
       </div>
     `;
     return;
   }
   
-  // Add each gallery item
+  historyItems.forEach(item => {
+    const historyCard = document.createElement('div');
+    historyCard.className = 'preview-card';
+    
+    historyCard.innerHTML = `
+      <div class="preview-actions">
+        <button class="edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
+        <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+      </div>
+      <h4>${item.title}</h4>
+      <p><strong>Date:</strong> ${formatDate(item.date)}</p>
+      <p>${item.description}</p>
+    `;
+    
+    historyItemsList.appendChild(historyCard);
+  });
+}
+
+// Functions for Resource Items
+function loadResourceItemsForDashboard() {
+  const resourceItemsList = document.getElementById('resource-items-list');
+  if (!resourceItemsList) return;
+  
+  const resourceItems = JSON.parse(localStorage.getItem('resourceItems') || '[]');
+  
+  resourceItemsList.innerHTML = '';
+  
+  if (resourceItems.length === 0) {
+    resourceItemsList.innerHTML = `
+      <div class="empty-state">
+        <p>No resources added yet.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  resourceItems.forEach(item => {
+    const resourceCard = document.createElement('div');
+    resourceCard.className = 'preview-card';
+    
+    resourceCard.innerHTML = `
+      <div class="preview-actions">
+        <button class="edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
+        <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
+      </div>
+      <h4>${item.title}</h4>
+      <p><strong>Category:</strong> ${item.category}</p>
+      <p>${item.description}</p>
+      <div class="resource-meta">
+        <span>${item.fileType} · ${item.fileSize}</span>
+        <a href="${item.fileLink}" target="_blank" class="download-btn">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+    `;
+    
+    resourceItemsList.appendChild(resourceCard);
+  });
+}
+
+// Functions for Gallery Items
+function loadGalleryItemsForDashboard() {
+  const galleryPreviewList = document.getElementById('gallery-preview-list');
+  if (!galleryPreviewList) return;
+  
+  const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
+  
+  galleryPreviewList.innerHTML = '';
+  
+  if (galleryItems.length === 0) {
+    galleryPreviewList.innerHTML = `
+      <div class="empty-state">
+        <p>No gallery items added yet.</p>
+      </div>
+    `;
+    return;
+  }
+  
   galleryItems.forEach(item => {
-    const previewItem = document.createElement('div');
-    previewItem.className = 'gallery-preview-item';
-    previewItem.innerHTML = `
-      <img src="${item.image}" alt="${item.title}">
+    const galleryPreviewItem = document.createElement('div');
+    galleryPreviewItem.className = 'gallery-preview-item';
+    
+    galleryPreviewItem.innerHTML = `
+      <img src="${item.imageUrl}" alt="${item.title}">
       <div class="gallery-preview-actions">
         <button class="edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
         <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
       </div>
     `;
     
-    galleryPreviewList.appendChild(previewItem);
-  });
-  
-  // Add event listeners to delete buttons
-  galleryPreviewList.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const itemId = this.getAttribute('data-id');
-      if (confirm('Are you sure you want to delete this gallery image?')) {
-        deleteGalleryItem(itemId);
-      }
-    });
+    galleryPreviewList.appendChild(galleryPreviewItem);
   });
 }
 
-// Function to delete gallery item
-function deleteGalleryItem(itemId) {
-  let galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-  galleryItems = galleryItems.filter(item => item.id !== itemId);
-  localStorage.setItem('galleryItems', JSON.stringify(galleryItems));
-  
-  // Update UI
-  loadGalleryItemsForDashboard();
-  
-  // Show success message
-  alert('Gallery image deleted successfully');
-}
-
-// Function to set up event form submission
-function setupEventForm() {
-  const eventForm = document.getElementById('event-form');
-  if (!eventForm) return;
-  
-  eventForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Get form values
-    const title = document.getElementById('event-title').value;
-    const date = document.getElementById('event-date').value;
-    const time = document.getElementById('event-time').value;
-    const location = document.getElementById('event-location').value;
-    const description = document.getElementById('event-description').value;
-    
-    // Create event object
-    const newEvent = {
-      id: Date.now().toString(),
-      title,
-      date,
-      time,
-      location,
-      description,
-      createdAt: new Date().toISOString()
-    };
-    
-    // Get existing events and add new one
-    const events = JSON.parse(localStorage.getItem('eventItems') || '[]');
-    events.push(newEvent);
-    
-    // Save to localStorage
-    localStorage.setItem('eventItems', JSON.stringify(events));
-    
-    // Update UI
-    loadEventsForDashboard();
-    
-    // Reset form
-    eventForm.reset();
-    
-    // Show success message
-    alert('Event added successfully');
-  });
-}
-
-// Function to load events for dashboard
-function loadEventsForDashboard() {
+// Functions for Event Items
+function loadEventItemsForDashboard() {
   const eventsPreviewList = document.getElementById('events-preview-list');
   if (!eventsPreviewList) return;
   
-  // Get events
-  const events = JSON.parse(localStorage.getItem('eventItems') || '[]');
+  const eventItems = JSON.parse(localStorage.getItem('eventItems') || '[]');
   
-  // Clear container
   eventsPreviewList.innerHTML = '';
   
-  if (events.length === 0) {
+  if (eventItems.length === 0) {
     eventsPreviewList.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-        <p>No events available. Use the form to add some.</p>
+      <div class="empty-state">
+        <p>No events added yet.</p>
       </div>
     `;
     return;
   }
   
-  // Sort events by date (upcoming first)
-  events.sort((a, b) => new Date(a.date) - new Date(b.date));
-  
-  // Add each event
-  events.forEach(event => {
-    // Format date
-    const eventDate = new Date(event.date);
-    const formattedDate = eventDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+  eventItems.forEach(item => {
+    const eventCard = document.createElement('div');
+    eventCard.className = 'preview-card';
     
-    const previewCard = document.createElement('div');
-    previewCard.className = 'preview-card';
-    previewCard.innerHTML = `
+    eventCard.innerHTML = `
       <div class="preview-actions">
-        <button class="edit-btn" data-id="${event.id}"><i class="fas fa-edit"></i></button>
-        <button class="delete-btn" data-id="${event.id}"><i class="fas fa-trash"></i></button>
+        <button class="edit-btn" data-id="${item.id}"><i class="fas fa-edit"></i></button>
+        <button class="delete-btn" data-id="${item.id}"><i class="fas fa-trash"></i></button>
       </div>
-      <h3>${event.title}</h3>
-      <div style="margin: 0.75rem 0; color: var(--gray-600);">
-        <div><i class="fas fa-calendar-alt"></i> ${formattedDate}</div>
-        <div><i class="fas fa-clock"></i> ${event.time}</div>
-        <div><i class="fas fa-map-marker-alt"></i> ${event.location}</div>
-      </div>
-      <p>${event.description}</p>
+      <h4>${item.title}</h4>
+      <p><strong>Date:</strong> ${formatDate(item.date)}</p>
+      <p><strong>Time:</strong> ${item.time}</p>
+      <p><strong>Location:</strong> ${item.location}</p>
+      <p>${item.description}</p>
     `;
     
-    eventsPreviewList.appendChild(previewCard);
+    eventsPreviewList.appendChild(eventCard);
   });
-  
-  // Add event listeners to delete buttons
-  eventsPreviewList.querySelectorAll('.delete-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const eventId = this.getAttribute('data-id');
-      if (confirm('Are you sure you want to delete this event?')) {
-        deleteEvent(eventId);
-      }
-    });
-  });
-}
-
-// Function to delete event
-function deleteEvent(eventId) {
-  let events = JSON.parse(localStorage.getItem('eventItems') || '[]');
-  events = events.filter(event => event.id !== eventId);
-  localStorage.setItem('eventItems', JSON.stringify(events));
-  
-  // Update UI
-  loadEventsForDashboard();
-  
-  // Show success message
-  alert('Event deleted successfully');
-}
-
-// Helper function to format date
-function formatDate(dateString) {
-  const options = { day: 'numeric', month: 'short', year: 'numeric' };
-  return new Date(dateString).toLocaleDateString(undefined, options);
-}
-
-// Helper function to get category display name
-function getCategoryName(categoryId) {
-  const categories = {
-    'road': 'Road & Transportation',
-    'water': 'Water Supply',
-    'electricity': 'Electricity',
-    'sanitation': 'Sanitation & Waste',
-    'health': 'Health Services',
-    'education': 'Education',
-    'agriculture': 'Agriculture',
-    'public-safety': 'Public Safety',
-    'other': 'Other'
-  };
-  
-  return categories[categoryId] || categoryId;
 }

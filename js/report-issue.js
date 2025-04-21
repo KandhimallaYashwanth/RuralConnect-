@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Create new issue object
+      // Create new issue object with tracking workflow
       const newIssue = {
         id: `#${category.substring(0, 3).toUpperCase()}-${Date.now()}`,
         title: title,
@@ -113,10 +113,193 @@ document.addEventListener('DOMContentLoaded', () => {
         filePreview.innerHTML = '';
       }
 
-      // Redirect to homepage after a delay
+      // Redirect to issue tracking page after a delay
       setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = 'issue-tracking.html';
       }, 2000);
     });
   }
+  
+  // Load user issues if on issue tracking page
+  if (document.getElementById('issue-tracking-container')) {
+    loadUserIssues();
+  }
 });
+
+// Function to load user issues
+function loadUserIssues() {
+  const issueTrackingContainer = document.getElementById('issue-tracking-container');
+  if (!issueTrackingContainer) return;
+  
+  const userPhone = localStorage.getItem('userPhone');
+  if (!userPhone) {
+    issueTrackingContainer.innerHTML = '<div class="empty-state">Please log in to view your reported issues.</div>';
+    return;
+  }
+  
+  const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
+  const userSpecificIssues = userIssues.filter(issue => issue.reportedBy === userPhone);
+  
+  if (userSpecificIssues.length === 0) {
+    issueTrackingContainer.innerHTML = '<div class="empty-state">You have not reported any issues yet.</div>';
+    return;
+  }
+  
+  // Display the latest issue (or the one specified by URL parameter)
+  const urlParams = new URLSearchParams(window.location.search);
+  const issueId = urlParams.get('id');
+  
+  let issueToDisplay = null;
+  
+  if (issueId) {
+    issueToDisplay = userSpecificIssues.find(issue => issue.id === issueId);
+  }
+  
+  if (!issueToDisplay) {
+    // If no specific issue requested or not found, show the latest one
+    issueToDisplay = userSpecificIssues[userSpecificIssues.length - 1];
+  }
+  
+  displayIssueDetails(issueToDisplay, issueTrackingContainer);
+}
+
+// Function to display issue details with timeline
+function displayIssueDetails(issue, container) {
+  if (!issue || !container) return;
+  
+  container.innerHTML = '';
+  
+  // Create header section
+  const issueHeader = createElement('div', 'issue-header');
+  issueHeader.innerHTML = `
+    <h2>${issue.title}</h2>
+    <div class="issue-meta-info">
+      <div class="issue-meta-item">
+        <span class="issue-meta-label">Issue ID</span>
+        <span class="issue-meta-value">${issue.id}</span>
+      </div>
+      <div class="issue-meta-item">
+        <span class="issue-meta-label">Category</span>
+        <span class="issue-meta-value">${issue.category}</span>
+      </div>
+      <div class="issue-meta-item">
+        <span class="issue-meta-label">Location</span>
+        <span class="issue-meta-value">${issue.location}</span>
+      </div>
+      <div class="issue-meta-item">
+        <span class="issue-meta-label">Reported On</span>
+        <span class="issue-meta-value">${formatDate(issue.reportedAt)}</span>
+      </div>
+      <div class="issue-meta-item">
+        <span class="issue-meta-label">Status</span>
+        <span class="issue-status-badge ${issue.status}">${issue.status.charAt(0).toUpperCase() + issue.status.slice(1)}</span>
+      </div>
+    </div>
+  `;
+  
+  // Create description box
+  const descriptionBox = createElement('div', 'issue-description-box');
+  descriptionBox.textContent = issue.description;
+  
+  // Create timeline section
+  const timelineContainer = createElement('div', 'issue-timeline');
+  const timelineHeader = createElement('h3', '', 'Issue Timeline');
+  timelineContainer.appendChild(timelineHeader);
+  
+  // Get all possible statuses in the workflow
+  const allStatuses = ['reported', 'forwarded', 'validated', 'in-progress', 'resolved', 'rejected'];
+  
+  // Get the current status index
+  const currentStatusIndex = allStatuses.indexOf(issue.status);
+  
+  // Create timeline items for each status
+  allStatuses.forEach((status, index) => {
+    const isCompleted = index < currentStatusIndex;
+    const isActive = index === currentStatusIndex;
+    const isPending = index > currentStatusIndex;
+    
+    let statusClass = isCompleted ? 'completed' : (isActive ? 'active' : 'pending');
+    
+    // Find the timeline entry for this status
+    const timelineEntry = issue.timeline.find(entry => entry.status === status);
+    
+    // Skip rejected status if current status is not rejected
+    if (status === 'rejected' && issue.status !== 'rejected') return;
+    
+    // Skip resolved status if current status is rejected
+    if (status === 'resolved' && issue.status === 'rejected') return;
+    
+    const timelineItem = createElement('div', `timeline-item ${statusClass}`);
+    
+    // Create timeline icon
+    const iconClass = getIconClassForStatus(status);
+    const timelineIcon = createElement('div', 'timeline-icon');
+    timelineIcon.innerHTML = `<i class="${iconClass}"></i>`;
+    
+    // Create timeline content
+    const timelineContent = createElement('div', 'timeline-content');
+    
+    // Create timeline header
+    const timelineHeader = createElement('div', 'timeline-header');
+    const timelineTitle = createElement('div', 'timeline-title');
+    timelineTitle.textContent = getStatusTitle(status);
+    
+    timelineHeader.appendChild(timelineTitle);
+    
+    // Add date if status is completed or active
+    if (timelineEntry) {
+      const timelineDate = createElement('div', 'timeline-date');
+      timelineDate.textContent = formatDate(timelineEntry.date);
+      timelineHeader.appendChild(timelineDate);
+    }
+    
+    timelineContent.appendChild(timelineHeader);
+    
+    // Add message if exists
+    if (timelineEntry && timelineEntry.message) {
+      const timelineMessage = createElement('div', 'timeline-message');
+      timelineMessage.textContent = timelineEntry.message;
+      timelineContent.appendChild(timelineMessage);
+    } else if (isPending) {
+      const timelineMessage = createElement('div', 'timeline-message');
+      timelineMessage.textContent = 'Pending';
+      timelineContent.appendChild(timelineMessage);
+    }
+    
+    // Assemble timeline item
+    timelineItem.appendChild(timelineIcon);
+    timelineItem.appendChild(timelineContent);
+    timelineContainer.appendChild(timelineItem);
+  });
+  
+  // Assemble issue tracking content
+  container.appendChild(issueHeader);
+  container.appendChild(descriptionBox);
+  container.appendChild(timelineContainer);
+}
+
+// Helper function to get icon class for status
+function getIconClassForStatus(status) {
+  switch (status) {
+    case 'reported': return 'fas fa-flag';
+    case 'forwarded': return 'fas fa-share';
+    case 'validated': return 'fas fa-check-circle';
+    case 'in-progress': return 'fas fa-tools';
+    case 'resolved': return 'fas fa-check-double';
+    case 'rejected': return 'fas fa-times-circle';
+    default: return 'fas fa-circle';
+  }
+}
+
+// Helper function to get title for status
+function getStatusTitle(status) {
+  switch (status) {
+    case 'reported': return 'Issue Reported';
+    case 'forwarded': return 'Forwarded to Authority';
+    case 'validated': return 'Issue Validated';
+    case 'in-progress': return 'Work In Progress';
+    case 'resolved': return 'Issue Resolved';
+    case 'rejected': return 'Issue Rejected';
+    default: return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+}
