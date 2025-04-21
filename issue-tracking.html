@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authority Login - RuralConnect</title>
+    <title>Issue Tracking - RuralConnect</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -37,33 +37,16 @@
     </nav>
 
     <main>
-        <div class="authority-login-container">
-            <form id="authority-login-form" class="authority-login-form">
-                <h2>Authority Login</h2>
-                <div class="form-group">
-                    <label for="role">Select Role</label>
-                    <select id="role" name="role" required>
-                        <option value="">-- Select a Role --</option>
-                        <option value="sarpanch">Sarpanch</option>
-                        <option value="vice-sarpanch">Vice Sarpanch</option>
-                        <option value="ward-member">Ward Member</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" class="btn-primary">Login</button>
+        <section class="issue-tracking-section">
+            <div class="container">
+                <h1>Track Your Reported Issue</h1>
+                <p>View the status and progress of your reported issue below.</p>
                 
-                <div class="register-link">
-                    <p>Public User? <a href="login.html">Login Here</a></p>
+                <div id="issue-tracking-container" class="issue-tracking-container">
+                    <!-- Issue tracking details will be loaded dynamically -->
                 </div>
-            </form>
-        </div>
+            </div>
+        </section>
     </main>
 
     <footer class="footer">
@@ -109,6 +92,6 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <script src="js/login.js"></script>
+    <script src="js/report-issue.js"></script>
 </body>
 </html>
