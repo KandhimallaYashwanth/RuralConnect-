@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Predefined credentials for demo
       const credentials = {
         'sarpanch': { email: 'sarpanch@gmail.com', password: 'sarpanch' },
-        'vice-sarpanch': { email: 'vicesarpanch@gmail.com', password: 'vicesarpanch' },
+        'wise-sarpanch': { email: 'wisesarpanch@gmail.com', password: 'wisesarpanch' },
         'ward-member': { email: 'wardmember@gmail.com', password: 'wardmember' }
       };
       
