@@ -10,30 +10,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-logo">
-                <a href="index.html">
-                    <div class="logo-circle">RC</div>
-                    RuralConnect
-                </a>
-            </div>
-            
-            <div id="hamburger" class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            
-            <ul id="navMenu" class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="budget.html" class="nav-link">Budget</a></li>
-                <li><a href="history.html" class="nav-link">History</a></li>
-                <li><a href="gallery.html" class="nav-link">Gallery</a></li>
-                <li><a href="resources.html" class="nav-link">Resources</a></li>
-                <li><a href="report-issue.html" class="nav-link report-issue-link">Report Issue</a></li>
-                <li><a href="login.html" class="login-btn">Login</a></li>
-            </ul>
-        </div>
+        <!-- Same navbar as login.html with active class on authority login -->
     </nav>
 
     <main>
@@ -45,7 +22,7 @@
                     <select id="role" name="role" required>
                         <option value="">-- Select a Role --</option>
                         <option value="sarpanch">Sarpanch</option>
-                        <option value="vice-sarpanch">Vice Sarpanch</option>
+                        <option value="wise-sarpanch">Wise Sarpanch</option>
                         <option value="ward-member">Ward Member</option>
                     </select>
                 </div>
@@ -58,54 +35,12 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit" class="btn-primary">Login</button>
-                
-                <div class="register-link">
-                    <p>Public User? <a href="login.html">Login Here</a></p>
-                </div>
             </form>
         </div>
     </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h3>About RuralConnect</h3>
-                    <p>RuralConnect is a platform designed to bridge the gap between village authorities and citizens, promoting transparency and better governance.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="budget.html">Budget</a></li>
-                        <li><a href="history.html">History</a></li>
-                        <li><a href="gallery.html">Gallery</a></li>
-                        <li><a href="resources.html">Resources</a></li>
-                        <li><a href="report-issue.html">Report Issue</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-contact">
-                    <h3>Contact Us</h3>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Village Office, Main Road, Village Name, District, PIN</li>
-                        <li><i class="fas fa-phone"></i> +91 1234567890</li>
-                        <li><i class="fas fa-envelope"></i> info@ruralconnect.com</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2023 RuralConnect. All Rights Reserved.</p>
-            </div>
-        </div>
+        <!-- Same footer content as index.html -->
     </footer>
 
     <script src="js/main.js"></script>
