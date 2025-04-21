@@ -1,69 +1,79 @@
-# Welcome to your Lovable project
 
-## Project info
+# RuralConnect - Village Administration Platform
 
-**URL**: https://lovable.dev/projects/ab1d9712-ddd1-4518-b47a-b55374818eae
+A comprehensive platform designed to bridge the gap between rural communities and authorities, empowering villages with digital tools for better governance and communication.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Issue Reporting**: Users can report local issues with images and track their resolution status
+- **Community Events**: Calendar of upcoming village events and gatherings
+- **Budget Transparency**: View allocation and utilization of public funds
+- **Resources Repository**: Access government scheme information and documents
+- **Village History**: Explore cultural heritage and historical information
+- **Gallery**: View images showcasing rural life, traditions, and landscapes
 
-**Use Lovable**
+## Technical Details
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ab1d9712-ddd1-4518-b47a-b55374818eae) and start prompting.
+This project is built using:
+- HTML5
+- CSS3
+- Vanilla JavaScript (No frameworks)
 
-Changes made via Lovable will be committed automatically to this repo.
+## Project Structure
 
-**Use your preferred IDE**
+- `index.html`: Home page
+- `login.html`: Public user login
+- `authority-login.html`: Authority login (Sarpanch, Ward Member, etc.)
+- `report-issue.html`: Issue reporting form
+- `events.html`: Community events calendar
+- `budget.html`: Budget transparency information
+- `history.html`: Village history and heritage
+- `resources.html`: Resources and documents repository
+- `gallery.html`: Image gallery of rural life
+- `authority-dashboard.html`: Dashboard for village authorities
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Local Storage Data Structure
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+The project uses browser localStorage for data persistence:
 
-Follow these steps:
+- `isLoggedIn`: Boolean indicating if a user is logged in
+- `userType`: Type of logged in user ('public' or 'authority')
+- `authorityRole`: Role of authority user ('sarpanch', 'wise-sarpanch', or 'ward-member')
+- `userIssues`: Array of issues reported by the current user
+- `pendingIssues`: Issues waiting for authority approval
+- `inProgressIssues`: Issues currently being addressed
+- `resolvedIssues`: Issues that have been resolved
+- `budgetItems`: Budget allocations and expenditures
+- `eventItems`: Upcoming and past events
+- `galleryItems`: Gallery images with metadata
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## User Flows
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+**Public User Flow**:
+1. View public information (events, budget, etc.)
+2. Login to report issues
+3. Submit and track reported issues
 
-# Step 3: Install the necessary dependencies.
-npm i
+**Authority User Flow**:
+1. Login with role-specific credentials
+2. Manage reported issues according to hierarchy (Ward Member → Wise Sarpanch → Sarpanch)
+3. Update content (budget, events, resources, gallery)
+4. Manage profile settings
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## Setup and Installation
 
-**Edit a file directly in GitHub**
+1. Clone the repository
+2. Open index.html in a web browser
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+No build process or server is required as this is a client-side only application.
 
-**Use GitHub Codespaces**
+## Demo Accounts
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Public User**:
+- Phone: Any phone number
+- Password: any password (for demo purposes)
 
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/ab1d9712-ddd1-4518-b47a-b55374818eae) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+**Authority**:
+- Sarpanch: Email: sarpanch@gmail.com, Password: sarpanch
+- Wise Sarpanch: Email: wisesarpanch@gmail.com, Password: wisesarpanch
+- Ward Member: Email: wardmember@gmail.com, Password: wardmember

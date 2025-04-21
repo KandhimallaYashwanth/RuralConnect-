@@ -1,0 +1,45 @@
+
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky -->
+  <rect width="400" height="150" fill="#7EC8E3" />
+  
+  <!-- Sun -->
+  <circle cx="350" cy="50" r="30" fill="#F0C05A" />
+  
+  <!-- Mountains -->
+  <polygon points="0,150 100,80 200,150" fill="#60A5FA" />
+  <polygon points="150,150 250,60 350,150" fill="#4D724D" />
+  <polygon points="300,150 350,100 400,150" fill="#60A5FA" />
+  
+  <!-- Fields -->
+  <rect x="0" y="150" width="400" height="50" fill="#A1E3AF" />
+  
+  <!-- Houses -->
+  <rect x="50" y="130" width="40" height="30" fill="#CD5D45" />
+  <polygon points="50,130 70,110 90,130" fill="#8B4513" />
+  <rect x="60" y="145" width="10" height="15" fill="#8B4513" />
+  
+  <rect x="150" y="135" width="30" height="25" fill="#CD5D45" />
+  <polygon points="150,135 165,115 180,135" fill="#8B4513" />
+  
+  <rect x="250" y="125" width="50" height="35" fill="#CD5D45" />
+  <polygon points="250,125 275,100 300,125" fill="#8B4513" />
+  <rect x="265" y="140" width="12" height="20" fill="#8B4513" />
+  
+  <!-- Trees -->
+  <rect x="120" y="130" width="8" height="30" fill="#8B4513" />
+  <circle cx="124" cy="120" r="15" fill="#4D724D" />
+  
+  <rect x="320" y="120" width="10" height="40" fill="#8B4513" />
+  <circle cx="325" cy="110" r="20" fill="#4D724D" />
+  
+  <!-- Farmland -->
+  <rect x="0" y="200" width="400" height="100" fill="#CD9E7C" />
+  
+  <!-- Crop rows -->
+  <rect x="20" y="210" width="360" height="5" fill="#4D724D" />
+  <rect x="20" y="230" width="360" height="5" fill="#4D724D" />
+  <rect x="20" y="250" width="360" height="5" fill="#4D724D" />
+  <rect x="20" y="270" width="360" height="5" fill="#4D724D" />
+  <rect x="20" y="290" width="360" height="5" fill="#4D724D" />
+</svg>

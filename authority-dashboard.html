@@ -1,1367 +1,377 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Authority Dashboard - RuralConnect</title>
-    <meta name="description" content="Authority dashboard for RuralConnect platform." />
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .dashboard-navigation {
-            background-color: var(--gray-100);
-            border-radius: var(--border-radius);
-            margin-bottom: 2rem;
-        }
-        
-        .dashboard-tabs {
-            display: flex;
-            overflow-x: auto;
-            padding: 0;
-            margin: 0;
-            list-style-type: none;
-        }
-        
-        .dashboard-tabs li {
-            padding: 0;
-        }
-        
-        .dashboard-tabs button {
-            padding: 1rem 1.5rem;
-            background: none;
-            border: none;
-            font-weight: 600;
-            color: var(--gray-600);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-        
-        .dashboard-tabs button:hover {
-            color: var(--terracotta);
-        }
-        
-        .dashboard-tabs button.active {
-            color: var(--terracotta);
-            border-bottom: 3px solid var(--terracotta);
-        }
-        
-        .dashboard-section {
-            display: none;
-        }
-        
-        .dashboard-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        .issues-status-tabs {
-            display: flex;
-            margin-bottom: 1.5rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
-        
-        .issue-status-tab {
-            padding: 0.5rem 1.5rem;
-            margin-right: 0.5rem;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .issue-status-tab.active {
-            background-color: var(--terracotta);
-            color: white;
-        }
-        
-        .content-category-tabs {
-            display: flex;
-            margin-bottom: 1.5rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
-        
-        .content-category-tab {
-            padding: 0.5rem 1.5rem;
-            margin-right: 0.5rem;
-            border-radius: var(--border-radius);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .content-category-tab.active {
-            background-color: var(--terracotta);
-            color: white;
-        }
-        
-        .content-section {
-            display: none;
-        }
-        
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .profile-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: var(--box-shadow);
-        }
-        
-        .profile-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2rem;
-        }
-        
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: var(--terracotta);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.5rem;
-            color: white;
-            margin-right: 1.5rem;
-        }
-        
-        .profile-title h2 {
-            margin: 0 0 0.5rem;
-        }
-        
-        .profile-info {
-            margin-bottom: 2rem;
-        }
-        
-        .info-group {
-            margin-bottom: 1rem;
-        }
-        
-        .info-label {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-value {
-            font-weight: 600;
-        }
-        
-        .gallery-upload-area {
-            border: 2px dashed var(--gray-300);
-            border-radius: var(--border-radius);
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .gallery-upload-area:hover {
-            border-color: var(--terracotta);
-            background-color: rgba(205, 93, 69, 0.05);
-        }
-        
-        .gallery-upload-icon {
-            font-size: 2rem;
-            color: var(--terracotta);
-            margin-bottom: 1rem;
-        }
-        
-        .gallery-preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-        
-        .gallery-preview-item {
-            position: relative;
-            height: 150px;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-        
-        .gallery-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .gallery-preview-remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-    </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-logo">
-                <a href="index.html">
-                    <div class="logo-circle">RC</div>
-                    <span>RuralConnect</span>
-                </a>
-            </div>
-            <div class="nav-menu" id="navMenu">
-                <a href="authority-dashboard.html" class="nav-link active"><i class="fas fa-home"></i> Dashboard</a>
-                <button id="logout-btn" class="btn btn-outline-accent">Logout</button>
-            </div>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <div class="logo-container">
+            <div class="logo-circle">RC</div>
+            <span>RuralConnect</span>
         </div>
-    </nav>
+        <h1 class="dashboard-title">Authorities Dashboard</h1>
+        <div class="auth-info">
+            <span id="authority-role">Sarpanch</span>
+            <button id="logout-btn" class="btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </header>
 
-    <main>
-        <section class="container py-5">
-            <div class="section-header">
-                <h1>Authority Dashboard</h1>
-                <p>Manage village affairs, handle reported issues, and update content for public users.</p>
-                <div id="authority-info" class="mt-4 p-4 bg-gray-100 rounded-lg">
-                    <h3>Welcome, <span id="role-display">Authority</span>!</h3>
-                    <p>You can manage all aspects of the village's digital presence from this dashboard.</p>
-                </div>
-            </div>
-
-            <!-- Dashboard Navigation -->
-            <div class="dashboard-navigation">
-                <ul class="dashboard-tabs">
-                    <li><button class="dashboard-tab active" data-tab="issues-section"><i class="fas fa-exclamation-circle"></i> Issue Management</button></li>
-                    <li><button class="dashboard-tab" data-tab="content-section"><i class="fas fa-folder-open"></i> Content Management</button></li>
-                    <li><button class="dashboard-tab" data-tab="profile-section"><i class="fas fa-user"></i> Profile</button></li>
+    <div class="dashboard-container">
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-section">
+                <h3>ISSUE MANAGEMENT</h3>
+                <ul class="sidebar-menu">
+                    <li class="active" data-section="pending-issues">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Pending Issues</span>
+                        <span class="item-count" id="pending-count">0</span>
+                    </li>
+                    <li data-section="in-progress-issues">
+                        <i class="fas fa-spinner"></i>
+                        <span>In Progress</span>
+                        <span class="item-count" id="progress-count">1</span>
+                    </li>
+                    <li data-section="resolved-issues">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Resolved</span>
+                        <span class="item-count" id="resolved-count">4</span>
+                    </li>
                 </ul>
             </div>
-
-            <!-- Issue Management Section -->
-            <section id="issues-section" class="dashboard-section active">
-                <div class="section-header">
-                    <h2><i class="fas fa-exclamation-circle"></i> Issues Management</h2>
-                    <p>Review and manage issues reported by public users.</p>
-                </div>
-                
-                <div class="issues-status-tabs">
-                    <div class="issue-status-tab active" data-status="pending">Pending Issues</div>
-                    <div class="issue-status-tab" data-status="in-progress">In Progress Issues</div>
-                    <div class="issue-status-tab" data-status="resolved">Resolved Issues</div>
-                </div>
-                
-                <div class="issue-list">
-                    <!-- Pending Issues -->
-                    <div class="issue-status-content active" id="pending-issues">
-                        <div class="issue-card" data-status="pending">
-                            <div class="issue-header">
-                                <div>
-                                    <h3>Water Supply Problem</h3>
-                                    <p>Reference ID: #WSP-2023-06-18 • Ward 2</p>
-                                    <p><strong>Category:</strong> Water • <strong>Reported by:</strong> Rahul Sharma</p>
-                                </div>
-                                <div class="issue-status reported">Pending Review</div>
-                            </div>
-                            <p class="issue-description">
-                                Insufficient water pressure in the main supply line. No water reaching the elevated areas of the locality.
-                            </p>
-                            <div class="issue-actions">
-                                <button class="btn btn-secondary view-details-btn">View Details</button>
-                                <div class="action-buttons">
-                                    <button class="btn btn-accent approve-btn"><i class="fas fa-check"></i> Approve</button>
-                                    <button class="btn btn-outline-accent reject-btn"><i class="fas fa-times"></i> Reject</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- In Progress Issues -->
-                    <div class="issue-status-content" id="in-progress-issues" style="display: none;">
-                        <div class="issue-card" data-status="in-progress">
-                            <div class="issue-header">
-                                <div>
-                                    <h3>Road Condition Issue</h3>
-                                    <p>Reference ID: #RCI-2023-06-15 • Ward 5</p>
-                                    <p><strong>Category:</strong> Infrastructure • <strong>Reported by:</strong> Priya Patel</p>
-                                </div>
-                                <div class="issue-status in-progress">In Progress</div>
-                            </div>
-                            <p class="issue-description">
-                                The road in Ward 5 near the community hall has several potholes making transportation difficult.
-                            </p>
-                            <div class="issue-actions">
-                                <button class="btn btn-secondary view-details-btn">View Details</button>
-                                <div class="action-buttons">
-                                    <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Resolved Issues -->
-                    <div class="issue-status-content" id="resolved-issues" style="display: none;">
-                        <div class="issue-card" data-status="resolved">
-                            <div class="issue-header">
-                                <div>
-                                    <h3>Streetlight Malfunction</h3>
-                                    <p>Reference ID: #SLM-2023-06-10 • Ward 3</p>
-                                    <p><strong>Category:</strong> Electricity • <strong>Reported by:</strong> Amit Kumar</p>
-                                </div>
-                                <div class="issue-status resolved">Resolved</div>
-                            </div>
-                            <p class="issue-description">
-                                Three streetlights near the market area are not working, causing safety concerns at night.
-                            </p>
-                            <div class="issue-actions">
-                                <button class="btn btn-secondary view-details-btn">View Details</button>
-                                <div class="action-buttons">
-                                    <button class="btn btn-outline-accent reopen-btn"><i class="fas fa-redo"></i> Reopen</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Content Management Section -->
-            <section id="content-section" class="dashboard-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-folder-open"></i> Content Management</h2>
-                    <p>Manage content that will be visible to public users.</p>
-                </div>
-                
-                <div class="content-category-tabs">
-                    <div class="content-category-tab active" data-category="budget">Budget Details</div>
-                    <div class="content-category-tab" data-category="history">History</div>
-                    <div class="content-category-tab" data-category="events">Events</div>
-                    <div class="content-category-tab" data-category="resources">Resources</div>
-                    <div class="content-category-tab" data-category="gallery">Gallery</div>
-                </div>
-                
-                <!-- Budget Content Section -->
-                <div class="content-section active" id="budget-content">
-                    <div class="section-header-with-action">
-                        <h3>Budget Details</h3>
-                        <button id="add-budget-btn" class="btn btn-primary">Add Budget Item</button>
-                    </div>
-                    
-                    <div class="budget-form-container" style="display: none;">
-                        <form id="budget-form" class="report-form">
-                            <div class="form-row">
-                                <label for="budget-year" class="form-label">Budget Year</label>
-                                <input type="text" id="budget-year" class="form-input" placeholder="e.g., 2023-24" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="budget-category" class="form-label">Category</label>
-                                <select id="budget-category" class="form-select" required>
-                                    <option value="">Select category</option>
-                                    <option value="infrastructure">Infrastructure</option>
-                                    <option value="education">Education</option>
-                                    <option value="health">Health</option>
-                                    <option value="agriculture">Agriculture</option>
-                                    <option value="sanitation">Sanitation</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="form-row">
-                                <label for="budget-allocation" class="form-label">Allocation Amount (₹)</label>
-                                <input type="number" id="budget-allocation" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="budget-projects" class="form-label">Projects (one per line)</label>
-                                <textarea id="budget-projects" class="form-textarea" rows="4" required></textarea>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" id="cancel-budget" class="btn btn-secondary">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Budget</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="budget-card">
-                        <!-- Budget content would be here -->
-                    </div>
-                </div>
-                
-                <!-- History Content Section -->
-                <div class="content-section" id="history-content" style="display: none;">
-                    <div class="section-header-with-action">
-                        <h3>Historical Records</h3>
-                        <button id="add-history-btn" class="btn btn-primary">Add Historical Record</button>
-                    </div>
-                    
-                    <div class="history-form-container" style="display: none;">
-                        <form id="history-form" class="report-form">
-                            <div class="form-row">
-                                <label for="history-title" class="form-label">Title</label>
-                                <input type="text" id="history-title" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="history-period" class="form-label">Time Period</label>
-                                <input type="text" id="history-period" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="history-description" class="form-label">Description</label>
-                                <textarea id="history-description" class="form-textarea" rows="4" required></textarea>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" id="cancel-history" class="btn btn-secondary">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Record</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="resource-grid">
-                        <!-- History items would be here -->
-                    </div>
-                </div>
-                
-                <!-- Events Content Section -->
-                <div class="content-section" id="events-content" style="display: none;">
-                    <div class="section-header-with-action">
-                        <h3>Events</h3>
-                        <button id="add-event-btn" class="btn btn-primary">Add New Event</button>
-                    </div>
-                    
-                    <div class="event-form-container" style="display: none;">
-                        <form id="event-form" class="report-form">
-                            <div class="form-row">
-                                <label for="event-title" class="form-label">Event Title</label>
-                                <input type="text" id="event-title" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="event-date" class="form-label">Date</label>
-                                <input type="date" id="event-date" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="event-time" class="form-label">Time</label>
-                                <input type="time" id="event-time" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="event-location" class="form-label">Location</label>
-                                <input type="text" id="event-location" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="event-description" class="form-label">Description</label>
-                                <textarea id="event-description" class="form-textarea" rows="4" required></textarea>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" id="cancel-event" class="btn btn-secondary">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Event</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="events-grid">
-                        <!-- Events would be here -->
-                    </div>
-                </div>
-                
-                <!-- Resources Content Section -->
-                <div class="content-section" id="resources-content" style="display: none;">
-                    <div class="section-header-with-action">
-                        <h3>Resources</h3>
-                        <button id="add-resource-btn" class="btn btn-primary">Add Resource</button>
-                    </div>
-                    
-                    <div class="resource-form-container" style="display: none;">
-                        <form id="resource-form" class="report-form">
-                            <div class="form-row">
-                                <label for="resource-title" class="form-label">Resource Title</label>
-                                <input type="text" id="resource-title" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="resource-type" class="form-label">Type</label>
-                                <select id="resource-type" class="form-select" required>
-                                    <option value="">Select type</option>
-                                    <option value="application">Application Form</option>
-                                    <option value="guide">Guidelines</option>
-                                    <option value="document">Document</option>
-                                    <option value="link">External Link</option>
-                                </select>
-                            </div>
-                            <div class="form-row">
-                                <label for="resource-description" class="form-label">Description</label>
-                                <textarea id="resource-description" class="form-textarea" rows="4" required></textarea>
-                            </div>
-                            <div class="form-row">
-                                <label for="resource-url" class="form-label">URL or File</label>
-                                <input type="text" id="resource-url" class="form-input" placeholder="Enter URL or leave empty to upload file">
-                            </div>
-                            <div class="form-row" id="resource-file-area" style="display: none;">
-                                <label class="form-label">Upload File</label>
-                                <div class="file-upload">
-                                    <input type="file" id="resource-file" style="display: none;">
-                                    <div class="file-upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <div class="file-upload-text">
-                                        Click to browse for files
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" id="cancel-resource" class="btn btn-secondary">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Resource</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="resource-grid">
-                        <!-- Resources would be here -->
-                    </div>
-                </div>
-                
-                <!-- Gallery Content Section -->
-                <div class="content-section" id="gallery-content" style="display: none;">
-                    <div class="section-header-with-action">
-                        <h3>Gallery</h3>
-                        <button id="add-gallery-btn" class="btn btn-primary">Add Gallery Images</button>
-                    </div>
-                    
-                    <div class="gallery-form-container" style="display: none;">
-                        <form id="gallery-form" class="report-form">
-                            <div class="form-row">
-                                <label for="gallery-title" class="form-label">Image Title</label>
-                                <input type="text" id="gallery-title" class="form-input" required>
-                            </div>
-                            <div class="form-row">
-                                <label for="gallery-description" class="form-label">Description</label>
-                                <textarea id="gallery-description" class="form-textarea" rows="2" required></textarea>
-                            </div>
-                            <div class="form-row">
-                                <label class="form-label">Image</label>
-                                <div class="gallery-upload-area" id="gallery-upload-area">
-                                    <div class="gallery-upload-icon">
-                                        <i class="fas fa-image"></i>
-                                    </div>
-                                    <p>Click to upload an image</p>
-                                    <input type="file" id="gallery-image" accept="image/*" style="display: none;">
-                                </div>
-                                <div class="gallery-preview" id="gallery-preview"></div>
-                            </div>
-                            <div class="form-actions">
-                                <button type="button" id="cancel-gallery" class="btn btn-secondary">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save Image</button>
-                            </div>
-                        </form>
-                    </div>
-                    
-                    <div class="gallery-grid" id="authority-gallery-grid">
-                        <!-- Gallery images would be here -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Profile Section -->
-            <section id="profile-section" class="dashboard-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-user"></i> Profile</h2>
-                    <p>Your account details and preferences</p>
-                </div>
-                
-                <div class="profile-card">
-                    <div class="profile-header">
-                        <div class="profile-avatar">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="profile-title">
-                            <h2 id="profile-name">Authority Name</h2>
-                            <p id="profile-role">Role: <span id="profile-role-value">Ward Member</span></p>
-                        </div>
-                    </div>
-                    
-                    <div class="profile-info">
-                        <div class="info-group">
-                            <div class="info-label">Email</div>
-                            <div class="info-value" id="profile-email">wardmember@gmail.com</div>
-                        </div>
-                        <div class="info-group">
-                            <div class="info-label">Ward/Area</div>
-                            <div class="info-value" id="profile-area">Ward 3</div>
-                        </div>
-                        <div class="info-group">
-                            <div class="info-label">Contact Number</div>
-                            <div class="info-value" id="profile-contact">+91 9876543210</div>
-                        </div>
-                    </div>
-                    
-                    <button class="btn btn-primary">Edit Profile</button>
-                </div>
-            </section>
-
-        </section>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h3>RuralConnect</h3>
-                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
-                </div>
-                
-                <div class="footer-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#issues-section" class="dashboard-scroll-link" data-tab="issues-section">Issue Management</a></li>
-                        <li><a href="#content-section" class="dashboard-scroll-link" data-tab="content-section">Content Management</a></li>
-                        <li><a href="#profile-section" class="dashboard-scroll-link" data-tab="profile-section">Profile</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-contact">
-                    <h3>Contact</h3>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
-                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
-                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
-                    </ul>
-                </div>
+            
+            <div class="sidebar-section">
+                <h3>CONTENT MANAGEMENT</h3>
+                <ul class="sidebar-menu">
+                    <li data-section="budget-management">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>Budget Details</span>
+                    </li>
+                    <li data-section="history-management">
+                        <i class="fas fa-book"></i>
+                        <span>Historical Information</span>
+                    </li>
+                    <li data-section="resources-management">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Resources</span>
+                    </li>
+                    <li data-section="gallery-management">
+                        <i class="fas fa-images"></i>
+                        <span>Gallery</span>
+                    </li>
+                    <li data-section="events-management">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Events</span>
+                    </li>
+                </ul>
             </div>
             
-            <div class="footer-bottom">
-                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+            <div class="sidebar-section">
+                <h3>SETTINGS</h3>
+                <ul class="sidebar-menu">
+                    <li data-section="profile-settings">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Profile Settings</span>
+                    </li>
+                </ul>
             </div>
-        </div>
-    </footer>
+        </aside>
+        
+        <main class="dashboard-content">
+            <!-- Pending Issues Section -->
+            <section id="pending-issues" class="dashboard-section active">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div>
+                        <h2>Pending Issues</h2>
+                        <p>Review and respond to newly submitted issues from citizens.</p>
+                    </div>
+                </div>
+                
+                <div id="pending-issues-list" class="issues-container">
+                    <!-- Pending issues will be dynamically loaded here -->
+                    <div class="empty-state">
+                        <p>No pending issues at this time.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- In Progress Issues Section -->
+            <section id="in-progress-issues" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+                    <div>
+                        <h2>In Progress Issues</h2>
+                        <p>Issues that are currently being addressed.</p>
+                    </div>
+                </div>
+                
+                <div class="issues-container" id="in-progress-issues-list">
+                    <!-- In progress issues would be loaded here -->
+                    <div class="issue-card">
+                        <h3>Road Condition Issue</h3>
+                        <div class="issue-meta">
+                            <span>#ROA-20230615</span>
+                            <span>Reported: 15 Jun 2023</span>
+                        </div>
+                        <span class="issue-category road">Road & Transportation</span>
+                        <p class="issue-description">The main road in Ward 5 has several large potholes making it difficult for vehicles to pass.</p>
+                        <div class="issue-detail"><strong>Location:</strong> Main Road, Ward 5</div>
+                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary">View Details</button>
+                            <button class="btn btn-primary">Mark Resolved</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Resolved Issues Section -->
+            <section id="resolved-issues" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h2>Resolved Issues</h2>
+                        <p>Issues that have been successfully addressed and completed.</p>
+                    </div>
+                </div>
+                
+                <div class="issues-container" id="resolved-issues-list">
+                    <!-- Resolved issues would be loaded here -->
+                    <div class="issue-card">
+                        <h3>Street Light Repair</h3>
+                        <div class="issue-meta">
+                            <span>#ELE-20230605</span>
+                            <span>Resolved: 12 Jun 2023</span>
+                        </div>
+                        <span class="issue-category electricity">Electricity</span>
+                        <p class="issue-description">Street lights in Ward 3 not functioning for the past week.</p>
+                        <div class="issue-detail"><strong>Location:</strong> Ward 3, Market Area</div>
+                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543210</div>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                    </div>
+                    
+                    <div class="issue-card">
+                        <h3>Water Supply Disruption</h3>
+                        <div class="issue-meta">
+                            <span>#WAT-20230601</span>
+                            <span>Resolved: 10 Jun 2023</span>
+                        </div>
+                        <span class="issue-category water">Water Supply</span>
+                        <p class="issue-description">No water supply in Ward 2 for the last 3 days.</p>
+                        <div class="issue-detail"><strong>Location:</strong> Ward 2, Residential Area</div>
+                        <div class="issue-detail"><strong>Reported By:</strong> +91 9876543211</div>
+                        <div class="issue-actions">
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-    <script src="/public/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set role from localStorage (set during login)
-            const role = localStorage.getItem('authorityRole') || 'Authority';
-            const roleDisplay = document.getElementById('role-display');
-            const profileRoleValue = document.getElementById('profile-role-value');
-            const profileEmail = document.getElementById('profile-email');
-            
-            if (roleDisplay) roleDisplay.textContent = role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ');
-            if (profileRoleValue) profileRoleValue.textContent = role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ');
-            
-            // Set profile email based on role
-            if (profileEmail && role) {
-                if (role === 'sarpanch') {
-                    profileEmail.textContent = 'sarpanch@gmail.com';
-                } else if (role === 'wise-sarpanch') {
-                    profileEmail.textContent = 'wisesarpanch@gmail.com';
-                } else if (role === 'ward-member') {
-                    profileEmail.textContent = 'wardmember@gmail.com';
-                }
-            }
-            
-            // Handle logout
-            const logoutBtn = document.getElementById('logout-btn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('userType');
-                    localStorage.removeItem('authorityRole');
-                    alert('You have been logged out.');
-                    window.location.href = 'index.html';
-                });
-            }
-            
-            // Dashboard tab navigation
-            const dashboardTabs = document.querySelectorAll('.dashboard-tab');
-            const dashboardSections = document.querySelectorAll('.dashboard-section');
-            
-            dashboardTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const targetId = tab.getAttribute('data-tab');
-                    
-                    // Update active class on tabs
-                    dashboardTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Show correct section
-                    dashboardSections.forEach(section => {
-                        if (section.id === targetId) {
-                            section.classList.add('active');
-                        } else {
-                            section.classList.remove('active');
-                        }
-                    });
-                });
-            });
-            
-            // Footer dashboard links
-            const dashboardScrollLinks = document.querySelectorAll('.dashboard-scroll-link');
-            dashboardScrollLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('data-tab');
-                    
-                    // Update active class on tabs
-                    dashboardTabs.forEach(t => {
-                        if (t.getAttribute('data-tab') === targetId) {
-                            t.click();
-                        }
-                    });
-                    
-                    // Scroll to section
-                    const targetSection = document.getElementById(targetId);
-                    if (targetSection) {
-                        targetSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            });
-            
-            // Issues status tabs
-            const issueStatusTabs = document.querySelectorAll('.issue-status-tab');
-            const issueStatusContents = document.querySelectorAll('.issue-status-content');
-            
-            issueStatusTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const status = tab.getAttribute('data-status');
-                    
-                    // Update active class on tabs
-                    issueStatusTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Show correct issue list
-                    issueStatusContents.forEach(content => {
-                        if (content.id === `${status}-issues`) {
-                            content.style.display = 'block';
-                        } else {
-                            content.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Content category tabs
-            const contentCategoryTabs = document.querySelectorAll('.content-category-tab');
-            const contentSections = document.querySelectorAll('.content-section');
-            
-            contentCategoryTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const category = tab.getAttribute('data-category');
-                    
-                    // Update active class on tabs
-                    contentCategoryTabs.forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Show correct content section
-                    contentSections.forEach(section => {
-                        if (section.id === `${category}-content`) {
-                            section.style.display = 'block';
-                        } else {
-                            section.style.display = 'none';
-                        }
-                    });
-                });
-            });
-            
-            // Budget form handling
-            const addBudgetBtn = document.getElementById('add-budget-btn');
-            const budgetFormContainer = document.querySelector('.budget-form-container');
-            const cancelBudgetBtn = document.getElementById('cancel-budget');
-            const budgetForm = document.getElementById('budget-form');
-            
-            if (addBudgetBtn && budgetFormContainer) {
-                addBudgetBtn.addEventListener('click', () => {
-                    budgetFormContainer.style.display = 'block';
-                    addBudgetBtn.style.display = 'none';
-                });
-            }
-            
-            if (cancelBudgetBtn && budgetFormContainer && addBudgetBtn) {
-                cancelBudgetBtn.addEventListener('click', () => {
-                    budgetFormContainer.style.display = 'none';
-                    addBudgetBtn.style.display = 'inline-flex';
-                });
-            }
-            
-            if (budgetForm) {
-                budgetForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    // Get form data
-                    const budgetYear = document.getElementById('budget-year').value;
-                    const budgetCategory = document.getElementById('budget-category').value;
-                    const budgetAllocation = document.getElementById('budget-allocation').value;
-                    const budgetProjects = document.getElementById('budget-projects').value.split('\n');
-                    
-                    // Create budget object
-                    const budgetItem = {
-                        year: budgetYear,
-                        category: budgetCategory,
-                        allocation: budgetAllocation,
-                        projects: budgetProjects,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    // Save to localStorage
-                    const budgets = JSON.parse(localStorage.getItem('budgetItems') || '[]');
-                    budgets.push(budgetItem);
-                    localStorage.setItem('budgetItems', JSON.stringify(budgets));
-                    
-                    notify('Budget information has been saved and published.', 'success');
-                    budgetFormContainer.style.display = 'none';
-                    addBudgetBtn.style.display = 'inline-flex';
-                    budgetForm.reset();
-                    
-                    // Update budget display
-                    displayBudgetItems();
-                });
-            }
-            
-            // Event form handling
-            const addEventBtn = document.getElementById('add-event-btn');
-            const eventFormContainer = document.querySelector('.event-form-container');
-            const cancelEventBtn = document.getElementById('cancel-event');
-            const eventForm = document.getElementById('event-form');
-            
-            if (addEventBtn && eventFormContainer) {
-                addEventBtn.addEventListener('click', () => {
-                    eventFormContainer.style.display = 'block';
-                    addEventBtn.style.display = 'none';
-                });
-            }
-            
-            if (cancelEventBtn && eventFormContainer && addEventBtn) {
-                cancelEventBtn.addEventListener('click', () => {
-                    eventFormContainer.style.display = 'none';
-                    addEventBtn.style.display = 'inline-flex';
-                });
-            }
-            
-            if (eventForm) {
-                eventForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    // Get form data
-                    const eventTitle = document.getElementById('event-title').value;
-                    const eventDate = document.getElementById('event-date').value;
-                    const eventTime = document.getElementById('event-time').value;
-                    const eventLocation = document.getElementById('event-location').value;
-                    const eventDescription = document.getElementById('event-description').value;
-                    
-                    // Create event object
-                    const eventItem = {
-                        title: eventTitle,
-                        date: eventDate,
-                        time: eventTime,
-                        location: eventLocation,
-                        description: eventDescription,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    // Save to localStorage
-                    const events = JSON.parse(localStorage.getItem('eventItems') || '[]');
-                    events.push(eventItem);
-                    localStorage.setItem('eventItems', JSON.stringify(events));
-                    
-                    notify('Event has been saved and published.', 'success');
-                    eventFormContainer.style.display = 'none';
-                    addEventBtn.style.display = 'inline-flex';
-                    eventForm.reset();
-                    
-                    // Update events display
-                    displayEventItems();
-                });
-            }
-            
-            // Resource form handling
-            const addResourceBtn = document.getElementById('add-resource-btn');
-            const resourceFormContainer = document.querySelector('.resource-form-container');
-            const cancelResourceBtn = document.getElementById('cancel-resource');
-            const resourceForm = document.getElementById('resource-form');
-            
-            if (addResourceBtn && resourceFormContainer) {
-                addResourceBtn.addEventListener('click', () => {
-                    resourceFormContainer.style.display = 'block';
-                    addResourceBtn.style.display = 'none';
-                });
-            }
-            
-            if (cancelResourceBtn && resourceFormContainer && addResourceBtn) {
-                cancelResourceBtn.addEventListener('click', () => {
-                    resourceFormContainer.style.display = 'none';
-                    addResourceBtn.style.display = 'inline-flex';
-                });
-            }
-            
-            if (resourceForm) {
-                resourceForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    // Get form data
-                    const resourceTitle = document.getElementById('resource-title').value;
-                    const resourceType = document.getElementById('resource-type').value;
-                    const resourceDescription = document.getElementById('resource-description').value;
-                    const resourceUrl = document.getElementById('resource-url').value;
-                    
-                    // Create resource object
-                    const resourceItem = {
-                        title: resourceTitle,
-                        type: resourceType,
-                        description: resourceDescription,
-                        url: resourceUrl,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    // Save to localStorage
-                    const resources = JSON.parse(localStorage.getItem('resourceItems') || '[]');
-                    resources.push(resourceItem);
-                    localStorage.setItem('resourceItems', JSON.stringify(resources));
-                    
-                    notify('Resource has been saved and published.', 'success');
-                    resourceFormContainer.style.display = 'none';
-                    addResourceBtn.style.display = 'inline-flex';
-                    resourceForm.reset();
-                    
-                    // Update resources display
-                    displayResourceItems();
-                });
-            }
-            
-            // Gallery form handling
-            const addGalleryBtn = document.getElementById('add-gallery-btn');
-            const galleryFormContainer = document.querySelector('.gallery-form-container');
-            const cancelGalleryBtn = document.getElementById('cancel-gallery');
-            const galleryForm = document.getElementById('gallery-form');
-            const galleryUploadArea = document.getElementById('gallery-upload-area');
-            const galleryImageInput = document.getElementById('gallery-image');
-            const galleryPreview = document.getElementById('gallery-preview');
-            
-            if (addGalleryBtn && galleryFormContainer) {
-                addGalleryBtn.addEventListener('click', () => {
-                    galleryFormContainer.style.display = 'block';
-                    addGalleryBtn.style.display = 'none';
-                });
-            }
-            
-            if (cancelGalleryBtn && galleryFormContainer && addGalleryBtn) {
-                cancelGalleryBtn.addEventListener('click', () => {
-                    galleryFormContainer.style.display = 'none';
-                    addGalleryBtn.style.display = 'inline-flex';
-                });
-            }
-            
-            if (galleryUploadArea && galleryImageInput) {
-                galleryUploadArea.addEventListener('click', () => {
-                    galleryImageInput.click();
-                });
+            <!-- Budget Management Section -->
+            <section id="budget-management" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>
+                        <h2>Budget Management</h2>
+                        <p>Add, edit or remove budget information visible to the public.</p>
+                    </div>
+                </div>
                 
-                galleryImageInput.addEventListener('change', () => {
-                    if (galleryImageInput.files && galleryImageInput.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            galleryPreview.innerHTML = '';
-                            const previewItem = document.createElement('div');
-                            previewItem.className = 'gallery-preview-item';
-                            previewItem.innerHTML = `
-                                <img src="${e.target.result}" alt="Gallery Preview">
-                                <div class="gallery-preview-remove"><i class="fas fa-times"></i></div>
-                            `;
-                            galleryPreview.appendChild(previewItem);
-                            
-                            const removeBtn = previewItem.querySelector('.gallery-preview-remove');
-                            removeBtn.addEventListener('click', (e) => {
-                                e.stopPropagation();
-                                galleryPreview.innerHTML = '';
-                                galleryImageInput.value = '';
-                            });
-                        };
-                        reader.readAsDataURL(galleryImageInput.files[0]);
-                    }
-                });
-            }
-            
-            if (galleryForm) {
-                galleryForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    if (!galleryImageInput.files || !galleryImageInput.files[0]) {
-                        notify('Please select an image to upload', 'warning');
-                        return;
-                    }
-                    
-                    const galleryTitle = document.getElementById('gallery-title').value;
-                    const galleryDescription = document.getElementById('gallery-description').value;
-                    
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Create gallery object
-                        const galleryItem = {
-                            title: galleryTitle,
-                            description: galleryDescription,
-                            image: e.target.result,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        // Save to localStorage
-                        const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-                        galleryItems.push(galleryItem);
-                        localStorage.setItem('galleryItems', JSON.stringify(galleryItems));
-                        
-                        notify('Gallery image has been saved and published.', 'success');
-                        galleryFormContainer.style.display = 'none';
-                        addGalleryBtn.style.display = 'inline-flex';
-                        galleryForm.reset();
-                        galleryPreview.innerHTML = '';
-                        
-                        // Update gallery display
-                        displayGalleryItems();
-                    };
-                    reader.readAsDataURL(galleryImageInput.files[0]);
-                });
-            }
-            
-            // Display saved items
-            function displayBudgetItems() {
-                const budgetCard = document.querySelector('.budget-card');
-                const budgets = JSON.parse(localStorage.getItem('budgetItems') || '[]');
-                
-                if (budgetCard && budgets.length > 0) {
-                    let budgetHtml = `
-                        <div class="budget-summary">
-                            <h3>Budget Summary ${budgets[0].year}</h3>
-                            <div class="budget-stats">
-                                <div class="budget-stat">
-                                    <span class="stat-label">Total Budget</span>
-                                    <span class="stat-value">₹${parseInt(budgets[0].allocation).toLocaleString('en-IN')}</span>
-                                </div>
-                            </div>
+                <div class="content-form-container">
+                    <form id="budget-form" class="content-form">
+                        <div class="form-row">
+                            <label for="budget-title">Budget Title</label>
+                            <input type="text" id="budget-title" required placeholder="E.g., Road Development Fund">
                         </div>
-                        <div class="budget-allocation">
-                            <h3>Budget Allocation</h3>
-                            <div class="allocation-grid">
-                    `;
-                    
-                    budgets.forEach(budget => {
-                        let iconClass = 'infrastructure';
-                        let icon = 'fa-road';
                         
-                        if (budget.category === 'education') {
-                            iconClass = 'education';
-                            icon = 'fa-school';
-                        } else if (budget.category === 'health') {
-                            iconClass = 'health';
-                            icon = 'fa-heartbeat';
-                        } else if (budget.category === 'agriculture') {
-                            iconClass = 'agriculture';
-                            icon = 'fa-tractor';
-                        }
-                        
-                        budgetHtml += `
-                            <div class="allocation-item">
-                                <div class="category-icon ${iconClass}">
-                                    <i class="fas ${icon}"></i>
-                                </div>
-                                <div class="allocation-details">
-                                    <h4>${budget.category.charAt(0).toUpperCase() + budget.category.slice(1)} <button class="btn-sm btn-outline-accent float-right delete-budget" data-timestamp="${budget.timestamp}">Delete</button></h4>
-                                    <div class="allocation-bar">
-                                        <div class="allocation-progress" style="width: 40%"></div>
-                                    </div>
-                                    <div class="allocation-info">
-                                        <span>₹${parseInt(budget.allocation).toLocaleString('en-IN')}</span>
-                                    </div>
-                                    <ul class="project-list">
-                        `;
-                        
-                        budget.projects.forEach(project => {
-                            if (project.trim()) {
-                                budgetHtml += `<li>${project}</li>`;
-                            }
-                        });
-                        
-                        budgetHtml += `
-                                    </ul>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    budgetHtml += `
-                            </div>
+                        <div class="form-row">
+                            <label for="budget-category">Category</label>
+                            <select id="budget-category" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="infrastructure">Infrastructure</option>
+                                <option value="education">Education</option>
+                                <option value="health">Health</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="water">Water Supply</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
-                    `;
-                    
-                    budgetCard.innerHTML = budgetHtml;
-                    
-                    // Add event listeners to delete buttons
-                    document.querySelectorAll('.delete-budget').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const timestamp = this.getAttribute('data-timestamp');
-                            const budgets = JSON.parse(localStorage.getItem('budgetItems') || '[]');
-                            const updatedBudgets = budgets.filter(item => item.timestamp !== timestamp);
-                            localStorage.setItem('budgetItems', JSON.stringify(updatedBudgets));
-                            displayBudgetItems();
-                            notify('Budget item deleted.', 'warning');
-                        });
-                    });
-                }
-            }
-            
-            function displayEventItems() {
-                const eventsGrid = document.querySelector('.events-grid');
-                const events = JSON.parse(localStorage.getItem('eventItems') || '[]');
-                
-                if (eventsGrid && events.length > 0) {
-                    let eventsHtml = '';
-                    
-                    events.forEach(event => {
-                        const eventDate = new Date(event.date);
-                        const formattedDate = eventDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
                         
-                        eventsHtml += `
-                            <div class="event-card">
-                                <div class="event-header">
-                                    <span>Upcoming Event</span>
-                                    <h3>${event.title}</h3>
-                                </div>
-                                <div class="event-details">
-                                    <div class="event-detail">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        <span>${formattedDate}</span>
-                                    </div>
-                                    <div class="event-detail">
-                                        <i class="fas fa-clock"></i>
-                                        <span>${event.time}</span>
-                                    </div>
-                                    <div class="event-detail">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>${event.location}</span>
-                                    </div>
-                                </div>
-                                <p>${event.description}</p>
-                                <div class="event-actions">
-                                    <button class="btn btn-secondary event-edit" data-timestamp="${event.timestamp}">Edit</button>
-                                    <button class="btn btn-outline-accent event-delete" data-timestamp="${event.timestamp}">Delete</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    eventsGrid.innerHTML = eventsHtml;
-                    
-                    // Add event listeners to delete buttons
-                    document.querySelectorAll('.event-delete').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const timestamp = this.getAttribute('data-timestamp');
-                            const events = JSON.parse(localStorage.getItem('eventItems') || '[]');
-                            const updatedEvents = events.filter(item => item.timestamp !== timestamp);
-                            localStorage.setItem('eventItems', JSON.stringify(updatedEvents));
-                            displayEventItems();
-                            notify('Event deleted.', 'warning');
-                        });
-                    });
-                }
-            }
-            
-            function displayResourceItems() {
-                const resourceGrid = document.querySelector('#resources-content .resource-grid');
-                const resources = JSON.parse(localStorage.getItem('resourceItems') || '[]');
-                
-                if (resourceGrid && resources.length > 0) {
-                    let resourcesHtml = '';
-                    
-                    resources.forEach(resource => {
-                        let icon = 'fa-file-alt';
-                        if (resource.type === 'guide') icon = 'fa-book';
-                        if (resource.type === 'link') icon = 'fa-link';
+                        <div class="form-row">
+                            <label for="budget-allocation">Allocation Amount (₹)</label>
+                            <input type="number" id="budget-allocation" required placeholder="Enter amount in rupees">
+                        </div>
                         
-                        resourcesHtml += `
-                            <div class="resource-card">
-                                <div class="resource-icon">
-                                    <i class="fas ${icon}"></i>
+                        <div class="form-row">
+                            <label for="budget-spent">Amount Spent (₹)</label>
+                            <input type="number" id="budget-spent" required placeholder="Enter amount in rupees">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="budget-description">Description</label>
+                            <textarea id="budget-description" rows="4" required placeholder="Provide details about this budget allocation"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="budget-projects">Related Projects (comma separated)</label>
+                            <input type="text" id="budget-projects" placeholder="E.g., Main Road Repair, Bridge Construction">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add Budget Item</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="content-preview">
+                    <h3>Existing Budget Items</h3>
+                    <div id="budget-items-list" class="preview-grid">
+                        <!-- Budget items will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Gallery Management Section -->
+            <section id="gallery-management" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-images"></i>
+                    </div>
+                    <div>
+                        <h2>Gallery Management</h2>
+                        <p>Upload and manage images for the public gallery.</p>
+                    </div>
+                </div>
+                
+                <div class="content-form-container">
+                    <form id="gallery-form" class="content-form">
+                        <div class="form-row">
+                            <label for="image-title">Image Title</label>
+                            <input type="text" id="image-title" required placeholder="Enter a title for this image">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="image-description">Description</label>
+                            <textarea id="image-description" rows="3" required placeholder="Provide a short description for the image"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label>Upload Image</label>
+                            <div class="file-upload">
+                                <div class="file-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
                                 </div>
-                                <div class="resource-details">
-                                    <h3>${resource.title}</h3>
-                                    <p>${resource.description}</p>
-                                    <div class="resource-meta">
-                                        <span>${resource.type.charAt(0).toUpperCase() + resource.type.slice(1)}</span>
-                                        <div>
-                                            <button class="btn-sm btn-secondary resource-edit" data-timestamp="${resource.timestamp}">Edit</button>
-                                            <button class="btn-sm btn-outline-accent resource-delete" data-timestamp="${resource.timestamp}">Delete</button>
-                                        </div>
-                                    </div>
+                                <div class="file-upload-text">
+                                    <p>Drag & drop or click to browse</p>
+                                    <span>JPG, PNG files up to 5MB</span>
                                 </div>
+                                <input type="file" id="gallery-file-input" accept="image/*" style="display:none" required>
                             </div>
-                        `;
-                    });
-                    
-                    resourceGrid.innerHTML = resourcesHtml;
-                    
-                    // Add event listeners to delete buttons
-                    document.querySelectorAll('.resource-delete').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const timestamp = this.getAttribute('data-timestamp');
-                            const resources = JSON.parse(localStorage.getItem('resourceItems') || '[]');
-                            const updatedResources = resources.filter(item => item.timestamp !== timestamp);
-                            localStorage.setItem('resourceItems', JSON.stringify(updatedResources));
-                            displayResourceItems();
-                            notify('Resource deleted.', 'warning');
-                        });
-                    });
-                }
-            }
+                            <div id="gallery-file-preview" class="file-preview"></div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="image-category">Category</label>
+                            <select id="image-category" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="festivals">Festivals & Celebrations</option>
+                                <option value="landscape">Rural Landscape</option>
+                                <option value="crafts">Traditional Crafts</option>
+                                <option value="people">Village Life & People</option>
+                                <option value="development">Development Projects</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Add to Gallery</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="content-preview">
+                    <h3>Existing Gallery Images</h3>
+                    <div id="gallery-preview-list" class="gallery-preview-grid">
+                        <!-- Gallery images will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
             
-            function displayGalleryItems() {
-                const galleryGrid = document.querySelector('#authority-gallery-grid');
-                const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
+            <!-- Events Management Section -->
+            <section id="events-management" class="dashboard-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <h2>Events Management</h2>
+                        <p>Create and manage village events visible to the public.</p>
+                    </div>
+                </div>
                 
-                if (galleryGrid && galleryItems.length > 0) {
-                    let galleryHtml = '';
-                    
-                    galleryItems.forEach(item => {
-                        galleryHtml += `
-                            <div class="gallery-preview-item" style="height: 200px; margin-bottom: 20px;">
-                                <img src="${item.image}" alt="${item.title}">
-                                <div class="gallery-preview-remove gallery-delete" data-timestamp="${item.timestamp}"><i class="fas fa-times"></i></div>
-                            </div>
-                        `;
-                    });
-                    
-                    galleryGrid.innerHTML = galleryHtml;
-                    
-                    // Add event listeners to delete buttons
-                    document.querySelectorAll('.gallery-delete').forEach(btn => {
-                        btn.addEventListener('click', function() {
-                            const timestamp = this.getAttribute('data-timestamp');
-                            const galleryItems = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-                            const updatedGalleryItems = galleryItems.filter(item => item.timestamp !== timestamp);
-                            localStorage.setItem('galleryItems', JSON.stringify(updatedGalleryItems));
-                            displayGalleryItems();
-                            notify('Gallery item deleted.', 'warning');
-                        });
-                    });
-                }
-            }
+                <div class="content-form-container">
+                    <form id="event-form" class="content-form">
+                        <div class="form-row">
+                            <label for="event-title">Event Title</label>
+                            <input type="text" id="event-title" required placeholder="Enter event title">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="event-date">Date</label>
+                            <input type="date" id="event-date" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="event-time">Time</label>
+                            <input type="time" id="event-time" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="event-location">Location</label>
+                            <input type="text" id="event-location" required placeholder="Enter event venue">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="event-description">Description</label>
+                            <textarea id="event-description" rows="4" required placeholder="Provide details about the event"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="content-preview">
+                    <h3>Upcoming Events</h3>
+                    <div id="events-preview-list" class="preview-grid">
+                        <!-- Events will be dynamically loaded here -->
+                    </div>
+                </div>
+            </section>
             
-            // Display saved items on page load
-            displayBudgetItems();
-            displayEventItems();
-            displayResourceItems();
-            displayGalleryItems();
-            
-            // Handle issue actions
-            const approveButtons = document.querySelectorAll('.approve-btn');
-            const rejectButtons = document.querySelectorAll('.reject-btn');
-            const resolveButtons = document.querySelectorAll('.resolve-btn');
-            const reopenButtons = document.querySelectorAll('.reopen-btn');
-            
-            approveButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const issueCard = this.closest('.issue-card');
-                    const statusElement = issueCard.querySelector('.issue-status');
-                    
-                    statusElement.textContent = 'In Progress';
-                    statusElement.className = 'issue-status in-progress';
-                    issueCard.setAttribute('data-status', 'in-progress');
-                    
-                    // Replace buttons
-                    const actionButtons = issueCard.querySelector('.action-buttons');
-                    actionButtons.innerHTML = `
-                        <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
-                    `;
-                    
-                    // Move issue card to in-progress section
-                    const inProgressIssues = document.getElementById('in-progress-issues');
-                    inProgressIssues.appendChild(issueCard.cloneNode(true));
-                    issueCard.remove();
-                    
-                    // Add event listener to new button
-                    const newResolveBtn = inProgressIssues.querySelector('.resolve-btn');
-                    newResolveBtn.addEventListener('click', handleResolveClick);
-                    
-                    notify('Issue has been approved and is now in progress.', 'success');
-                });
-            });
-            
-            rejectButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const issueCard = this.closest('.issue-card');
-                    if (confirm('Are you sure you want to reject this issue?')) {
-                        issueCard.remove();
-                        notify('Issue has been rejected.', 'warning');
-                    }
-                });
-            });
-            
-            resolveButtons.forEach(button => {
-                button.addEventListener('click', handleResolveClick);
-            });
-            
-            function handleResolveClick() {
-                const issueCard = this.closest('.issue-card');
-                const statusElement = issueCard.querySelector('.issue-status');
-                
-                statusElement.textContent = 'Resolved';
-                statusElement.className = 'issue-status resolved';
-                issueCard.setAttribute('data-status', 'resolved');
-                
-                // Replace buttons
-                const actionButtons = issueCard.querySelector('.action-buttons');
-                actionButtons.innerHTML = `
-                    <button class="btn btn-outline-accent reopen-btn"><i class="fas fa-redo"></i> Reopen</button>
-                `;
-                
-                // Move issue card to resolved section
-                const resolvedIssues = document.getElementById('resolved-issues');
-                resolvedIssues.appendChild(issueCard.cloneNode(true));
-                issueCard.remove();
-                
-                // Add event listener to new button
-                const newReopenBtn = resolvedIssues.querySelector('.reopen-btn');
-                newReopenBtn.addEventListener('click', handleReopenClick);
-                
-                notify('Issue has been marked as resolved.', 'success');
-            }
-            
-            function handleReopenClick() {
-                const issueCard = this.closest('.issue-card');
-                const statusElement = issueCard.querySelector('.issue-status');
-                
-                statusElement.textContent = 'In Progress';
-                statusElement.className = 'issue-status in-progress';
-                issueCard.setAttribute('data-status', 'in-progress');
-                
-                // Replace buttons
-                const actionButtons = issueCard.querySelector('.action-buttons');
-                actionButtons.innerHTML = `
-                    <button class="btn btn-primary resolve-btn"><i class="fas fa-check-double"></i> Mark as Resolved</button>
-                `;
-                
-                // Move issue card to in-progress section
-                const inProgressIssues = document.getElementById('in-progress-issues');
-                inProgressIssues.appendChild(issueCard.cloneNode(true));
-                issueCard.remove();
-                
-                // Add event listener to new button
-                const newResolveBtn = inProgressIssues.querySelector('.resolve-btn');
-                newResolveBtn.addEventListener('click', handleResolveClick);
-                
-                notify('Issue has been reopened.', 'info');
-            }
-            
-            reopenButtons.forEach(button => {
-                button.addEventListener('click', handleReopenClick);
-            });
-        });
-    </script>
+            <!-- Other management sections would follow the same pattern -->
+        </main>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>

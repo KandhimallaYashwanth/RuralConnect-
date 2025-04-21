@@ -1,66 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery - RuralConnect</title>
-    <meta name="description" content="Gallery of rural life and activities - RuralConnect." />
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .gallery-item {
-            position: relative;
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--box-shadow);
-            height: 250px;
-            transition: transform 0.3s ease;
-        }
-        
-        .gallery-item:hover {
-            transform: translateY(-5px);
-        }
-        
-        .gallery-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .gallery-caption {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 0.75rem;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-        }
-        
-        .gallery-item:hover .gallery-caption {
-            transform: translateY(0);
-        }
-        
-        .gallery-caption h3 {
-            margin: 0 0 0.5rem;
-            font-size: 1.1rem;
-        }
-        
-        .gallery-caption p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -79,9 +24,8 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link active"><i class="fas fa-images"></i> Gallery</a>
-                <div class="auth-buttons">
-                    <button id="login-status-btn" class="btn-outline-accent login-btn">Login</button>
-                </div>
+                <a href="login.html" class="btn login-btn">Login</a>
+                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -92,14 +36,16 @@
     </nav>
 
     <main>
-        <section class="container py-5">
-            <div class="section-header">
-                <h1>Rural Life Gallery</h1>
-                <p>A glimpse into the beautiful rural life, traditions, and landscapes of our village.</p>
-            </div>
-
-            <div class="gallery-grid">
-                <!-- Gallery items will be dynamically loaded from JavaScript -->
+        <section class="gallery-section py-5">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Rural Life Gallery</h2>
+                    <p>Explore the beauty and traditions of rural India through our collection of images showcasing village life, agriculture, festivals, and landscapes.</p>
+                </div>
+                
+                <div id="gallery-container" class="gallery-grid">
+                    <!-- Gallery images will be dynamically loaded here -->
+                </div>
             </div>
         </section>
     </main>
@@ -156,131 +102,7 @@
         </div>
     </footer>
 
-    <script src="/public/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const loginStatusBtn = document.getElementById('login-status-btn');
-            const reportIssueLink = document.querySelector('.report-issue-link');
-            
-            // Update login button text based on login status
-            if (isLoggedIn) {
-                loginStatusBtn.textContent = 'Logout';
-                loginStatusBtn.classList.remove('login-btn');
-                loginStatusBtn.classList.add('logout-btn');
-                
-                // Enable report issue link
-                if (reportIssueLink) {
-                    reportIssueLink.classList.remove('disabled-link');
-                    reportIssueLink.addEventListener('click', (e) => {
-                        // Proceed normally as user is logged in
-                    });
-                }
-            } else {
-                // Disable report issue link for non-logged in users
-                if (reportIssueLink) {
-                    reportIssueLink.classList.add('disabled-link');
-                    reportIssueLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        alert('Please login to report an issue');
-                        // Store current page before redirecting to login
-                        sessionStorage.setItem('redirectFrom', window.location.href);
-                        window.location.href = 'login.html';
-                    });
-                }
-            }
-            
-            // Handle login/logout button click
-            if (loginStatusBtn) {
-                loginStatusBtn.addEventListener('click', () => {
-                    if (isLoggedIn) {
-                        // Logout logic
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userType');
-                        localStorage.removeItem('authorityRole');
-                        alert('You have been logged out.');
-                        window.location.reload();
-                    } else {
-                        // Login logic - redirect to login page
-                        sessionStorage.setItem('redirectFrom', window.location.href);
-                        window.location.href = 'login.html';
-                    }
-                });
-            }
-
-            // Gallery images
-            const galleryData = [
-                {
-                    image: 'https://images.unsplash.com/photo-1472396961693-142e6e269027',
-                    title: 'Wildlife in the Mountains',
-                    description: 'Deer grazing peacefully in their natural habitat'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1517022812141-23620dba5c23',
-                    title: 'Pastoral Life',
-                    description: 'Shepherd with his flock of sheep in the grasslands'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1493962853295-0fd70327578a',
-                    title: 'Rural Livestock',
-                    description: 'Traditional animal husbandry in mountainous regions'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1466721591366-2d5fba72006d',
-                    title: 'Wildlife Conservation',
-                    description: 'Protected species in their natural environment'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef',
-                    title: 'Sunrise in the Fields',
-                    description: 'Early morning agricultural scene'
-                },
-                {
-                    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef',
-                    title: 'Harvest Season',
-                    description: 'Local farmers working during the harvest season'
-                }
-            ];
-            
-            // Render gallery items
-            const galleryGrid = document.querySelector('.gallery-grid');
-            if (galleryGrid) {
-                galleryData.forEach(item => {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    
-                    galleryItem.innerHTML = `
-                        <img src="${item.image}" alt="${item.title}" class="gallery-image">
-                        <div class="gallery-caption">
-                            <h3>${item.title}</h3>
-                            <p>${item.description}</p>
-                        </div>
-                    `;
-                    
-                    galleryGrid.appendChild(galleryItem);
-                });
-            }
-
-            // Check if there are any gallery items added by authorities
-            const authorityGallery = JSON.parse(localStorage.getItem('galleryItems') || '[]');
-            authorityGallery.forEach(item => {
-                if (galleryGrid) {
-                    const galleryItem = document.createElement('div');
-                    galleryItem.className = 'gallery-item';
-                    
-                    galleryItem.innerHTML = `
-                        <img src="${item.image}" alt="${item.title}" class="gallery-image">
-                        <div class="gallery-caption">
-                            <h3>${item.title}</h3>
-                            <p>${item.description}</p>
-                        </div>
-                    `;
-                    
-                    galleryGrid.appendChild(galleryItem);
-                }
-            });
-        });
-    </script>
+    <script src="js/main.js"></script>
+    <script src="js/gallery.js"></script>
 </body>
 </html>

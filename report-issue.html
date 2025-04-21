@@ -1,24 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Report Issue - RuralConnect</title>
-    <meta name="description" content="Report issues in your village through RuralConnect platform." />
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .disabled-link {
-            pointer-events: none;
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .my-issues {
-            margin-top: 3rem;
-        }
-    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -37,9 +24,8 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
-                <div class="auth-buttons">
-                    <button id="login-status-btn" class="btn-outline-accent login-btn">Login</button>
-                </div>
+                <a href="login.html" class="btn login-btn">Login</a>
+                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -50,510 +36,75 @@
     </nav>
 
     <main>
-        <section class="container py-5">
-            <div id="login-required" style="display: none;">
+        <section class="report-issue-section py-5">
+            <div class="container">
                 <div class="section-header">
-                    <h1>Report an Issue</h1>
-                    <p>You need to be logged in to report an issue.</p>
-                </div>
-                <div class="text-center">
-                    <p>Please login to access this feature and report issues in your village.</p>
-                    <button id="login-redirect" class="btn btn-primary mt-4">Login Now</button>
-                </div>
-            </div>
-            
-            <div id="issue-reporting" style="display: none;">
-                <div class="section-header">
-                    <h1>Report an Issue</h1>
-                    <p>Help us improve our village by reporting issues you've observed</p>
+                    <h2>Report an Issue</h2>
+                    <p>Let us know about any issues or concerns in your village. Your report will be sent to the appropriate authorities for review and action.</p>
                 </div>
                 
-                <form id="issue-report-form" class="report-form">
-                    <div class="form-row">
-                        <label for="issue-title" class="form-label">Issue Title</label>
-                        <input type="text" id="issue-title" class="form-input" placeholder="Briefly describe the issue" required>
-                    </div>
-                    
-                    <div class="form-row">
-                        <label for="issue-category" class="form-label">Category</label>
-                        <select id="issue-category" class="form-select" required>
-                            <option value="">Select a category</option>
-                            <option value="infrastructure">Infrastructure</option>
-                            <option value="water">Water Supply</option>
-                            <option value="sanitation">Sanitation</option>
-                            <option value="electricity">Electricity</option>
-                            <option value="health">Health Services</option>
-                            <option value="education">Education</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-row">
-                        <label for="issue-location" class="form-label">Location</label>
-                        <input type="text" id="issue-location" class="form-input" placeholder="Where is this issue located?" required>
-                    </div>
-                    
-                    <div class="form-row">
-                        <label for="issue-description" class="form-label">Detailed Description</label>
-                        <textarea id="issue-description" class="form-textarea" rows="4" placeholder="Provide details about the issue" required></textarea>
-                    </div>
-                    
-                    <div class="form-row">
-                        <label class="form-label">Attachments (Optional)</label>
-                        <div class="file-upload">
-                            <input type="file" id="file-input" multiple style="display: none;">
-                            <div class="file-upload-icon">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                            </div>
-                            <div class="file-upload-text">
-                                Drag & drop files here or click to browse
+                <div class="report-form">
+                    <form id="report-issue-form">
+                        <div class="form-row">
+                            <label for="issue-title" class="form-label">Issue Title</label>
+                            <input type="text" id="issue-title" name="issue-title" class="form-input" required placeholder="Give your issue a clear title">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="issue-category" class="form-label">Issue Category</label>
+                            <select id="issue-category" name="issue-category" class="form-select" required>
+                                <option value="">-- Select Category --</option>
+                                <option value="road">Road & Transportation</option>
+                                <option value="water">Water Supply</option>
+                                <option value="electricity">Electricity</option>
+                                <option value="sanitation">Sanitation & Waste</option>
+                                <option value="health">Health Services</option>
+                                <option value="education">Education</option>
+                                <option value="agriculture">Agriculture</option>
+                                <option value="public-safety">Public Safety</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="issue-location" class="form-label">Location</label>
+                            <input type="text" id="issue-location" name="issue-location" class="form-input" required placeholder="Describe where the issue is located">
+                        </div>
+                        
+                        <div class="form-row">
+                            <label for="issue-description" class="form-label">Description</label>
+                            <textarea id="issue-description" name="issue-description" class="form-textarea" required rows="4" placeholder="Please provide details about the issue..."></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Upload Images (Optional)</label>
+                            <div class="file-upload">
+                                <div class="file-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="file-upload-text">
+                                    <p>Drag & drop files or click to browse</p>
+                                    <span>Upload up to 3 images (JPG, PNG)</span>
+                                </div>
+                                <input type="file" id="file-input" accept="image/*" multiple style="display:none">
                             </div>
                             <div class="file-preview"></div>
                         </div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Submit Issue</button>
-                    </div>
-                </form>
-                
-                <div id="my-issues" class="my-issues">
-                    <h2>My Reported Issues</h2>
-                    <div class="issue-list" id="user-issues-list">
-                        <!-- User issues will be listed here -->
-                    </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Submit Issue</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
     </main>
 
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-about">
-                    <h3>RuralConnect</h3>
-                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-links">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="report-issue.html">Report Issue</a></li>
-                        <li><a href="events.html">Events</a></li>
-                        <li><a href="budget.html">Budget</a></li>
-                        <li><a href="history.html">History</a></li>
-                        <li><a href="resources.html">Resources</a></li>
-                        <li><a href="gallery.html">Gallery</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-contact">
-                    <h3>Contact</h3>
-                    <ul>
-                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
-                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
-                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
-                    </ul>
-                </div>
-                
-                <div class="footer-language">
-                    <h3>Language</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">हिंदी</button>
-                        <button class="lang-btn">தமிழ்</button>
-                        <button class="lang-btn">తెలుగు</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
-            </div>
-        </div>
+        
     </footer>
 
-    <script src="/public/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const userType = localStorage.getItem('userType');
-            const loginStatusBtn = document.getElementById('login-status-btn');
-            const loginRequiredDiv = document.getElementById('login-required');
-            const issueReportingDiv = document.getElementById('issue-reporting');
-            const loginRedirectBtn = document.getElementById('login-redirect');
-            const userIssuesList = document.getElementById('user-issues-list');
-            
-            // Display appropriate content based on login status
-            if (isLoggedIn && userType === 'public') {
-                loginStatusBtn.textContent = 'Logout';
-                loginStatusBtn.classList.remove('login-btn');
-                loginStatusBtn.classList.add('logout-btn');
-                
-                loginRequiredDiv.style.display = 'none';
-                issueReportingDiv.style.display = 'block';
-                
-                // Load user's reported issues
-                displayUserIssues();
-            } else {
-                loginRequiredDiv.style.display = 'block';
-                issueReportingDiv.style.display = 'none';
-            }
-            
-            // Handle login/logout button click
-            if (loginStatusBtn) {
-                loginStatusBtn.addEventListener('click', () => {
-                    if (isLoggedIn) {
-                        // Logout logic
-                        localStorage.removeItem('isLoggedIn');
-                        localStorage.removeItem('userType');
-                        localStorage.removeItem('authorityRole');
-                        alert('You have been logged out.');
-                        window.location.reload();
-                    } else {
-                        // Login logic - redirect to login page
-                        sessionStorage.setItem('redirectFrom', window.location.href);
-                        window.location.href = 'login.html';
-                    }
-                });
-            }
-            
-            // Login redirect button
-            if (loginRedirectBtn) {
-                loginRedirectBtn.addEventListener('click', () => {
-                    sessionStorage.setItem('redirectFrom', window.location.href);
-                    window.location.href = 'login.html';
-                });
-            }
-            
-            // Handle issue form submission
-            const issueForm = document.getElementById('issue-report-form');
-            if (issueForm) {
-                issueForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    
-                    // Get form data
-                    const issueTitle = document.getElementById('issue-title').value;
-                    const issueCategory = document.getElementById('issue-category').value;
-                    const issueLocation = document.getElementById('issue-location').value;
-                    const issueDescription = document.getElementById('issue-description').value;
-                    const userPhone = localStorage.getItem('userPhone') || 'Anonymous';
-                    const userName = localStorage.getItem('userName') || 'User';
-                    
-                    // Create new issue object
-                    const issue = {
-                        id: `#${issueCategory.substring(0, 3).toUpperCase()}-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`,
-                        title: issueTitle,
-                        category: issueCategory,
-                        location: issueLocation,
-                        description: issueDescription,
-                        status: 'reported', // Initial status is always 'reported'
-                        reporter: {
-                            name: userName,
-                            phone: userPhone
-                        },
-                        timeline: [
-                            {
-                                status: 'reported',
-                                date: new Date().toISOString(),
-                                message: 'Issue reported successfully'
-                            }
-                        ],
-                        currentStep: 'ward-member', // Always sent to Ward Member first
-                        created: new Date().toISOString()
-                    };
-                    
-                    // Save to localStorage
-                    const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
-                    userIssues.push(issue);
-                    localStorage.setItem('userIssues', JSON.stringify(userIssues));
-                    
-                    // Also add to pending issues for authorities
-                    const pendingIssues = JSON.parse(localStorage.getItem('pendingIssues') || '[]');
-                    pendingIssues.push(issue);
-                    localStorage.setItem('pendingIssues', JSON.stringify(pendingIssues));
-                    
-                    notify('Your issue has been reported successfully!', 'success');
-                    issueForm.reset();
-                    
-                    // Clear file previews
-                    const filePreview = document.querySelector('.file-preview');
-                    if (filePreview) filePreview.innerHTML = '';
-                    
-                    // Update user issues display
-                    displayUserIssues();
-                });
-            }
-            
-            // Display user's reported issues
-            function displayUserIssues() {
-                if (!userIssuesList) return;
-                
-                const userIssues = JSON.parse(localStorage.getItem('userIssues') || '[]');
-                
-                if (userIssues.length === 0) {
-                    userIssuesList.innerHTML = '<p>You have not reported any issues yet.</p>';
-                    return;
-                }
-                
-                userIssuesList.innerHTML = '';
-                
-                userIssues.forEach(issue => {
-                    const issueStatusClass = getStatusClass(issue.status);
-                    const issueStatusText = getStatusText(issue.status);
-                    
-                    const issueCard = document.createElement('div');
-                    issueCard.className = 'issue-card';
-                    
-                    // Create issue timeline based on current status
-                    let timelineHTML = `
-                        <div class="issue-timeline">
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Issue Reported</h4>
-                                        <span>${formatDate(issue.created)}</span>
-                                    </div>
-                                    <p>You've reported an issue with ${issue.category} in ${issue.location}</p>
-                                </div>
-                            </div>
-                    `;
-                    
-                    if (issue.status === 'reported') {
-                        timelineHTML += `
-                            <div class="timeline-item active">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Ward Member Review</h4>
-                                        <span>Pending</span>
-                                    </div>
-                                    <p>Your issue is being reviewed by the Ward Member</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item pending">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-hourglass-half"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Wise Sarpanch Review</h4>
-                                        <span>Pending</span>
-                                    </div>
-                                    <p>Issue will be forwarded to Wise Sarpanch if approved</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item pending">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-hourglass-half"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Sarpanch Review</h4>
-                                        <span>Pending</span>
-                                    </div>
-                                    <p>Issue will be forwarded to Sarpanch for final resolution</p>
-                                </div>
-                            </div>
-                        `;
-                    } else if (issue.status === 'in-progress' && issue.currentStep === 'wise-sarpanch') {
-                        timelineHTML += `
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Ward Member Review</h4>
-                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Ward Member has approved your issue</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item active">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Wise Sarpanch Review</h4>
-                                        <span>In Progress</span>
-                                    </div>
-                                    <p>Your issue is being reviewed by the Wise Sarpanch</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item pending">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-hourglass-half"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Sarpanch Review</h4>
-                                        <span>Pending</span>
-                                    </div>
-                                    <p>Issue will be forwarded to Sarpanch for final resolution</p>
-                                </div>
-                            </div>
-                        `;
-                    } else if (issue.status === 'in-progress' && issue.currentStep === 'sarpanch') {
-                        timelineHTML += `
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Ward Member Review</h4>
-                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Ward Member has approved your issue</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Wise Sarpanch Review</h4>
-                                        <span>${issue.timeline[2] ? formatDate(issue.timeline[2].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Wise Sarpanch has approved your issue</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item active">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Sarpanch Review</h4>
-                                        <span>In Progress</span>
-                                    </div>
-                                    <p>Your issue is being reviewed by the Sarpanch for final resolution</p>
-                                </div>
-                            </div>
-                        `;
-                    } else if (issue.status === 'resolved') {
-                        timelineHTML += `
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Ward Member Review</h4>
-                                        <span>${issue.timeline[1] ? formatDate(issue.timeline[1].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Ward Member has approved your issue</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Wise Sarpanch Review</h4>
-                                        <span>${issue.timeline[2] ? formatDate(issue.timeline[2].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Wise Sarpanch has approved your issue</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item completed">
-                                <div class="timeline-icon">
-                                    <i class="fas fa-check"></i>
-                                </div>
-                                <div class="timeline-content">
-                                    <div class="timeline-header">
-                                        <h4>Resolved by Sarpanch</h4>
-                                        <span>${issue.timeline[3] ? formatDate(issue.timeline[3].date) : 'Completed'}</span>
-                                    </div>
-                                    <p>Your issue has been successfully resolved</p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
-                    timelineHTML += `</div>`;
-                    
-                    issueCard.innerHTML = `
-                        <div class="issue-header">
-                            <div>
-                                <h3>${issue.title}</h3>
-                                <p>Reference ID: ${issue.id}</p>
-                            </div>
-                            <div class="issue-status ${issueStatusClass}">${issueStatusText}</div>
-                        </div>
-                        <p class="issue-description">
-                            ${issue.description}
-                        </p>
-                        ${timelineHTML}
-                        <div class="issue-actions">
-                            <button class="btn btn-secondary view-details-btn" data-id="${issue.id}">View Details</button>
-                        </div>
-                    `;
-                    
-                    userIssuesList.appendChild(issueCard);
-                });
-                
-                // Add event listeners to view details buttons
-                document.querySelectorAll('.view-details-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const issueId = this.getAttribute('data-id');
-                        const issue = userIssues.find(i => i.id === issueId);
-                        
-                        if (issue) {
-                            alert(`Issue Details:\n\nTitle: ${issue.title}\nCategory: ${issue.category}\nLocation: ${issue.location}\nStatus: ${getStatusText(issue.status)}\nReported on: ${formatDate(issue.created)}`);
-                        }
-                    });
-                });
-            }
-            
-            // Helper functions
-            function getStatusClass(status) {
-                switch (status) {
-                    case 'reported': return 'reported';
-                    case 'in-progress': return 'in-progress';
-                    case 'resolved': return 'resolved';
-                    default: return 'reported';
-                }
-            }
-            
-            function getStatusText(status) {
-                switch (status) {
-                    case 'reported': return 'Reported';
-                    case 'in-progress': return 'In Progress';
-                    case 'resolved': return 'Resolved';
-                    default: return 'Reported';
-                }
-            }
-            
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-            }
-            
-            // Listen for storage events to update content in real-time
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'userIssues' || e.key === 'pendingIssues') {
-                    // Refresh user issues when they change
-                    displayUserIssues();
-                }
-            });
-        });
-    </script>
+    <script src="js/main.js"></script>
+    <script src="js/report-issue.js"></script>
 </body>
 </html>
