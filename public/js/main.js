@@ -1,3 +1,4 @@
+
 // Mobile menu toggle
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('navMenu');
@@ -211,44 +212,38 @@ function updateLoginStatusUI() {
       btn.textContent = 'Logout';
       btn.classList.remove('login-btn');
       btn.classList.add('logout-btn');
-
-      // Replace button node to remove all listeners
+      
+      // Remove any existing event listeners
       const newBtn = btn.cloneNode(true);
       if (btn.parentNode) {
         btn.parentNode.replaceChild(newBtn, btn);
-        // Add logout event
-        newBtn.addEventListener('click', () => {
-          localStorage.removeItem('isLoggedIn');
-          localStorage.removeItem('userType');
-          localStorage.removeItem('authorityRole');
-          window.notify('You have been logged out.', 'success');
-          window.location.reload();
-        });
       }
+      
+      newBtn.addEventListener('click', () => {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('authorityRole');
+        alert('You have been logged out.');
+        window.location.reload();
+      });
     } else {
       btn.textContent = 'Login';
       btn.classList.add('login-btn');
       btn.classList.remove('logout-btn');
-      // Replace button node to remove all listeners
+      
+      // Remove any existing event listeners
       const newBtn = btn.cloneNode(true);
       if (btn.parentNode) {
         btn.parentNode.replaceChild(newBtn, btn);
-        // Add login event
-        newBtn.addEventListener('click', () => {
-          sessionStorage.setItem('redirectFrom', window.location.href);
-          window.location.href = 'login.html';
-        });
       }
+      
+      newBtn.addEventListener('click', () => {
+        sessionStorage.setItem('redirectFrom', window.location.href);
+        window.location.href = 'login.html';
+      });
     }
   });
 }
-
-// Listen for localStorage changes, run on page load as well
-window.addEventListener('storage', function(e) {
-  if (e.key === 'isLoggedIn') {
-    updateLoginStatusUI();
-  }
-});
 
 // Function to update report issue link behavior based on login status
 function updateReportIssueLinkBehavior() {
