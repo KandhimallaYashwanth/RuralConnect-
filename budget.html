@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,7 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
-                <a href="login.html" class="btn login-btn">Login</a>
-                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
+                <a href="login.html" class="btn login-btn" id="login-status-btn">Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -74,8 +74,12 @@
                 <div class="budget-allocation">
                     <h3>Budget Allocation by Category</h3>
                     
-                    <div id="budget-cards-container" class="allocation-grid">
+                    <div id="budget-cards-container" class="budget-cards-grid">
                         <!-- Budget allocation cards will be dynamically loaded here -->
+                        <div class="loading-indicator">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <span>Loading budget data...</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -83,14 +87,14 @@
                     <h3>Budget Documents</h3>
                     
                     <div class="document-grid">
-                        <div class="document-item">
+                        <div class="document-card">
                             <div class="document-icon">
                                 <i class="fas fa-file-pdf"></i>
                             </div>
                             
                             <div class="document-info">
-                                <h4>Annual Budget Plan 2023-24</h4>
-                                <span class="document-meta">PDF • 2.4 MB • Uploaded on 15 Apr 2023</span>
+                                <h4>Annual Budget Plan 2025-26</h4>
+                                <span class="document-meta">PDF • 2.4 MB • Uploaded on 15 Apr 2025</span>
                                 
                                 <button class="btn-outline-accent btn-sm">
                                     <i class="fas fa-download"></i> Download
@@ -98,14 +102,14 @@
                             </div>
                         </div>
                         
-                        <div class="document-item">
+                        <div class="document-card">
                             <div class="document-icon">
                                 <i class="fas fa-file-excel"></i>
                             </div>
                             
                             <div class="document-info">
                                 <h4>Budget Expenditure Report Q1</h4>
-                                <span class="document-meta">Excel • 1.1 MB • Uploaded on 10 Jul 2023</span>
+                                <span class="document-meta">Excel • 1.1 MB • Uploaded on 10 Jul 2025</span>
                                 
                                 <button class="btn-outline-accent btn-sm">
                                     <i class="fas fa-download"></i> Download
@@ -113,14 +117,14 @@
                             </div>
                         </div>
                         
-                        <div class="document-item">
+                        <div class="document-card">
                             <div class="document-icon">
                                 <i class="fas fa-file-pdf"></i>
                             </div>
                             
                             <div class="document-info">
                                 <h4>Previous Year Financial Summary</h4>
-                                <span class="document-meta">PDF • 3.2 MB • Uploaded on 20 Mar 2023</span>
+                                <span class="document-meta">PDF • 3.2 MB • Uploaded on 20 Mar 2025</span>
                                 
                                 <button class="btn-outline-accent btn-sm">
                                     <i class="fas fa-download"></i> Download
@@ -133,7 +137,7 @@
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer compact-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
@@ -155,6 +159,7 @@
                         <li><a href="budget.html">Budget</a></li>
                         <li><a href="history.html">History</a></li>
                         <li><a href="resources.html">Resources</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
                     </ul>
                 </div>
                 
@@ -165,16 +170,6 @@
                         <li><i class="fas fa-phone"></i> +91 9876543210</li>
                         <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
                     </ul>
-                </div>
-                
-                <div class="footer-language">
-                    <h3>Language</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">हिंदी</button>
-                        <button class="lang-btn">தமிழ்</button>
-                        <button class="lang-btn">తెలుగు</button>
-                    </div>
                 </div>
             </div>
             

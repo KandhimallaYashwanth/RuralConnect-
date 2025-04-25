@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,7 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
-                <a href="login.html" class="btn login-btn">Login</a>
-                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
+                <a href="login.html" class="btn login-btn" id="login-status-btn">Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -43,7 +43,19 @@
                     <p>Let us know about any issues or concerns in your village. Your report will be sent to the appropriate authorities for review and action.</p>
                 </div>
                 
-                <div class="report-form">
+                <!-- Login Required Message - will be shown if not logged in -->
+                <div class="login-required-message" id="loginRequiredMessage" style="display:none;">
+                    <div class="login-message-card">
+                        <i class="fas fa-user-lock message-icon"></i>
+                        <h3>Please log in to report an issue</h3>
+                        <p>You need to be logged in to submit new issue reports.</p>
+                        <a href="login.html" class="btn-primary">Login</a>
+                        <p class="register-link">Don't have an account? <a href="register.html">Register here</a></p>
+                    </div>
+                </div>
+                
+                <!-- Report Form - will be hidden if not logged in -->
+                <div class="report-form" id="reportFormContainer" style="display:none;">
                     <form id="report-issue-form">
                         <div class="form-row">
                             <label for="issue-title" class="form-label">Issue Title</label>
@@ -96,12 +108,73 @@
                         </div>
                     </form>
                 </div>
+
+                <!-- Previous Issues Section -->
+                <div class="previous-issues-section" id="previousIssuesSection">
+                    <h3>Previously Reported Issues</h3>
+                    <div class="issue-cards" id="issueCards">
+                        <!-- Issues will be added dynamically here -->
+                    </div>
+                </div>
             </div>
         </section>
+
+        <!-- Issue Tracking Modal -->
+        <div id="issueTrackingModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalIssueTitle">Issue Tracking</h3>
+                    <span class="modal-close">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="issue-timeline" id="issueTimeline">
+                        <!-- Timeline items will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <footer class="footer">
-        
+    <footer class="footer compact-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-about">
+                    <h3>RuralConnect</h3>
+                    <p>Connecting rural communities with digital tools for better governance, transparency, and citizen participation.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="report-issue.html">Report Issue</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="budget.html">Budget</a></li>
+                        <li><a href="history.html">History</a></li>
+                        <li><a href="resources.html">Resources</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-contact">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Panchayat Office, Village Area, District, State - Pincode</li>
+                        <li><i class="fas fa-phone"></i> +91 9876543210</li>
+                        <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2025 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+            </div>
+        </div>
     </footer>
 
     <script src="js/main.js"></script>

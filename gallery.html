@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,7 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link active"><i class="fas fa-images"></i> Gallery</a>
-                <a href="login.html" class="btn login-btn">Login</a>
-                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
+                <a href="login.html" class="btn login-btn" id="login-status-btn">Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -43,14 +43,135 @@
                     <p>Explore the beauty and traditions of rural India through our collection of images showcasing village life, agriculture, festivals, and landscapes.</p>
                 </div>
                 
+                <!-- Gallery Filter -->
+                <div class="gallery-filter" id="galleryFilter">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="nature">Nature</button>
+                    <button class="filter-btn" data-filter="culture">Culture</button>
+                    <button class="filter-btn" data-filter="development">Development</button>
+                    <button class="filter-btn" data-filter="agriculture">Agriculture</button>
+                </div>
+                
                 <div id="gallery-container" class="gallery-grid">
-                    <!-- Gallery images will be dynamically loaded here -->
+                    <!-- Default gallery items -->
+                    <div class="gallery-item" data-category="nature">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1472396961693-142e6e269027" alt="Village Deer">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Village Deer</h4>
+                                    <p>Quiet Forest Morning</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Village Deer</h4>
+                            <p>Peaceful deer captured in the morning mist of our village woods.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-item" data-category="culture">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1466721591366-2d5fba72006d" alt="Village Camels">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Village Camels</h4>
+                                    <p>Harvest Fair</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Village Camels</h4>
+                            <p>A vibrant moment from last season's village harvest festival.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-item" data-category="culture">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1500673922987-e212871fec22" alt="Villagers and Fields">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Villagers and Fields</h4>
+                                    <p>Village Togetherness</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Villagers and Fields</h4>
+                            <p>Residents celebrating unity and tradition in the heart of the fields.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-item" data-category="development">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716" alt="Development Project">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Development Project</h4>
+                                    <p>Community Progress</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Development Project</h4>
+                            <p>New projects shaping a brighter future for the next generation.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-item" data-category="agriculture">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1527576539890-dfa815648363" alt="Sheep Fields">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Sheep Fields</h4>
+                                    <p>Evening Flock</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Sheep Fields</h4>
+                            <p>Sheep roaming the lush green pastures at sunset.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-item" data-category="agriculture">
+                        <div class="gallery-image">
+                            <img src="https://images.unsplash.com/photo-1721322800607-8c38375eef04" alt="Cattle Gathering">
+                            <div class="gallery-overlay">
+                                <div class="gallery-info">
+                                    <h4>Cattle Gathering</h4>
+                                    <p>Nature's Rhythm</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="gallery-caption">
+                            <h4>Cattle Gathering</h4>
+                            <p>Cattle return home as the village settles into dusk.</p>
+                        </div>
+                    </div>
+                    <!-- Additional gallery items will be loaded dynamically -->
+                </div>
+                
+                <!-- Lightbox Modal -->
+                <div id="gallery-lightbox" class="lightbox">
+                    <div class="lightbox-content">
+                        <span class="lightbox-close">&times;</span>
+                        <img id="lightbox-image" src="" alt="Lightbox Image">
+                        <div class="lightbox-caption">
+                            <h4 id="lightbox-title"></h4>
+                            <p id="lightbox-description"></p>
+                        </div>
+                        <div class="lightbox-navigation">
+                            <button class="lightbox-nav-btn prev"><i class="fas fa-chevron-left"></i></button>
+                            <button class="lightbox-nav-btn next"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer compact-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
@@ -84,20 +205,10 @@
                         <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
                     </ul>
                 </div>
-                
-                <div class="footer-language">
-                    <h3>Language</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">हिंदी</button>
-                        <button class="lang-btn">தமிழ்</button>
-                        <button class="lang-btn">తెలుగు</button>
-                    </div>
-                </div>
             </div>
             
             <div class="footer-bottom">
-                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+                <p>© 2025 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
             </div>
         </div>
     </footer>

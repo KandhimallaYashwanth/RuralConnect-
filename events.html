@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,8 +25,7 @@
                 <a href="history.html" class="nav-link"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
-                <a href="login.html" class="btn login-btn">Login</a>
-                <a href="authority-login.html" class="btn btn-outline-accent" style="margin-left: 10px;">Authority Login</a>
+                <a href="login.html" class="btn login-btn" id="login-status-btn">Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -39,18 +39,42 @@
         <section class="events-section">
             <div class="container">
                 <div class="section-header">
-                    <h2>Upcoming Village Events</h2>
+                    <h2>Village Events</h2>
                     <p>Stay informed about important community gatherings, government programs, and local festivals.</p>
                 </div>
                 
-                <div id="events-container" class="events-grid">
-                    <!-- Events will be dynamically loaded here -->
+                <!-- Upcoming Events Section -->
+                <div class="events-category">
+                    <div class="category-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Upcoming Events</h3>
+                    </div>
+                    <div id="upcoming-events-container" class="events-timeline">
+                        <div class="loading-indicator">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <span>Loading upcoming events...</span>
+                        </div>
+                        <!-- Upcoming events will be dynamically loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Past Events Section -->
+                <div class="events-category past-events">
+                    <div class="category-header">
+                        <h3><i class="fas fa-history"></i> Past Events</h3>
+                    </div>
+                    <div id="past-events-container" class="events-grid">
+                        <div class="loading-indicator">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                            <span>Loading past events...</span>
+                        </div>
+                        <!-- Past events will be dynamically loaded here -->
+                    </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer compact-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
@@ -72,6 +96,7 @@
                         <li><a href="budget.html">Budget</a></li>
                         <li><a href="history.html">History</a></li>
                         <li><a href="resources.html">Resources</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
                     </ul>
                 </div>
                 
@@ -82,16 +107,6 @@
                         <li><i class="fas fa-phone"></i> +91 9876543210</li>
                         <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
                     </ul>
-                </div>
-                
-                <div class="footer-language">
-                    <h3>Language</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">हिंदी</button>
-                        <button class="lang-btn">தமிழ்</button>
-                        <button class="lang-btn">తెలుగు</button>
-                    </div>
                 </div>
             </div>
             

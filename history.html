@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>History - RuralConnect</title>
     <meta name="description" content="Village history records - RuralConnect" />
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -25,9 +26,7 @@
                 <a href="history.html" class="nav-link active"><i class="fas fa-book"></i> History</a>
                 <a href="resources.html" class="nav-link"><i class="fas fa-folder-open"></i> Resources</a>
                 <a href="gallery.html" class="nav-link"><i class="fas fa-images"></i> Gallery</a>
-                <div class="auth-buttons">
-                    <button id="login-status-btn" class="login-btn">Login</button>
-                </div>
+                <a href="login.html" class="btn login-btn" id="login-status-btn">Login</a>
             </div>
             <div class="hamburger" id="hamburger">
                 <span></span>
@@ -38,44 +37,70 @@
     </nav>
 
     <main>
-        <section class="container py-5">
-            <div class="section-header">
-                <h1>Village History</h1>
-                <p>Learn about the rich heritage and historical events of our village.</p>
-            </div>
+        <section class="history-section py-5">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Village History</h2>
+                    <p>Learn about the rich heritage and historical events of our village.</p>
+                </div>
 
-            <div class="resource-grid" id="history-grid">
-                <!-- Default history items -->
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-landmark"></i>
+                <div class="history-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-year">1950</div>
+                        <div class="timeline-content">
+                            <h3>Village Foundation</h3>
+                            <p>Our village was established in the post-independence era when several families from neighboring regions settled here.</p>
+                        </div>
                     </div>
-                    <div class="resource-details">
-                        <h3>Village Foundation</h3>
-                        <p>Learn about the founding of our village in 1865 and the key historical events that shaped our community.</p>
-                        <div class="resource-meta">
-                            <span>Historical Records</span>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">1975</div>
+                        <div class="timeline-content">
+                            <h3>First School Established</h3>
+                            <p>The primary school was built to provide education to village children, marking a significant milestone in our development.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">1985</div>
+                        <div class="timeline-content">
+                            <h3>Electrification</h3>
+                            <p>The village received electricity for the first time, transforming daily life and enabling progress.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2000</div>
+                        <div class="timeline-content">
+                            <h3>Water Supply Project</h3>
+                            <p>A major water supply project was completed, providing clean drinking water to all households.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-content">
+                            <h3>Digital Revolution</h3>
+                            <p>The village embraced technology with the establishment of a computer center and internet connectivity.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-year">2025</div>
+                        <div class="timeline-content">
+                            <h3>RuralConnect Launch</h3>
+                            <p>Our village adopted the RuralConnect platform to strengthen governance and improve community engagement.</p>
                         </div>
                     </div>
                 </div>
-                <div class="resource-card">
-                    <div class="resource-icon">
-                        <i class="fas fa-monument"></i>
-                    </div>
-                    <div class="resource-details">
-                        <h3>Freedom Fighters</h3>
-                        <p>Our village's contribution to India's freedom struggle and notable freedom fighters from our community.</p>
-                        <div class="resource-meta">
-                            <span>Historical Records</span>
-                        </div>
-                    </div>
-                </div>
+                
                 <!-- Dynamic history items will be added here -->
+                <div id="dynamic-history-items" class="history-timeline"></div>
             </div>
         </section>
     </main>
 
-    <footer class="footer">
+    <footer class="footer compact-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
@@ -109,101 +134,15 @@
                         <li><i class="fas fa-envelope"></i> contact@ruralconnect.gov.in</li>
                     </ul>
                 </div>
-                
-                <div class="footer-language">
-                    <h3>Language</h3>
-                    <div class="language-buttons">
-                        <button class="lang-btn active">English</button>
-                        <button class="lang-btn">हिंदी</button>
-                        <button class="lang-btn">தமிழ்</button>
-                        <button class="lang-btn">తెలుగు</button>
-                    </div>
-                </div>
             </div>
             
             <div class="footer-bottom">
-                <p>© 2023 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
+                <p>© 2025 RuralConnect. All rights reserved. | Developed for Digital India Initiative</p>
             </div>
         </div>
     </footer>
 
-    <script src="/public/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if user is logged in
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const loginStatusBtn = document.getElementById('login-status-btn');
-            
-            // Update login button text based on login status
-            if (isLoggedIn) {
-                loginStatusBtn.textContent = 'Logout';
-                loginStatusBtn.classList.remove('login-btn');
-                loginStatusBtn.classList.add('logout-btn');
-                
-                loginStatusBtn.addEventListener('click', () => {
-                    localStorage.removeItem('isLoggedIn');
-                    localStorage.removeItem('userType');
-                    localStorage.removeItem('authorityRole');
-                    alert('You have been logged out.');
-                    window.location.reload();
-                });
-            } else {
-                loginStatusBtn.addEventListener('click', () => {
-                    sessionStorage.setItem('redirectFrom', window.location.href);
-                    window.location.href = 'login.html';
-                });
-            }
-            
-            // Load history items from localStorage
-            function loadHistoryItems() {
-                const historyGrid = document.getElementById('history-grid');
-                const historyItems = JSON.parse(localStorage.getItem('historyItems') || '[]');
-                
-                if (historyGrid && historyItems.length > 0) {
-                    historyItems.forEach(item => {
-                        const historyCard = document.createElement('div');
-                        historyCard.className = 'resource-card';
-                        historyCard.innerHTML = `
-                            <div class="resource-icon">
-                                <i class="fas fa-history"></i>
-                            </div>
-                            <div class="resource-details">
-                                <h3>${item.title}</h3>
-                                <p>${item.description}</p>
-                                <div class="resource-meta">
-                                    <span>${item.period}</span>
-                                </div>
-                            </div>
-                        `;
-                        historyGrid.appendChild(historyCard);
-                    });
-                }
-            }
-            
-            // Load history items when page loads
-            loadHistoryItems();
-            
-            // Listen for storage events to update content in real-time
-            window.addEventListener('storage', function(e) {
-                if (e.key === 'historyItems') {
-                    // Refresh history items when they change
-                    const historyGrid = document.getElementById('history-grid');
-                    const existingItems = historyGrid.querySelectorAll('.resource-card');
-                    
-                    // Keep only the first two default items
-                    if (existingItems.length > 2) {
-                        for (let i = 2; i < existingItems.length; i++) {
-                            historyGrid.removeChild(existingItems[i]);
-                        }
-                    }
-                    
-                    loadHistoryItems();
-                }
-            });
-            
-            // Update report issue link behavior
-            updateReportIssueLinkBehavior();
-        });
-    </script>
+    <script src="js/main.js"></script>
+    <script src="js/history.js"></script>
 </body>
 </html>

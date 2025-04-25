@@ -76,4 +76,34 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Create a notification function if it doesn't exist yet
+  if (typeof window.notify !== 'function') {
+    window.notify = function(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      const closeBtn = document.createElement('span');
+      closeBtn.className = 'notification-close';
+      closeBtn.innerHTML = '&times;';
+      closeBtn.addEventListener('click', () => {
+        notification.classList.add('fadeOut');
+        setTimeout(() => notification.remove(), 500);
+      });
+      
+      notification.appendChild(closeBtn);
+      document.body.appendChild(notification);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (document.body.contains(notification)) {
+          notification.classList.add('fadeOut');
+          setTimeout(() => notification.remove(), 500);
+        }
+      }, 5000);
+      
+      return notification;
+    };
+  }
 });

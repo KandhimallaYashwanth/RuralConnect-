@@ -9,7 +9,177 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      authorities: {
+        Row: {
+          email: string
+          id: string
+          password: string
+          role: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          password: string
+          role: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          password?: string
+          role?: string
+        }
+        Relationships: []
+      }
+      budgets: {
+        Row: {
+          allocation: number
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          projects: string[] | null
+          spent: number
+          title: string
+        }
+        Insert: {
+          allocation: number
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          projects?: string[] | null
+          spent?: number
+          title: string
+        }
+        Update: {
+          allocation?: number
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          projects?: string[] | null
+          spent?: number
+          title?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          event_date: string
+          event_time: string | null
+          id: string
+          location: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          id?: string
+          location?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          id?: string
+          location?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      gallery: {
+        Row: {
+          category: string | null
+          description: string | null
+          id: string
+          image_url: string
+          title: string
+          uploaded_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          image_url: string
+          title: string
+          uploaded_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string
+          title?: string
+          uploaded_at?: string | null
+        }
+        Relationships: []
+      }
+      issues: {
+        Row: {
+          category: string
+          description: string
+          id: string
+          location: string | null
+          reported_at: string | null
+          reported_by: string | null
+          status: string
+          timeline: Json | null
+          title: string
+        }
+        Insert: {
+          category: string
+          description: string
+          id?: string
+          location?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          status?: string
+          timeline?: Json | null
+          title: string
+        }
+        Update: {
+          category?: string
+          description?: string
+          id?: string
+          location?: string | null
+          reported_at?: string | null
+          reported_by?: string | null
+          status?: string
+          timeline?: Json | null
+          title?: string
+        }
+        Relationships: []
+      }
+      public_users: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          password_hash: string
+          phone_number: string
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id?: string
+          password_hash: string
+          phone_number: string
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          password_hash?: string
+          phone_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
