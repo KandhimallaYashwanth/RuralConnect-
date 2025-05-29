@@ -1,6 +1,7 @@
 
 # RuralConnect - Village Administration Platform
 
+
 A comprehensive platform designed to bridge the gap between rural communities and authorities, empowering villages with digital tools for better governance and communication.
 
 ## Features
