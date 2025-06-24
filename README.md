@@ -61,21 +61,6 @@ The project uses browser localStorage for data persistence:
 3. Update content (budget, events, resources, gallery)
 4. Manage profile settings
 
-## Setup and Installation
 
-1. Clone the repository
-2. Open index.html in a web browser
 
-No build process or server is required as this is a client-side only application.
-
-## Demo Accounts
-
-**Public User**:
-- Phone: Any phone number
-- Password: any password (for demo purposes)
-
-**Authority**:
-- Sarpanch: Email: sarpanch@gmail.com, Password: sarpanch
-- Wise Sarpanch: Email: wisesarpanch@gmail.com, Password: wisesarpanch
-- Ward Member: Email: wardmember@gmail.com, Password: wardmember
 
